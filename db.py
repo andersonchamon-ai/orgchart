@@ -1,0 +1,272 @@
+#!/usr/bin/env python3
+"""SQLite database layer for orgchart."""
+import sqlite3, json, os, shutil
+from datetime import datetime
+
+DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'orgchart.db')
+BACKUP_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'backups')
+
+def get_db():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA journal_mode=WAL")       # safe concurrent reads
+    conn.execute("PRAGMA foreign_keys=ON")
+    conn.execute("PRAGMA busy_timeout=5000")
+    return conn
+
+def init_db():
+    """Create tables if they don't exist."""
+    conn = get_db()
+    conn.executescript("""
+        CREATE TABLE IF NOT EXISTS companies (
+            id TEXT PRIMARY KEY,
+            name TEXT NOT NULL,
+            tag TEXT NOT NULL,
+            color TEXT NOT NULL,
+            sort_order INTEGER DEFAULT 0
+        );
+
+        CREATE TABLE IF NOT EXISTS people (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT DEFAULT '',
+            role TEXT NOT NULL,
+            company_id TEXT NOT NULL REFERENCES companies(id),
+            level INTEGER NOT NULL DEFAULT 2,
+            reports_to INTEGER REFERENCES people(id) ON DELETE SET NULL,
+            created_at TEXT DEFAULT (datetime('now')),
+            updated_at TEXT DEFAULT (datetime('now'))
+        );
+
+        CREATE TABLE IF NOT EXISTS responsibilities (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            person_id INTEGER NOT NULL REFERENCES people(id) ON DELETE CASCADE,
+            description TEXT NOT NULL,
+            created_at TEXT DEFAULT (datetime('now'))
+        );
+
+        CREATE TABLE IF NOT EXISTS unassigned_responsibilities (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            company_id TEXT NOT NULL REFERENCES companies(id),
+            description TEXT NOT NULL,
+            created_at TEXT DEFAULT (datetime('now'))
+        );
+
+        CREATE TABLE IF NOT EXISTS audit_log (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            action TEXT NOT NULL,
+            entity_type TEXT NOT NULL,
+            entity_id TEXT,
+            old_data TEXT,
+            new_data TEXT,
+            timestamp TEXT DEFAULT (datetime('now'))
+        );
+
+        CREATE TABLE IF NOT EXISTS snapshots (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            data TEXT NOT NULL,
+            reason TEXT DEFAULT 'auto',
+            created_at TEXT DEFAULT (datetime('now'))
+        );
+    """)
+    conn.commit()
+    conn.close()
+
+def seed_companies():
+    """Insert default companies if empty."""
+    conn = get_db()
+    count = conn.execute("SELECT COUNT(*) FROM companies").fetchone()[0]
+    if count == 0:
+        conn.executemany("INSERT INTO companies (id, name, tag, color, sort_order) VALUES (?,?,?,?,?)", [
+            ('lionx', 'LionX (Holding)', 'tag-holding', '#3b82f6', 0),
+            ('pws', 'PWS Cloud', 'tag-pws', '#22c55e', 1),
+            ('phiz', 'PhizChat', 'tag-phiz', '#818cf8', 2),
+            ('fabrica', 'Fábrica de Software', 'tag-fab', '#f59e0b', 3),
+        ])
+        conn.commit()
+    conn.close()
+
+def log_audit(conn, action, entity_type, entity_id, old_data=None, new_data=None):
+    conn.execute(
+        "INSERT INTO audit_log (action, entity_type, entity_id, old_data, new_data) VALUES (?,?,?,?,?)",
+        (action, entity_type, str(entity_id), json.dumps(old_data, ensure_ascii=False) if old_data else None,
+         json.dumps(new_data, ensure_ascii=False) if new_data else None)
+    )
+
+def take_snapshot(reason='auto'):
+    """Save a full snapshot of all data."""
+    conn = get_db()
+    data = export_all(conn)
+    conn.execute("INSERT INTO snapshots (data, reason) VALUES (?,?)",
+                 (json.dumps(data, ensure_ascii=False), reason))
+    # Keep last 100 snapshots
+    conn.execute("""
+        DELETE FROM snapshots WHERE id NOT IN (
+            SELECT id FROM snapshots ORDER BY created_at DESC LIMIT 100
+        )
+    """)
+    conn.commit()
+    conn.close()
+    return data
+
+def restore_snapshot(snapshot_id):
+    """Restore from a snapshot."""
+    conn = get_db()
+    row = conn.execute("SELECT data FROM snapshots WHERE id=?", (snapshot_id,)).fetchone()
+    if not row:
+        conn.close()
+        raise ValueError(f"Snapshot {snapshot_id} not found")
+    data = json.loads(row['data'])
+    import_all(data, conn, reason=f'restore from snapshot {snapshot_id}')
+    conn.close()
+    return data
+
+def list_snapshots():
+    conn = get_db()
+    rows = conn.execute(
+        "SELECT id, reason, created_at, LENGTH(data) as size FROM snapshots ORDER BY created_at DESC LIMIT 50"
+    ).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+def export_all(conn=None):
+    """Export full database as dict."""
+    close = False
+    if conn is None:
+        conn = get_db()
+        close = True
+    
+    people = []
+    for row in conn.execute("SELECT * FROM people ORDER BY level, name"):
+        resps = [r['description'] for r in conn.execute(
+            "SELECT description FROM responsibilities WHERE person_id=? ORDER BY id", (row['id'],)
+        )]
+        people.append({
+            'id': row['id'], 'name': row['name'], 'role': row['role'],
+            'company': row['company_id'], 'level': row['level'],
+            'reportsTo': row['reports_to'], 'responsibilities': resps
+        })
+    
+    unassigned = {}
+    for comp in conn.execute("SELECT id FROM companies"):
+        cid = comp['id']
+        items = [r['description'] for r in conn.execute(
+            "SELECT description FROM unassigned_responsibilities WHERE company_id=? ORDER BY id", (cid,)
+        )]
+        unassigned[cid] = items
+
+    if close:
+        conn.close()
+    return {'people': people, 'unassigned': unassigned}
+
+def import_all(data, conn=None, reason='import'):
+    """Import full dataset, replacing everything. Logs audit."""
+    close = False
+    if conn is None:
+        conn = get_db()
+        close = True
+
+    # Snapshot before destructive import
+    old_data = export_all(conn)
+    log_audit(conn, 'full_import', 'database', None, old_data, data)
+
+    conn.execute("DELETE FROM responsibilities")
+    conn.execute("DELETE FROM unassigned_responsibilities")
+    conn.execute("DELETE FROM people")
+
+    for p in data.get('people', []):
+        conn.execute(
+            "INSERT INTO people (id, name, role, company_id, level, reports_to) VALUES (?,?,?,?,?,?)",
+            (p['id'], p.get('name',''), p['role'], p['company'], p['level'], p.get('reportsTo'))
+        )
+        for r in p.get('responsibilities', []):
+            conn.execute("INSERT INTO responsibilities (person_id, description) VALUES (?,?)", (p['id'], r))
+
+    for company_id, items in data.get('unassigned', {}).items():
+        for desc in items:
+            conn.execute("INSERT INTO unassigned_responsibilities (company_id, description) VALUES (?,?)",
+                        (company_id, desc))
+
+    conn.commit()
+    if close:
+        conn.close()
+
+# --- CRUD operations ---
+
+def get_person(person_id):
+    conn = get_db()
+    row = conn.execute("SELECT * FROM people WHERE id=?", (person_id,)).fetchone()
+    if not row:
+        conn.close()
+        return None
+    resps = [r['description'] for r in conn.execute(
+        "SELECT description FROM responsibilities WHERE person_id=? ORDER BY id", (row['id'],)
+    )]
+    conn.close()
+    return {**dict(row), 'responsibilities': resps}
+
+def upsert_person(person_data):
+    conn = get_db()
+    pid = person_data.get('id')
+    
+    if pid:
+        old = conn.execute("SELECT * FROM people WHERE id=?", (pid,)).fetchone()
+        if old:
+            log_audit(conn, 'update', 'person', pid, dict(old), person_data)
+            conn.execute("""
+                UPDATE people SET name=?, role=?, company_id=?, level=?, reports_to=?, updated_at=datetime('now')
+                WHERE id=?
+            """, (person_data.get('name',''), person_data['role'], person_data['company'],
+                  person_data['level'], person_data.get('reportsTo'), pid))
+            # Replace responsibilities
+            conn.execute("DELETE FROM responsibilities WHERE person_id=?", (pid,))
+            for r in person_data.get('responsibilities', []):
+                conn.execute("INSERT INTO responsibilities (person_id, description) VALUES (?,?)", (pid, r))
+            conn.commit()
+            conn.close()
+            return pid
+    
+    # Insert new
+    log_audit(conn, 'create', 'person', None, None, person_data)
+    cursor = conn.execute(
+        "INSERT INTO people (name, role, company_id, level, reports_to) VALUES (?,?,?,?,?)",
+        (person_data.get('name',''), person_data['role'], person_data['company'],
+         person_data['level'], person_data.get('reportsTo'))
+    )
+    pid = cursor.lastrowid
+    for r in person_data.get('responsibilities', []):
+        conn.execute("INSERT INTO responsibilities (person_id, description) VALUES (?,?)", (pid, r))
+    conn.commit()
+    conn.close()
+    return pid
+
+def delete_person(person_id):
+    conn = get_db()
+    old = conn.execute("SELECT * FROM people WHERE id=?", (person_id,)).fetchone()
+    if old:
+        log_audit(conn, 'delete', 'person', person_id, dict(old), None)
+        # Reassign reports
+        conn.execute("UPDATE people SET reports_to=NULL WHERE reports_to=?", (person_id,))
+        conn.execute("DELETE FROM people WHERE id=?", (person_id,))
+        conn.commit()
+    conn.close()
+
+def backup_db():
+    """Physical backup of the SQLite file."""
+    os.makedirs(BACKUP_DIR, exist_ok=True)
+    ts = datetime.now().strftime('%Y%m%d_%H%M%S')
+    dest = os.path.join(BACKUP_DIR, f'orgchart_{ts}.db')
+    # Use SQLite backup API for safe copy
+    src = sqlite3.connect(DB_PATH)
+    dst = sqlite3.connect(dest)
+    src.backup(dst)
+    dst.close()
+    src.close()
+    # Keep last 50 backups
+    backups = sorted([f for f in os.listdir(BACKUP_DIR) if f.endswith('.db')])
+    while len(backups) > 50:
+        os.remove(os.path.join(BACKUP_DIR, backups.pop(0)))
+    return dest
+
+# Initialize on import
+init_db()
+seed_companies()

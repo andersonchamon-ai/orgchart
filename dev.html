@@ -460,37 +460,44 @@ function removeUnassigned(c,i){if(confirm('Remover?')){unassigned[c].splice(i,1)
 
 // --- Export/Import ---
 function syncToServer(){
-  // Download current data as JSON for Bob to commit to repo
-  const payload = JSON.stringify({people:data, unassigned, _syncedAt:new Date().toISOString()}, null, 2);
-  const blob = new Blob([payload], {type:'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'data.json';
-  a.click();
-  alert('Arquivo data.json baixado!\\n\\nEnvie este arquivo para o Bob no Telegram para ele atualizar o backup no servidor.');
+  const payload = JSON.stringify({people:data, unassigned});
+  fetch(API_URL + '/api/save', {
+    method:'POST', headers:{'Content-Type':'application/json'}, body:payload
+  }).then(r => r.json()).then(res => {
+    if(res.ok) { updateSyncStatus('✅ Salvo no banco'); alert('Dados salvos no banco de dados com snapshot de segurança!'); }
+    else { updateSyncStatus('⚠️ Erro'); alert('Erro: ' + (res.error||'desconhecido')); }
+  }).catch(() => { updateSyncStatus('☁️ Servidor offline'); alert('Servidor offline. Verifique se o Mac mini está ligado.'); });
 }
 
-function showBackups(){
-  const backups = JSON.parse(localStorage.getItem('orgchart-backups')||'[]');
-  if(backups.length===0){alert('Nenhum backup disponível.');return;}
-  const options = backups.map((b,i)=>{
-    const d = new Date(b.ts);
-    const parsed = JSON.parse(b.data);
-    const count = (parsed.people||[]).length;
-    return `${i+1}. ${d.toLocaleDateString('pt-BR')} ${d.toLocaleTimeString('pt-BR')} (${count} posições)`;
-  }).join('\n');
-  const choice = prompt(`Backups disponíveis (mais recente = último):\n\n${options}\n\nDigite o número para restaurar (ou cancele):`);
-  if(!choice) return;
-  const idx = parseInt(choice)-1;
-  if(idx<0||idx>=backups.length){alert('Número inválido');return;}
-  if(!confirm('Restaurar este backup? Os dados atuais serão substituídos.')) return;
-  const parsed = JSON.parse(backups[idx].data);
-  if(Array.isArray(parsed)){data=parsed;}else{data=parsed.people||parsed;unassigned=parsed.unassigned||{lionx:[],pws:[],phiz:[],fabrica:[]};}
-  nextId=Math.max(...data.map(d=>d.id))+1;
-  data.forEach(d=>{if(!d.responsibilities)d.responsibilities=[];});
-  localStorage.setItem('orgchart-dev',backups[idx].data);
-  render();
-  alert('Backup restaurado!');
+async function showBackups(){
+  try {
+    const resp = await fetch(API_URL + '/api/snapshots');
+    const snapshots = await resp.json();
+    if(snapshots.length===0){alert('Nenhum snapshot disponível.');return;}
+    const options = snapshots.slice(0,20).map((s,i)=>
+      `${i+1}. [${s.reason}] ${s.created_at} (${Math.round(s.size/1024)}KB)`
+    ).join('\n');
+    const choice = prompt(`Snapshots no banco (${snapshots.length} total):\n\n${options}\n\nDigite o número para restaurar (ou cancele):`);
+    if(!choice) return;
+    const idx = parseInt(choice)-1;
+    if(idx<0||idx>=Math.min(20,snapshots.length)){alert('Número inválido');return;}
+    if(!confirm('Restaurar este snapshot? Um backup de segurança será criado automaticamente antes.')) return;
+    const restoreResp = await fetch(API_URL + '/api/restore', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({snapshot_id: snapshots[idx].id})
+    });
+    const result = await restoreResp.json();
+    if(result.ok){
+      data = result.data.people || [];
+      unassigned = result.data.unassigned || {lionx:[],pws:[],phiz:[],fabrica:[]};
+      nextId = Math.max(...data.map(d=>d.id))+1;
+      data.forEach(d=>{if(!d.responsibilities)d.responsibilities=[];});
+      render();
+      alert('Snapshot restaurado com sucesso!');
+    } else { alert('Erro: ' + result.error); }
+  } catch(e) {
+    alert('Servidor offline. Não é possível acessar backups.');
+  }
 }
 
 function exportJSON(){const b=new Blob([JSON.stringify({people:data,unassigned},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='lionx-organograma.json';a.click();}
@@ -511,15 +518,15 @@ function saveLocal(){
       while(backups.length > 10) backups.shift();
       localStorage.setItem('orgchart-backups', JSON.stringify(backups));
     }
-    // Auto-sync to server (at most every 30 seconds)
-    if (now - lastServerSync > 30*1000) {
+    // Auto-sync to SQLite (at most every 10 seconds)
+    if (now - lastServerSync > 10*1000) {
       lastServerSync = now;
       fetch(API_URL + '/api/save', {
         method:'POST', headers:{'Content-Type':'application/json'}, body:payload
       }).then(r => {
-        if(r.ok) updateSyncStatus('✅ Sincronizado');
-        else updateSyncStatus('⚠️ Erro no sync');
-      }).catch(() => updateSyncStatus('☁️ Servidor offline'));
+        if(r.ok) updateSyncStatus('✅ Salvo');
+        else updateSyncStatus('⚠️ Erro');
+      }).catch(() => updateSyncStatus('⚠️ Offline'));
     }
   }catch(e){}
 }
@@ -536,37 +543,26 @@ function loadLocal(){try{const s=localStorage.getItem('orgchart-dev');if(s){cons
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeUaModal();}});
 window.addEventListener('resize', () => drawAllLines());
 async function init() {
-  loadLocal();
-  const hasLocalData = localStorage.getItem('orgchart-dev');
-  if (!hasLocalData) {
-    // Try server first, then GitHub data.json
-    let loaded = false;
-    try {
-      const resp = await fetch(API_URL + '/data.json?t=' + Date.now());
-      if (resp.ok) {
-        const parsed = await resp.json();
-        data = parsed.people || [];
-        unassigned = parsed.unassigned || {lionx:[],pws:[],phiz:[],fabrica:[]};
-        nextId = Math.max(...data.map(d=>d.id)) + 1;
-        data.forEach(d => { if (!d.responsibilities) d.responsibilities = []; });
-        loaded = true;
-        console.log('📦 Dados carregados do servidor local');
-        updateSyncStatus('✅ Dados do servidor');
-      }
-    } catch(e) {}
-    if (!loaded) {
-      try {
-        const resp = await fetch('data.json?t=' + Date.now());
-        if (resp.ok) {
-          const parsed = await resp.json();
-          data = parsed.people || [];
-          unassigned = parsed.unassigned || {lionx:[],pws:[],phiz:[],fabrica:[]};
-          nextId = Math.max(...data.map(d=>d.id)) + 1;
-          data.forEach(d => { if (!d.responsibilities) d.responsibilities = []; });
-          console.log('📦 Dados carregados do data.json (GitHub fallback)');
-        }
-      } catch(e) { console.log('Usando dados padrão hardcoded'); }
+  // Priority: 1) SQLite via API  2) localStorage  3) hardcoded
+  let loaded = false;
+  try {
+    const resp = await fetch(API_URL + '/api/data?t=' + Date.now());
+    if (resp.ok) {
+      const parsed = await resp.json();
+      data = parsed.people || [];
+      unassigned = parsed.unassigned || {lionx:[],pws:[],phiz:[],fabrica:[]};
+      nextId = Math.max(...data.map(d=>d.id)) + 1;
+      data.forEach(d => { if (!d.responsibilities) d.responsibilities = []; });
+      loaded = true;
+      console.log('📀 Dados carregados do banco SQLite');
+      updateSyncStatus('✅ Banco conectado');
     }
+  } catch(e) {
+    console.log('Servidor offline, tentando localStorage...');
+  }
+  if (!loaded) {
+    loadLocal();
+    updateSyncStatus('⚠️ Modo offline');
   }
   render();
 }
