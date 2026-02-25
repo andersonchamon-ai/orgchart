@@ -31,9 +31,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .card .card-name{font-size:14px;font-weight:600;margin-bottom:2px}
 .card .card-role{font-size:12px;color:var(--text-muted)}
 .card .card-level{position:absolute;top:8px;right:10px;font-size:10px;color:var(--text-muted);opacity:0.5}
-.card .card-resp{margin-top:8px;padding-top:6px;border-top:1px solid var(--border)}
-.card .card-resp-item{font-size:11px;color:var(--text-muted);padding:2px 0;display:flex;align-items:center;gap:4px}
-.card .card-resp-item::before{content:'•';color:var(--accent);font-size:8px}
+.card .card-resp-count{margin-top:6px;font-size:11px;color:var(--text-muted);opacity:0.6}
 .card .remove-btn{position:absolute;top:6px;right:6px;background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;opacity:0;transition:opacity 0.2s;padding:2px 6px}
 .card:hover .remove-btn{opacity:0.7}
 .card .remove-btn:hover{opacity:1}
@@ -216,7 +214,7 @@ function render() {
           <div class="card-name">${vacant ? '⚠️ VAGA ABERTA' : item.name}</div>
           <div class="card-role">${item.role}</div>
           ${reportsToName ? `<div class="card-level">→ ${reportsToName}</div>` : ''}
-          ${resps.length > 0 ? `<div class="card-resp">${resps.map(r => `<div class="card-resp-item">${r}</div>`).join('')}</div>` : ''}
+          ${resps.length > 0 ? `<div class="card-resp-count">${resps.length} responsabilidade${resps.length>1?'s':''}</div>` : ''}
           <button class="remove-btn" onclick="event.stopPropagation();removeCard(${item.id})">✕</button>
         </div>`;
       }
