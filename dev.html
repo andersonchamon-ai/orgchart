@@ -25,7 +25,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 
 /* Tree container */
 .tree-wrap{position:relative;overflow-x:auto;padding:20px 0;-webkit-overflow-scrolling:touch}
-.tree-wrap > .tree-level{display:inline-flex;min-width:100%}
+.tree-wrap > .tree-level{display:inline-flex;min-width:100%;justify-content:center}
 .tree-wrap svg{position:absolute;top:0;left:0;pointer-events:none}
 .tree-level{display:flex;justify-content:center;gap:24px;margin-top:40px;position:relative}
 .tree-level-group{display:flex;flex-direction:column;align-items:center;flex-shrink:0}
@@ -67,6 +67,31 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .dot-vacant{background:var(--red);border:1px dashed var(--red)}
 
 /* Modal */
+/* Responsive */
+@media(max-width:768px){
+  .node-card{width:130px;padding:10px 12px}
+  .node-name{font-size:12px}
+  .node-role{font-size:10px}
+  .tree-level{gap:12px;margin-top:32px}
+  .holding-row{gap:8px}
+  .company-header h2{font-size:14px}
+  .tag{font-size:10px}
+  .toolbar h1{font-size:14px}
+  .toolbar{padding:8px 12px;gap:8px}
+  .toolbar button{padding:6px 10px;font-size:11px}
+  .container{padding:100px 12px 30px}
+  .toggle-btn{width:18px;height:18px;font-size:10px;line-height:18px}
+}
+@media(max-width:480px){
+  .node-card{width:110px;padding:8px 10px}
+  .node-name{font-size:11px}
+  .node-role{font-size:9px}
+  .tree-level{gap:8px;margin-top:24px}
+  .holding-row{gap:6px}
+  .toolbar .legend{display:none}
+  .toolbar .stats{font-size:11px}
+}
+
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:300;justify-content:center;align-items:center}
 .modal-overlay.active{display:flex}
 .modal{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;width:90%;max-width:450px;max-height:90vh;overflow-y:auto}
