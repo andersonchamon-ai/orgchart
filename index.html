@@ -3,7 +3,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>LionX — Organograma</title>
 <style>
-:root{--bg:#0f172a;--card:#1e293b;--card-vacant:#2d1b1b;--border:#334155;--border-vacant:#ef4444;--text:#e2e8f0;--text-muted:#94a3b8;--accent:#3b82f6;--accent2:#8b5cf6;--green:#22c55e;--red:#ef4444;--orange:#f59e0b}
+:root{--bg:#0f172a;--card:#1e293b;--card-vacant:#2d1b1b;--border:#334155;--border-vacant:#ef4444;--text:#e2e8f0;--text-muted:#94a3b8;--accent:#3b82f6;--accent2:#8b5cf6;--green:#22c55e;--red:#ef4444;--orange:#f59e0b;--yellow:#eab308}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif;overflow:auto}
 .toolbar{position:fixed;top:0;left:0;right:0;background:rgba(15,23,42,0.95);backdrop-filter:blur(10px);padding:12px 24px;display:flex;align-items:center;gap:16px;z-index:100;border-bottom:1px solid var(--border)}
@@ -31,23 +31,44 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .card .card-name{font-size:14px;font-weight:600;margin-bottom:2px}
 .card .card-role{font-size:12px;color:var(--text-muted)}
 .card .card-level{position:absolute;top:8px;right:10px;font-size:10px;color:var(--text-muted);opacity:0.5}
+.card .card-resp{margin-top:8px;padding-top:6px;border-top:1px solid var(--border)}
+.card .card-resp-item{font-size:11px;color:var(--text-muted);padding:2px 0;display:flex;align-items:center;gap:4px}
+.card .card-resp-item::before{content:'•';color:var(--accent);font-size:8px}
 .card .remove-btn{position:absolute;top:6px;right:6px;background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;opacity:0;transition:opacity 0.2s;padding:2px 6px}
 .card:hover .remove-btn{opacity:0.7}
 .card .remove-btn:hover{opacity:1}
 .add-btn{background:transparent;border:1px dashed var(--border);border-radius:8px;padding:12px 16px;min-width:120px;cursor:pointer;color:var(--text-muted);font-size:13px;transition:all 0.2s}
 .add-btn:hover{border-color:var(--accent);color:var(--accent)}
+/* Unassigned footer */
+.unassigned-section{margin-top:16px;padding:16px;background:rgba(234,179,8,0.05);border:1px dashed var(--orange);border-radius:10px}
+.unassigned-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.unassigned-header h3{font-size:13px;font-weight:600;color:var(--orange);text-transform:uppercase;letter-spacing:1px}
+.unassigned-header button{background:transparent;border:1px dashed var(--orange);color:var(--orange);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600}
+.unassigned-header button:hover{background:rgba(234,179,8,0.1)}
+.unassigned-list{display:flex;flex-wrap:wrap;gap:8px}
+.unassigned-item{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:12px;color:var(--text-muted);cursor:pointer;transition:all 0.2s;position:relative;display:flex;align-items:center;gap:8px}
+.unassigned-item:hover{border-color:var(--orange);color:var(--text)}
+.unassigned-item .remove-ua{background:none;border:none;color:var(--red);cursor:pointer;font-size:12px;opacity:0;transition:opacity 0.2s;padding:0 2px}
+.unassigned-item:hover .remove-ua{opacity:0.7}
+.unassigned-item .remove-ua:hover{opacity:1}
 /* Modal */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;justify-content:center;align-items:center}
 .modal-overlay.active{display:flex}
-.modal{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;width:90%;max-width:400px}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;width:90%;max-width:450px;max-height:90vh;overflow-y:auto}
 .modal h3{margin-bottom:16px;font-size:16px}
 .modal label{display:block;font-size:12px;color:var(--text-muted);margin-bottom:4px;margin-top:12px}
-.modal input,.modal select{width:100%;padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:14px}
+.modal input,.modal select,.modal textarea{width:100%;padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:14px;font-family:inherit}
+.modal textarea{resize:vertical;min-height:60px}
 .modal .btn-row{display:flex;gap:8px;margin-top:20px;justify-content:flex-end}
 .modal button{padding:8px 20px;border-radius:6px;border:none;cursor:pointer;font-weight:600;font-size:13px}
 .modal .btn-save{background:var(--accent);color:#fff}
 .modal .btn-cancel{background:var(--border);color:var(--text)}
-.modal .btn-vacant{background:var(--red);color:#fff}
+.modal .resp-list{margin-top:8px}
+.modal .resp-entry{display:flex;gap:6px;align-items:center;margin-bottom:6px}
+.modal .resp-entry input{flex:1}
+.modal .resp-entry button{background:var(--red);color:#fff;padding:6px 10px;border-radius:4px;border:none;cursor:pointer;font-size:12px}
+.modal .add-resp-btn{background:transparent;border:1px dashed var(--border);color:var(--text-muted);padding:6px 12px;border-radius:4px;cursor:pointer;font-size:12px;margin-top:4px}
+.modal .add-resp-btn:hover{border-color:var(--accent);color:var(--accent)}
 .legend{display:flex;gap:16px;align-items:center;font-size:12px;color:var(--text-muted);margin-left:16px}
 .legend span{display:flex;align-items:center;gap:4px}
 .legend .dot{width:10px;height:10px;border-radius:3px}
@@ -70,6 +91,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 
 <div class="container" id="container"></div>
 
+<!-- Person Modal -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <h3 id="modalTitle">Editar Posição</h3>
@@ -87,9 +109,25 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
     </select>
     <label>Reporta a</label>
     <select id="mReportsTo"><option value="">— Ninguém (topo) —</option></select>
+    <label>Responsabilidades</label>
+    <div class="resp-list" id="mRespList"></div>
+    <button class="add-resp-btn" type="button" onclick="addRespField()">+ Adicionar responsabilidade</button>
     <div class="btn-row">
       <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
       <button class="btn-save" onclick="saveModal()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Unassigned Responsibility Modal -->
+<div class="modal-overlay" id="uaModalOverlay">
+  <div class="modal">
+    <h3 id="uaModalTitle">Nova Responsabilidade</h3>
+    <label>Descrição</label>
+    <input id="uaDesc" placeholder="Ex: Definir estratégia de pricing">
+    <div class="btn-row">
+      <button class="btn-cancel" onclick="closeUaModal()">Cancelar</button>
+      <button class="btn-save" onclick="saveUaModal()">Salvar</button>
     </div>
   </div>
 </div>
@@ -106,47 +144,56 @@ const COMPANIES = [
 
 let data = [
   // Holding
-  {id:1, name:'Anderson Chamon', role:'CEO', company:'lionx', level:0, reportsTo:null},
+  {id:1, name:'Anderson Chamon', role:'CEO', company:'lionx', level:0, reportsTo:null, responsibilities:[]},
   // PWS
-  {id:10, name:'Márcio Galbe', role:'CEO', company:'pws', level:1, reportsTo:1},
-  {id:11, name:'Henrique Weber', role:'CTO', company:'pws', level:2, reportsTo:10},
-  {id:12, name:'Dyane Caroliny', role:'Head Human Resources', company:'pws', level:2, reportsTo:10},
-  {id:13, name:'Rodrigo Lima', role:'Coordenador Financeiro', company:'pws', level:2, reportsTo:10},
-  {id:14, name:'Allan Yukio Oka', role:'Head Growth', company:'pws', level:2, reportsTo:10},
+  {id:10, name:'Márcio Galbe', role:'CEO', company:'pws', level:1, reportsTo:1, responsibilities:[]},
+  {id:11, name:'Henrique Weber', role:'CTO', company:'pws', level:2, reportsTo:10, responsibilities:[]},
+  {id:12, name:'Dyane Caroliny', role:'Head Human Resources', company:'pws', level:2, reportsTo:10, responsibilities:[]},
+  {id:13, name:'Rodrigo Lima', role:'Coordenador Financeiro', company:'pws', level:2, reportsTo:10, responsibilities:[]},
+  {id:14, name:'Allan Yukio Oka', role:'Head Growth', company:'pws', level:2, reportsTo:10, responsibilities:[]},
   // PhizChat
-  {id:20, name:'Raphael', role:'CEO', company:'phiz', level:1, reportsTo:1},
-  {id:21, name:'Louis', role:'CTO', company:'phiz', level:2, reportsTo:20},
-  {id:22, name:'Luiz Felipe (Luizinho)', role:'CPO', company:'phiz', level:2, reportsTo:20},
-  {id:23, name:'Alex', role:'RH', company:'phiz', level:2, reportsTo:20},
-  {id:24, name:'Michel', role:'Financeiro', company:'phiz', level:2, reportsTo:20},
-  {id:25, name:'', role:'QA Lead / War Room', company:'phiz', level:3, reportsTo:21},
-  {id:26, name:'', role:'Tech Lead - Call', company:'phiz', level:3, reportsTo:21},
-  {id:27, name:'', role:'Tech Lead - Chat', company:'phiz', level:3, reportsTo:21},
-  {id:28, name:'', role:'Designer Lead (UI/UX)', company:'phiz', level:3, reportsTo:22},
+  {id:20, name:'Raphael', role:'CEO', company:'phiz', level:1, reportsTo:1, responsibilities:[]},
+  {id:21, name:'Louis', role:'CTO', company:'phiz', level:2, reportsTo:20, responsibilities:[]},
+  {id:22, name:'Luiz Felipe (Luizinho)', role:'CPO', company:'phiz', level:2, reportsTo:20, responsibilities:[]},
+  {id:23, name:'Alex', role:'RH', company:'phiz', level:2, reportsTo:20, responsibilities:[]},
+  {id:24, name:'Michel', role:'Financeiro', company:'phiz', level:2, reportsTo:20, responsibilities:[]},
+  {id:25, name:'', role:'QA Lead / War Room', company:'phiz', level:3, reportsTo:21, responsibilities:[]},
+  {id:26, name:'', role:'Tech Lead - Call', company:'phiz', level:3, reportsTo:21, responsibilities:[]},
+  {id:27, name:'', role:'Tech Lead - Chat', company:'phiz', level:3, reportsTo:21, responsibilities:[]},
+  {id:28, name:'', role:'Designer Lead (UI/UX)', company:'phiz', level:3, reportsTo:22, responsibilities:[]},
   // Fábrica
-  {id:30, name:'Jenner', role:'CEO', company:'fabrica', level:1, reportsTo:1},
-  {id:31, name:'Gênero', role:'Gestor Operacional', company:'fabrica', level:2, reportsTo:30},
-  {id:32, name:'Wesley', role:'Líder Técnico', company:'fabrica', level:2, reportsTo:30},
-  {id:33, name:'', role:'Head de Vendas / Novos Projetos', company:'fabrica', level:2, reportsTo:30},
-  {id:34, name:'', role:'Coordenador de Squads', company:'fabrica', level:3, reportsTo:31},
+  {id:30, name:'Jenner', role:'CEO', company:'fabrica', level:1, reportsTo:1, responsibilities:[]},
+  {id:31, name:'Gênero', role:'Gestor Operacional', company:'fabrica', level:2, reportsTo:30, responsibilities:[]},
+  {id:32, name:'Wesley', role:'Líder Técnico', company:'fabrica', level:2, reportsTo:30, responsibilities:[]},
+  {id:33, name:'', role:'Head de Vendas / Novos Projetos', company:'fabrica', level:2, reportsTo:30, responsibilities:[]},
+  {id:34, name:'', role:'Coordenador de Squads', company:'fabrica', level:3, reportsTo:31, responsibilities:[]},
   // Holding - Suporte
-  {id:40, name:'Ju', role:'Financeiro', company:'lionx', level:2, reportsTo:1},
-  {id:41, name:'Bruna', role:'RH', company:'lionx', level:2, reportsTo:1},
-  {id:42, name:'André', role:'CFO (JTF)', company:'lionx', level:2, reportsTo:1},
-  {id:43, name:'', role:'Chief of Staff', company:'lionx', level:2, reportsTo:1},
+  {id:40, name:'Ju', role:'Financeiro', company:'lionx', level:2, reportsTo:1, responsibilities:[]},
+  {id:41, name:'Bruna', role:'RH', company:'lionx', level:2, reportsTo:1, responsibilities:[]},
+  {id:42, name:'André', role:'CFO (JTF)', company:'lionx', level:2, reportsTo:1, responsibilities:[]},
+  {id:43, name:'', role:'Chief of Staff', company:'lionx', level:2, reportsTo:1, responsibilities:[]},
 ];
+
+// Unassigned responsibilities per company
+let unassigned = {
+  lionx: [],
+  pws: [],
+  phiz: [],
+  fabrica: [],
+};
 
 let nextId = 100;
 let editingId = null;
+let uaEditCompany = null;
+let uaEditIndex = null;
 
 function render() {
   const c = document.getElementById('container');
   let html = '';
   
-  // Group by company
   for (const comp of COMPANIES) {
     const items = data.filter(d => d.company === comp.id).sort((a,b) => a.level - b.level || a.name.localeCompare(b.name));
-    if (items.length === 0) continue;
+    if (items.length === 0 && (!unassigned[comp.id] || unassigned[comp.id].length === 0)) continue;
     
     html += `<div class="company-section">`;
     html += `<div class="company-header"><h2>${comp.name}</h2><span class="tag ${comp.tag}">${items.filter(i=>i.name).length}/${items.length} preenchidos</span></div>`;
@@ -160,49 +207,82 @@ function render() {
       for (const item of levelItems) {
         const vacant = !item.name;
         const reportsToName = item.reportsTo ? data.find(d=>d.id===item.reportsTo)?.name || '?' : '';
+        const resps = item.responsibilities || [];
         html += `<div class="card ${vacant?'vacant':''}" onclick="editCard(${item.id})">
           <div class="card-name">${vacant ? '⚠️ VAGA ABERTA' : item.name}</div>
           <div class="card-role">${item.role}</div>
           ${reportsToName ? `<div class="card-level">→ ${reportsToName}</div>` : ''}
+          ${resps.length > 0 ? `<div class="card-resp">${resps.map(r => `<div class="card-resp-item">${r}</div>`).join('')}</div>` : ''}
           <button class="remove-btn" onclick="event.stopPropagation();removeCard(${item.id})">✕</button>
         </div>`;
       }
       html += `</div></div>`;
     }
+    
+    // Unassigned responsibilities footer
+    const ua = unassigned[comp.id] || [];
+    html += `<div class="unassigned-section">`;
+    html += `<div class="unassigned-header"><h3>📋 Responsabilidades a definir</h3><button onclick="addUnassigned('${comp.id}')">+ Adicionar</button></div>`;
+    if (ua.length > 0) {
+      html += `<div class="unassigned-list">`;
+      ua.forEach((item, idx) => {
+        html += `<div class="unassigned-item" onclick="editUnassigned('${comp.id}',${idx})">
+          ${item}
+          <button class="remove-ua" onclick="event.stopPropagation();removeUnassigned('${comp.id}',${idx})">✕</button>
+        </div>`;
+      });
+      html += `</div>`;
+    } else {
+      html += `<div style="font-size:12px;color:var(--text-muted);font-style:italic;padding:4px 0">Nenhuma responsabilidade pendente</div>`;
+    }
+    html += `</div>`;
+    
     html += `</div>`;
   }
   
   c.innerHTML = html;
   
-  // Stats
   const total = data.length;
   const filled = data.filter(d => d.name).length;
   const vacant = total - filled;
-  document.getElementById('stats').textContent = `${filled} preenchidos · ${vacant} vagas abertas · ${total} total`;
+  const totalUa = Object.values(unassigned).reduce((s, a) => s + a.length, 0);
+  document.getElementById('stats').textContent = `${filled} preenchidos · ${vacant} vagas · ${totalUa} resp. a definir`;
 }
 
+// --- Person Modal ---
 function openModal(item) {
   editingId = item ? item.id : null;
   document.getElementById('modalTitle').textContent = item ? 'Editar Posição' : 'Nova Posição';
   document.getElementById('mName').value = item ? item.name : '';
   document.getElementById('mRole').value = item ? item.role : '';
   
-  // Populate company select
   const cs = document.getElementById('mCompany');
   cs.innerHTML = COMPANIES.map(c => `<option value="${c.id}" ${item && item.company===c.id?'selected':''}>${c.name}</option>`).join('');
   
-  // Level
   document.getElementById('mLevel').value = item ? item.level : 2;
   
-  // Reports to
   const rs = document.getElementById('mReportsTo');
   rs.innerHTML = '<option value="">— Ninguém (topo) —</option>' + 
     data.filter(d => d.name && (!item || d.id !== item.id)).map(d => 
       `<option value="${d.id}" ${item && item.reportsTo===d.id?'selected':''}>${d.name} (${d.role})</option>`
     ).join('');
   
+  // Responsibilities
+  const rl = document.getElementById('mRespList');
+  rl.innerHTML = '';
+  const resps = item ? (item.responsibilities || []) : [];
+  resps.forEach(r => addRespField(r));
+  
   document.getElementById('modalOverlay').classList.add('active');
   document.getElementById('mName').focus();
+}
+
+function addRespField(value) {
+  const rl = document.getElementById('mRespList');
+  const div = document.createElement('div');
+  div.className = 'resp-entry';
+  div.innerHTML = `<input class="resp-input" value="${value || ''}" placeholder="Ex: Gestão de infraestrutura cloud"><button type="button" onclick="this.parentElement.remove()">✕</button>`;
+  rl.appendChild(div);
 }
 
 function closeModal() {
@@ -217,13 +297,16 @@ function saveModal() {
   const level = parseInt(document.getElementById('mLevel').value);
   const reportsTo = document.getElementById('mReportsTo').value ? parseInt(document.getElementById('mReportsTo').value) : null;
   
+  const respInputs = document.querySelectorAll('#mRespList .resp-input');
+  const responsibilities = Array.from(respInputs).map(i => i.value.trim()).filter(v => v);
+  
   if (!role) { alert('Cargo é obrigatório'); return; }
   
   if (editingId !== null) {
     const item = data.find(d => d.id === editingId);
-    Object.assign(item, {name, role, company, level, reportsTo});
+    Object.assign(item, {name, role, company, level, reportsTo, responsibilities});
   } else {
-    data.push({id: nextId++, name, role, company, level, reportsTo});
+    data.push({id: nextId++, name, role, company, level, reportsTo, responsibilities});
   }
   
   closeModal();
@@ -241,8 +324,59 @@ function removeCard(id) {
   } 
 }
 
+// --- Unassigned Modal ---
+function addUnassigned(compId) {
+  uaEditCompany = compId;
+  uaEditIndex = null;
+  document.getElementById('uaModalTitle').textContent = 'Nova Responsabilidade';
+  document.getElementById('uaDesc').value = '';
+  document.getElementById('uaModalOverlay').classList.add('active');
+  document.getElementById('uaDesc').focus();
+}
+
+function editUnassigned(compId, idx) {
+  uaEditCompany = compId;
+  uaEditIndex = idx;
+  document.getElementById('uaModalTitle').textContent = 'Editar Responsabilidade';
+  document.getElementById('uaDesc').value = unassigned[compId][idx];
+  document.getElementById('uaModalOverlay').classList.add('active');
+  document.getElementById('uaDesc').focus();
+}
+
+function closeUaModal() {
+  document.getElementById('uaModalOverlay').classList.remove('active');
+  uaEditCompany = null;
+  uaEditIndex = null;
+}
+
+function saveUaModal() {
+  const desc = document.getElementById('uaDesc').value.trim();
+  if (!desc) { alert('Descrição é obrigatória'); return; }
+  
+  if (uaEditIndex !== null) {
+    unassigned[uaEditCompany][uaEditIndex] = desc;
+  } else {
+    if (!unassigned[uaEditCompany]) unassigned[uaEditCompany] = [];
+    unassigned[uaEditCompany].push(desc);
+  }
+  
+  closeUaModal();
+  render();
+  saveLocal();
+}
+
+function removeUnassigned(compId, idx) {
+  if (confirm('Remover esta responsabilidade?')) {
+    unassigned[compId].splice(idx, 1);
+    render();
+    saveLocal();
+  }
+}
+
+// --- Export/Import ---
 function exportJSON() {
-  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const exportData = {people: data, unassigned: unassigned};
+  const blob = new Blob([JSON.stringify(exportData, null, 2)], {type:'application/json'});
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
   a.download = 'lionx-organograma.json'; a.click();
 }
@@ -252,24 +386,52 @@ function importJSON() {
   fi.onchange = e => {
     const reader = new FileReader();
     reader.onload = ev => {
-      try { data = JSON.parse(ev.target.result); nextId = Math.max(...data.map(d=>d.id))+1; render(); saveLocal(); }
-      catch(e) { alert('JSON inválido'); }
+      try {
+        const parsed = JSON.parse(ev.target.result);
+        if (Array.isArray(parsed)) {
+          // Legacy format
+          data = parsed;
+        } else {
+          data = parsed.people || parsed;
+          unassigned = parsed.unassigned || {lionx:[],pws:[],phiz:[],fabrica:[]};
+        }
+        nextId = Math.max(...data.map(d=>d.id))+1;
+        // Ensure responsibilities field
+        data.forEach(d => { if (!d.responsibilities) d.responsibilities = []; });
+        render(); saveLocal();
+      } catch(e) { alert('JSON inválido'); }
     };
     reader.readAsText(e.target.files[0]);
   };
   fi.click();
 }
 
-function saveLocal() { try { localStorage.setItem('orgchart', JSON.stringify(data)); } catch(e){} }
-function loadLocal() { 
+function saveLocal() { 
   try { 
-    const s = localStorage.getItem('orgchart'); 
-    if (s) { data = JSON.parse(s); nextId = Math.max(...data.map(d=>d.id))+1; }
+    localStorage.setItem('orgchart', JSON.stringify({people: data, unassigned: unassigned})); 
   } catch(e){} 
 }
 
-// Keyboard
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+function loadLocal() { 
+  try { 
+    const s = localStorage.getItem('orgchart'); 
+    if (s) { 
+      const parsed = JSON.parse(s);
+      if (Array.isArray(parsed)) {
+        data = parsed;
+      } else {
+        data = parsed.people || parsed;
+        unassigned = parsed.unassigned || {lionx:[],pws:[],phiz:[],fabrica:[]};
+      }
+      nextId = Math.max(...data.map(d=>d.id))+1;
+      data.forEach(d => { if (!d.responsibilities) d.responsibilities = []; });
+    }
+  } catch(e){} 
+}
+
+document.addEventListener('keydown', e => { 
+  if (e.key === 'Escape') { closeModal(); closeUaModal(); }
+});
 
 loadLocal();
 render();
