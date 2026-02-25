@@ -125,6 +125,10 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
     <h3 id="uaModalTitle">Nova Responsabilidade</h3>
     <label>Descrição</label>
     <input id="uaDesc" placeholder="Ex: Definir estratégia de pricing">
+    <div id="uaAssignRow" style="display:none">
+      <label>Atribuir a</label>
+      <select id="uaAssignTo"><option value="">— Manter pendente —</option></select>
+    </div>
     <div class="btn-row">
       <button class="btn-cancel" onclick="closeUaModal()">Cancelar</button>
       <button class="btn-save" onclick="saveUaModal()">Salvar</button>
@@ -330,6 +334,8 @@ function addUnassigned(compId) {
   uaEditIndex = null;
   document.getElementById('uaModalTitle').textContent = 'Nova Responsabilidade';
   document.getElementById('uaDesc').value = '';
+  document.getElementById('uaAssignRow').style.display = 'none';
+  document.getElementById('uaAssignTo').value = '';
   document.getElementById('uaModalOverlay').classList.add('active');
   document.getElementById('uaDesc').focus();
 }
@@ -339,6 +345,13 @@ function editUnassigned(compId, idx) {
   uaEditIndex = idx;
   document.getElementById('uaModalTitle').textContent = 'Editar Responsabilidade';
   document.getElementById('uaDesc').value = unassigned[compId][idx];
+  // Show assign dropdown with people from this company
+  const assignRow = document.getElementById('uaAssignRow');
+  const assignSelect = document.getElementById('uaAssignTo');
+  const people = data.filter(d => d.company === compId && d.name);
+  assignSelect.innerHTML = '<option value="">— Manter pendente —</option>' +
+    people.map(p => `<option value="${p.id}">${p.name} (${p.role})</option>`).join('');
+  assignRow.style.display = 'block';
   document.getElementById('uaModalOverlay').classList.add('active');
   document.getElementById('uaDesc').focus();
 }
@@ -353,7 +366,17 @@ function saveUaModal() {
   const desc = document.getElementById('uaDesc').value.trim();
   if (!desc) { alert('Descrição é obrigatória'); return; }
   
-  if (uaEditIndex !== null) {
+  const assignTo = document.getElementById('uaAssignTo').value;
+  
+  if (assignTo && uaEditIndex !== null) {
+    // Assign to person: add to their responsibilities, remove from unassigned
+    const person = data.find(d => d.id === parseInt(assignTo));
+    if (person) {
+      if (!person.responsibilities) person.responsibilities = [];
+      person.responsibilities.push(desc);
+      unassigned[uaEditCompany].splice(uaEditIndex, 1);
+    }
+  } else if (uaEditIndex !== null) {
     unassigned[uaEditCompany][uaEditIndex] = desc;
   } else {
     if (!unassigned[uaEditCompany]) unassigned[uaEditCompany] = [];
