@@ -81,7 +81,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
     <select id="mCompany"></select>
     <label>Nível</label>
     <select id="mLevel">
-      <option value="1">N-1 (C-Level / Direto ao CEO)</option>
+      <option value="1">CEO da Empresa</option>
       <option value="2">N-2 (Diretoria / Head)</option>
       <option value="3">N-3 (Gerência / Coordenação)</option>
     </select>
@@ -100,7 +100,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 const COMPANIES = [
   {id:'lionx', name:'LionX (Holding)', tag:'tag-holding', color:'#3b82f6'},
   {id:'pws', name:'PWS Cloud', tag:'tag-pws', color:'#22c55e'},
-  {id:'phiz', name:'PhizChat (Fizz)', tag:'tag-phiz', color:'#818cf8'},
+  {id:'phiz', name:'PhizChat', tag:'tag-phiz', color:'#818cf8'},
   {id:'fabrica', name:'Fábrica de Software', tag:'tag-fab', color:'#f59e0b'},
 ];
 
@@ -156,7 +156,7 @@ function render() {
     for (const lvl of levels) {
       const levelItems = items.filter(i => i.level === lvl);
       if (levelItems.length === 0) continue;
-      const levelNames = ['CEO Holding','N-1 (C-Level)','N-2 (Diretoria/Head)','N-3 (Gerência/Coord)'];
+      const levelNames = ['CEO Holding',`CEO ${comp.name}`,'N-2 (Diretoria/Head)','N-3 (Gerência/Coord)'];
       html += `<div class="org-grid"><div class="level-label">${levelNames[lvl]}</div><div class="level-row">`;
       for (const item of levelItems) {
         const vacant = !item.name;
