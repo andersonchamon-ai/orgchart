@@ -26,7 +26,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 /* Tree container */
 .tree-wrap{position:relative;overflow-x:auto;padding:20px 0}
 .tree-wrap svg{position:absolute;top:0;left:0;pointer-events:none}
-.tree-level{display:flex;justify-content:center;gap:24px;margin-bottom:0;position:relative}
+.tree-level{display:flex;justify-content:center;gap:24px;margin-top:40px;position:relative}
 .tree-level-group{display:flex;flex-direction:column;align-items:center}
 
 /* Card */
@@ -39,7 +39,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .node-role{font-size:12px;color:var(--text-muted)}
 .node-card .remove-btn{position:absolute;top:4px;right:6px;background:none;border:none;color:var(--red);cursor:pointer;font-size:13px;opacity:0;transition:opacity 0.2s}
 .node-card:hover .remove-btn{opacity:0.5}
-.toggle-btn{display:inline-block;background:var(--border);border:none;color:var(--text-muted);width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:12px;line-height:22px;text-align:center;margin-top:6px;transition:all 0.2s;position:relative;z-index:2}
+.toggle-btn{display:inline-block;background:var(--border);border:none;color:var(--text-muted);width:20px;height:20px;border-radius:50%;cursor:pointer;font-size:11px;line-height:20px;text-align:center;margin-top:4px;transition:all 0.2s;position:relative;z-index:2}
 .toggle-btn:hover{background:var(--accent);color:#fff}
 .toggle-btn.active{background:var(--accent);color:#fff}
 
@@ -304,7 +304,7 @@ function drawAllLines() {
       // Find toggle button
       const toggleBtn = wrap.querySelector(`[data-toggle="${parentId}"]`);
       const toggleBottom = toggleBtn ? (toggleBtn.getBoundingClientRect().bottom - wrapRect.top) : py;
-      const startY = toggleBtn ? toggleBottom + 4 : py + 8;
+      const startY = toggleBtn ? toggleBottom + 2 : py + 4;
 
       // Get direct child cards
       const childGroups = levelDiv.querySelectorAll(':scope > .tree-level-group');
@@ -323,7 +323,7 @@ function drawAllLines() {
 
       if (childPositions.length === 0) return;
 
-      const midY = startY + (childPositions[0].y - startY) / 2;
+      const midY = startY + (childPositions[0].y - startY) * 0.5;
 
       // Vertical line from parent down to midY
       addLine(svg, px, startY, px, midY);
