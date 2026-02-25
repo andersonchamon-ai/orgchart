@@ -502,7 +502,12 @@ async function showBackups(){
 
 function exportJSON(){const b=new Blob([JSON.stringify({people:data,unassigned},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='lionx-organograma.json';a.click();}
 function importJSON(){const fi=document.getElementById('fileInput');fi.onchange=e=>{const r=new FileReader();r.onload=ev=>{try{const p=JSON.parse(ev.target.result);if(Array.isArray(p)){data=p;}else{data=p.people||p;unassigned=p.unassigned||{lionx:[],pws:[],phiz:[],fabrica:[]};}nextId=Math.max(...data.map(d=>d.id))+1;data.forEach(d=>{if(!d.responsibilities)d.responsibilities=[];});render();saveLocal();}catch(e){alert('JSON inválido');}};r.readAsText(e.target.files[0]);};fi.click();}
-const API_URL = 'http://localhost:8790';
+// Try public tunnel first, fallback to localhost
+const API_URLS = [
+  'https://compensation-privacy-excuse-possession.trycloudflare.com',
+  'http://localhost:8790'
+];
+let API_URL = API_URLS[0];
 let lastServerSync = 0;
 
 function saveLocal(){
@@ -545,6 +550,13 @@ window.addEventListener('resize', () => drawAllLines());
 async function init() {
   // Priority: 1) SQLite via API  2) localStorage  3) hardcoded
   let loaded = false;
+  // Auto-detect working API
+  for (const url of API_URLS) {
+    try {
+      const test = await fetch(url + '/api/health', {signal: AbortSignal.timeout(3000)});
+      if (test.ok) { API_URL = url; break; }
+    } catch(e) {}
+  }
   try {
     const resp = await fetch(API_URL + '/api/data?t=' + Date.now());
     if (resp.ok) {
