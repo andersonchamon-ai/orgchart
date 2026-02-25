@@ -122,6 +122,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
   <button class="secondary" onclick="exportJSON()">💾 Exportar</button>
   <button class="secondary" onclick="importJSON()">📂 Importar</button>
   <button class="secondary" onclick="showBackups()">🔄 Backups</button>
+  <button class="secondary" onclick="syncToServer()">☁️ Sync</button>
   <button onclick="addPosition()">+ Posição</button>
 </div>
 <div class="container" id="container"></div>
@@ -457,6 +458,17 @@ function saveUaModal(){const desc=document.getElementById('uaDesc').value.trim()
 function removeUnassigned(c,i){if(confirm('Remover?')){unassigned[c].splice(i,1);render();saveLocal();}}
 
 // --- Export/Import ---
+function syncToServer(){
+  // Download current data as JSON for Bob to commit to repo
+  const payload = JSON.stringify({people:data, unassigned, _syncedAt:new Date().toISOString()}, null, 2);
+  const blob = new Blob([payload], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'data.json';
+  a.click();
+  alert('Arquivo data.json baixado!\\n\\nEnvie este arquivo para o Bob no Telegram para ele atualizar o backup no servidor.');
+}
+
 function showBackups(){
   const backups = JSON.parse(localStorage.getItem('orgchart-backups')||'[]');
   if(backups.length===0){alert('Nenhum backup disponível.');return;}
@@ -503,7 +515,25 @@ function loadLocal(){try{const s=localStorage.getItem('orgchart-dev');if(s){cons
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeUaModal();}});
 window.addEventListener('resize', () => drawAllLines());
-loadLocal();
-render();
+async function init() {
+  loadLocal();
+  // If localStorage was empty (data still matches hardcoded default), try loading from data.json
+  const hasLocalData = localStorage.getItem('orgchart-dev');
+  if (!hasLocalData) {
+    try {
+      const resp = await fetch('data.json?t=' + Date.now());
+      if (resp.ok) {
+        const parsed = await resp.json();
+        data = parsed.people || [];
+        unassigned = parsed.unassigned || {lionx:[],pws:[],phiz:[],fabrica:[]};
+        nextId = Math.max(...data.map(d=>d.id)) + 1;
+        data.forEach(d => { if (!d.responsibilities) d.responsibilities = []; });
+        console.log('📦 Dados carregados do data.json (fallback)');
+      }
+    } catch(e) { console.log('data.json não disponível, usando dados padrão'); }
+  }
+  render();
+}
+init();
 </script>
 </body></html>
