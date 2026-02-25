@@ -523,16 +523,13 @@ function saveLocal(){
       while(backups.length > 10) backups.shift();
       localStorage.setItem('orgchart-prod-backups', JSON.stringify(backups));
     }
-    // Auto-sync to SQLite (at most every 10 seconds)
-    if (now - lastServerSync > 10*1000) {
-      lastServerSync = now;
-      fetch(API_URL + '/api/save', {
-        method:'POST', headers:{'Content-Type':'application/json'}, body:payload
-      }).then(r => {
-        if(r.ok) updateSyncStatus('✅ Salvo');
-        else updateSyncStatus('⚠️ Erro');
-      }).catch(() => updateSyncStatus('⚠️ Offline'));
-    }
+    // Auto-sync to SQLite on every save
+    fetch(API_URL + '/api/save', {
+      method:'POST', headers:{'Content-Type':'application/json'}, body:payload
+    }).then(r => {
+      if(r.ok) updateSyncStatus('✅ Salvo');
+      else updateSyncStatus('⚠️ Erro');
+    }).catch(() => updateSyncStatus('⚠️ Offline'));
   }catch(e){}
 }
 
