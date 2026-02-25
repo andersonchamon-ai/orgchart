@@ -6,8 +6,6 @@
 :root{--bg:#0f172a;--card:#1e293b;--card-vacant:#2d1b1b;--border:#334155;--border-vacant:#ef4444;--text:#e2e8f0;--text-muted:#94a3b8;--accent:#3b82f6;--green:#22c55e;--red:#ef4444;--orange:#f59e0b;--line:#475569}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif;overflow:auto}
-
-/* Banner */
 .dev-banner{background:#f59e0b;color:#000;text-align:center;padding:6px;font-size:13px;font-weight:700;position:fixed;top:0;left:0;right:0;z-index:200}
 .toolbar{position:fixed;top:32px;left:0;right:0;background:rgba(15,23,42,0.95);backdrop-filter:blur(10px);padding:12px 24px;display:flex;align-items:center;gap:16px;z-index:100;border-bottom:1px solid var(--border)}
 .toolbar h1{font-size:18px;font-weight:700;color:var(--accent)}
@@ -16,79 +14,51 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .toolbar button:hover{opacity:0.85}
 .toolbar button.secondary{background:var(--border)}
 .container{padding:112px 24px 40px;min-height:100vh}
-
-/* Tags */
 .tag{font-size:11px;padding:3px 8px;border-radius:4px;font-weight:600}
 .tag-pws{background:#0e4429;color:#22c55e}
 .tag-phiz{background:#1e1b4b;color:#818cf8}
 .tag-fab{background:#422006;color:#f59e0b}
 .tag-holding{background:#172554;color:#60a5fa}
-
-/* Company section */
 .company-section{margin-bottom:48px}
-.company-header{display:flex;align-items:center;gap:12px;margin-bottom:24px;padding:12px 16px;background:var(--card);border-radius:10px;border-left:4px solid var(--accent)}
+.company-header{display:flex;align-items:center;gap:12px;margin-bottom:8px;padding:12px 16px;background:var(--card);border-radius:10px;border-left:4px solid var(--accent)}
 .company-header h2{font-size:16px;font-weight:700}
 
-/* Tree org chart */
-.org-tree{display:flex;flex-direction:column;align-items:center;overflow-x:auto;padding:20px 0}
-.org-tree ul{display:flex;justify-content:center;padding-top:20px;position:relative;transition:all 0.3s;list-style:none}
-/* Vertical line from parent down to horizontal bar */
-.org-tree ul::before{content:'';position:absolute;top:0;left:50%;border-left:2px solid var(--line);height:20px}
-.org-tree li{display:flex;flex-direction:column;align-items:center;position:relative;padding:20px 16px 0}
-/* Horizontal bar across siblings + vertical stub down to each child */
-.org-tree li::before{content:'';position:absolute;top:0;left:0;right:50%;height:20px;border-top:2px solid var(--line);border-left:2px solid var(--line);border-top-left-radius:4px}
-.org-tree li::after{content:'';position:absolute;top:0;left:50%;right:0;height:20px;border-top:2px solid var(--line);border-right:2px solid var(--line);border-top-right-radius:4px}
-/* First child: no left horizontal */
-.org-tree li:first-child::before{border-top:none;border-left:none;border-radius:0}
-/* Last child: no right horizontal */
-.org-tree li:last-child::after{border-top:none;border-right:none;border-radius:0}
-/* Middle children: straight horizontal, vertical comes from ul::before logic */
-.org-tree li:not(:first-child):not(:last-child)::before{border-radius:0;border-left:none}
-.org-tree li:not(:first-child):not(:last-child)::after{border-radius:0;border-right:none}
-/* Only child: just a vertical line */
-.org-tree li:only-child::before,
-.org-tree li:only-child::after{border:none}
-.org-tree li:only-child::before{content:'';position:absolute;top:0;left:50%;width:0;height:20px;border-left:2px solid var(--line);border-top:none;border-radius:0}
-/* Root level: no connectors */
-.org-tree > ul::before{display:none}
-.org-tree > ul > li::before,.org-tree > ul > li::after{border:none}
+/* Tree container */
+.tree-wrap{position:relative;overflow-x:auto;padding:20px 0}
+.tree-wrap svg{position:absolute;top:0;left:0;pointer-events:none}
+.tree-level{display:flex;justify-content:center;gap:24px;margin-bottom:0;position:relative}
+.tree-level-group{display:flex;flex-direction:column;align-items:center}
 
 /* Card */
-.node-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;min-width:180px;max-width:240px;cursor:pointer;transition:all 0.2s;text-align:center;position:relative}
+.node-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;min-width:160px;max-width:220px;cursor:pointer;transition:all 0.2s;text-align:center;position:relative;z-index:1}
 .node-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,0.3)}
 .node-card.vacant{background:var(--card-vacant);border:1px dashed var(--border-vacant)}
 .node-card.vacant .node-name{color:var(--red);font-style:italic}
 .node-card.ceo{border-color:var(--accent);border-width:2px}
 .node-name{font-size:14px;font-weight:600;margin-bottom:2px}
 .node-role{font-size:12px;color:var(--text-muted)}
-.node-card .remove-btn{position:absolute;top:4px;right:6px;background:none;border:none;color:var(--red);cursor:pointer;font-size:13px;opacity:0;transition:opacity 0.2s;padding:2px 4px}
+.node-card .remove-btn{position:absolute;top:4px;right:6px;background:none;border:none;color:var(--red);cursor:pointer;font-size:13px;opacity:0;transition:opacity 0.2s}
 .node-card:hover .remove-btn{opacity:0.5}
-.node-card .remove-btn:hover{opacity:1}
-
-/* Collapse toggle */
-.toggle-btn{display:inline-block;background:var(--border);border:none;color:var(--text-muted);width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:12px;line-height:22px;text-align:center;margin-top:6px;transition:all 0.2s}
+.toggle-btn{display:inline-block;background:var(--border);border:none;color:var(--text-muted);width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:12px;line-height:22px;text-align:center;margin-top:6px;transition:all 0.2s;position:relative;z-index:2}
 .toggle-btn:hover{background:var(--accent);color:#fff}
-.collapsed > ul{display:none}
-.collapsed .toggle-btn{background:var(--accent);color:#fff}
+.toggle-btn.active{background:var(--accent);color:#fff}
 
-/* Holding section (simple) */
-.holding-row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:8px}
+/* Holding */
 .holding-section{text-align:center;margin-bottom:40px}
+.holding-row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:8px}
 .holding-section .level-label{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin:20px 0 12px}
 
 /* Unassigned */
 .unassigned-section{margin-top:20px;padding:14px 16px;background:rgba(148,163,184,0.04);border:1px dashed var(--border);border-radius:10px}
 .unassigned-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .unassigned-header h3{font-size:12px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px}
-.unassigned-header button{background:transparent;border:1px dashed var(--border);color:var(--text-muted);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500}
+.unassigned-header button{background:transparent;border:1px dashed var(--border);color:var(--text-muted);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px}
 .unassigned-header button:hover{border-color:var(--text-muted);color:var(--text)}
 .unassigned-list{display:flex;flex-wrap:wrap;gap:8px}
 .unassigned-item{background:transparent;border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:12px;color:var(--text-muted);cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:8px}
 .unassigned-item:hover{border-color:var(--text-muted);color:var(--text)}
 .unassigned-item .remove-ua{background:none;border:none;color:var(--red);cursor:pointer;font-size:12px;opacity:0;transition:opacity 0.2s}
 .unassigned-item:hover .remove-ua{opacity:0.7}
-
-/* Legend */
 .legend{display:flex;gap:16px;align-items:center;font-size:12px;color:var(--text-muted);margin-left:16px}
 .legend span{display:flex;align-items:center;gap:4px}
 .legend .dot{width:10px;height:10px;border-radius:3px}
@@ -116,7 +86,6 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 </head><body>
 
 <div class="dev-banner">⚠️ AMBIENTE DE TESTE — não é a versão final</div>
-
 <div class="toolbar">
   <h1>🦁 LionX — Organograma</h1>
   <div class="legend">
@@ -128,27 +97,22 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
   <button class="secondary" onclick="importJSON()">📂 Importar</button>
   <button onclick="addPosition()">+ Posição</button>
 </div>
-
 <div class="container" id="container"></div>
 
 <!-- Person Modal -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <h3 id="modalTitle">Editar Posição</h3>
-    <label>Nome</label>
-    <input id="mName" placeholder="Nome da pessoa (vazio = vaga aberta)">
-    <label>Cargo / Role</label>
-    <input id="mRole" placeholder="Ex: CTO, Head of Engineering">
-    <label>Empresa</label>
-    <select id="mCompany"></select>
+    <label>Nome</label><input id="mName" placeholder="Nome da pessoa (vazio = vaga aberta)">
+    <label>Cargo / Role</label><input id="mRole" placeholder="Ex: CTO, Head of Engineering">
+    <label>Empresa</label><select id="mCompany"></select>
     <label>Nível</label>
     <select id="mLevel">
       <option value="1">CEO da Empresa</option>
       <option value="2">N-2 (Diretoria / Head)</option>
       <option value="3">N-3 (Gerência / Coordenação)</option>
     </select>
-    <label>Reporta a</label>
-    <select id="mReportsTo"><option value="">— Ninguém (topo) —</option></select>
+    <label>Reporta a</label><select id="mReportsTo"><option value="">— Ninguém (topo) —</option></select>
     <label>Responsabilidades</label>
     <div class="resp-list" id="mRespList"></div>
     <button class="add-resp-btn" type="button" onclick="addRespField()">+ Adicionar responsabilidade</button>
@@ -163,11 +127,9 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 <div class="modal-overlay" id="uaModalOverlay">
   <div class="modal">
     <h3 id="uaModalTitle">Nova Responsabilidade</h3>
-    <label>Descrição</label>
-    <input id="uaDesc" placeholder="Ex: Definir estratégia de pricing">
+    <label>Descrição</label><input id="uaDesc" placeholder="Ex: Definir estratégia de pricing">
     <div id="uaAssignRow" style="display:none">
-      <label>Atribuir a</label>
-      <select id="uaAssignTo"><option value="">— Manter pendente —</option></select>
+      <label>Atribuir a</label><select id="uaAssignTo"><option value="">— Manter pendente —</option></select>
     </div>
     <div class="btn-row">
       <button class="btn-cancel" onclick="closeUaModal()">Cancelar</button>
@@ -175,7 +137,6 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
     </div>
   </div>
 </div>
-
 <input type="file" id="fileInput" accept=".json" style="display:none">
 
 <script>
@@ -213,132 +174,202 @@ let data = [
   {id:43, name:'', role:'Chief of Staff', company:'lionx', level:2, reportsTo:1, responsibilities:[]},
 ];
 
-let unassigned = { lionx:[], pws:[], phiz:[], fabrica:[] };
-let collapsed = {}; // id -> true/false
+let unassigned = {lionx:[],pws:[],phiz:[],fabrica:[]};
+let collapsedSet = new Set();
 let nextId = 100;
 let editingId = null;
 let uaEditCompany = null;
 let uaEditIndex = null;
 
-// Build tree from flat data for a given root
-function buildTree(rootId) {
-  const children = data.filter(d => d.reportsTo === rootId);
-  return children.map(child => ({
-    ...child,
-    children: buildTree(child.id)
-  }));
+function getChildren(parentId) {
+  return data.filter(d => d.reportsTo === parentId);
 }
 
-function renderCard(item) {
+function renderCardHTML(item) {
   const vacant = !item.name;
-  const isCeo = item.level <= 1 ? 'ceo' : '';
-  const hasChildren = item.children && item.children.length > 0;
-  const isCollapsed = collapsed[item.id];
-  return `<div class="node-card ${vacant?'vacant':''} ${isCeo}" onclick="editCard(${item.id})">
+  const isCeo = item.level <= 1;
+  const children = getChildren(item.id);
+  const hasChildren = children.length > 0 && !collapsedSet.has(item.id);
+  const isCollapsed = collapsedSet.has(item.id);
+  const showToggle = getChildren(item.id).length > 0;
+  return `<div class="node-card ${vacant?'vacant':''} ${isCeo?'ceo':''}" data-id="${item.id}" onclick="editCard(${item.id})">
     <div class="node-name">${vacant ? '⚠️ VAGA' : item.name}</div>
     <div class="node-role">${item.role}</div>
     <button class="remove-btn" onclick="event.stopPropagation();removeCard(${item.id})">✕</button>
-  </div>${hasChildren ? `<button class="toggle-btn" onclick="event.stopPropagation();toggleCollapse(${item.id})">${isCollapsed ? '+' : '−'}</button>` : ''}`;
+  </div>${showToggle ? `<button class="toggle-btn ${isCollapsed?'active':''}" data-toggle="${item.id}" onclick="event.stopPropagation();toggleCollapse(${item.id})">${isCollapsed?'+':'−'}</button>` : ''}`;
 }
 
-function renderTree(nodes) {
-  if (!nodes || nodes.length === 0) return '';
-  let html = '<ul>';
-  for (const node of nodes) {
-    const isCollapsed = collapsed[node.id];
-    html += `<li class="${isCollapsed ? 'collapsed' : ''}">`;
-    html += renderCard(node);
-    if (node.children && node.children.length > 0) {
-      html += renderTree(node.children);
+// Recursive render: each node is a column (card on top, children row below)
+function renderSubtree(item) {
+  const children = getChildren(item.id);
+  const isCollapsed = collapsedSet.has(item.id);
+  let html = `<div class="tree-level-group" data-node="${item.id}">`;
+  html += renderCardHTML(item);
+  if (children.length > 0 && !isCollapsed) {
+    html += `<div class="tree-level" data-parent="${item.id}">`;
+    for (const child of children) {
+      html += renderSubtree(child);
     }
-    html += '</li>';
+    html += `</div>`;
   }
-  html += '</ul>';
+  html += `</div>`;
   return html;
 }
 
 function render() {
   const c = document.getElementById('container');
   let html = '';
-  
-  // --- Holding (simple layout) ---
-  const holdingComp = COMPANIES.find(c => c.id === 'lionx');
+
+  // Holding
   const ceo = data.find(d => d.id === 1);
   const holdingDirect = data.filter(d => d.company === 'lionx' && d.reportsTo === 1);
-  
   html += `<div class="holding-section">`;
-  html += `<div class="company-header" style="justify-content:center"><h2>${holdingComp.name}</h2><span class="tag ${holdingComp.tag}">${data.filter(d=>d.company==='lionx'&&d.name).length} preenchidos</span></div>`;
-  if (ceo) {
-    html += `<div style="display:flex;justify-content:center;margin:16px 0"><div class="node-card ceo" onclick="editCard(${ceo.id})"><div class="node-name">${ceo.name}</div><div class="node-role">${ceo.role}</div></div></div>`;
-  }
+  html += `<div class="company-header" style="justify-content:center"><h2>LionX (Holding)</h2><span class="tag tag-holding">${data.filter(d=>d.company==='lionx'&&d.name).length} preenchidos</span></div>`;
+  if (ceo) html += `<div style="display:flex;justify-content:center;margin:16px 0"><div class="node-card ceo" onclick="editCard(${ceo.id})"><div class="node-name">${ceo.name}</div><div class="node-role">${ceo.role}</div></div></div>`;
   if (holdingDirect.length > 0) {
-    html += `<div class="level-label">Diretos ao CEO</div>`;
-    html += `<div class="holding-row">`;
+    html += `<div class="level-label">Diretos ao CEO</div><div class="holding-row">`;
     for (const item of holdingDirect) {
       const vacant = !item.name;
-      html += `<div class="node-card ${vacant?'vacant':''}" onclick="editCard(${item.id})">
-        <div class="node-name">${vacant ? '⚠️ VAGA' : item.name}</div>
-        <div class="node-role">${item.role}</div>
-        <button class="remove-btn" onclick="event.stopPropagation();removeCard(${item.id})">✕</button>
-      </div>`;
+      html += `<div class="node-card ${vacant?'vacant':''}" onclick="editCard(${item.id})"><div class="node-name">${vacant?'⚠️ VAGA':item.name}</div><div class="node-role">${item.role}</div><button class="remove-btn" onclick="event.stopPropagation();removeCard(${item.id})">✕</button></div>`;
     }
     html += `</div>`;
   }
-  // Holding unassigned
   html += renderUnassigned('lionx');
   html += `</div>`;
-  
-  // --- Company org trees ---
+
+  // Company trees
   for (const comp of COMPANIES) {
     if (comp.id === 'lionx') continue;
     const compPeople = data.filter(d => d.company === comp.id);
     if (compPeople.length === 0) continue;
-    
-    // Find the CEO of this company
     const compCeo = compPeople.find(d => d.level === 1);
     if (!compCeo) continue;
-    
-    // Build tree from CEO
-    const tree = [{
-      ...compCeo,
-      children: buildTree(compCeo.id)
-    }];
-    
+
     html += `<div class="company-section">`;
     html += `<div class="company-header"><h2>${comp.name}</h2><span class="tag ${comp.tag}">${compPeople.filter(i=>i.name).length}/${compPeople.length} preenchidos</span></div>`;
-    html += `<div class="org-tree">${renderTree(tree)}</div>`;
+    html += `<div class="tree-wrap" id="tree-${comp.id}">`;
+    html += `<div class="tree-level" data-parent="root-${comp.id}">`;
+    html += renderSubtree(compCeo);
+    html += `</div></div>`;
     html += renderUnassigned(comp.id);
     html += `</div>`;
   }
-  
+
   c.innerHTML = html;
-  
+
+  // Stats
   const total = data.length;
   const filled = data.filter(d => d.name).length;
   const vacant = total - filled;
   const totalUa = Object.values(unassigned).reduce((s, a) => s + a.length, 0);
   document.getElementById('stats').textContent = `${filled} preenchidos · ${vacant} vagas · ${totalUa} resp. a definir`;
+
+  // Draw SVG lines after DOM is rendered
+  requestAnimationFrame(() => drawAllLines());
+}
+
+function drawAllLines() {
+  for (const comp of COMPANIES) {
+    if (comp.id === 'lionx') continue;
+    const wrap = document.getElementById(`tree-${comp.id}`);
+    if (!wrap) continue;
+    // Remove old SVG
+    const oldSvg = wrap.querySelector('svg');
+    if (oldSvg) oldSvg.remove();
+
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.style.position = 'absolute';
+    svg.style.top = '0';
+    svg.style.left = '0';
+    svg.style.width = wrap.scrollWidth + 'px';
+    svg.style.height = wrap.scrollHeight + 'px';
+    svg.style.pointerEvents = 'none';
+    svg.style.zIndex = '0';
+
+    const wrapRect = wrap.getBoundingClientRect();
+
+    // For each parent that has visible children
+    const parentLevels = wrap.querySelectorAll('.tree-level[data-parent]');
+    parentLevels.forEach(levelDiv => {
+      const parentId = levelDiv.dataset.parent;
+      if (parentId.startsWith('root-')) return; // skip root container
+
+      const parentCard = wrap.querySelector(`.node-card[data-id="${parentId}"]`);
+      if (!parentCard) return;
+
+      const parentRect = parentCard.getBoundingClientRect();
+      const px = parentRect.left + parentRect.width / 2 - wrapRect.left;
+      const py = parentRect.bottom - wrapRect.top;
+
+      // Find toggle button
+      const toggleBtn = wrap.querySelector(`[data-toggle="${parentId}"]`);
+      const toggleBottom = toggleBtn ? (toggleBtn.getBoundingClientRect().bottom - wrapRect.top) : py;
+      const startY = toggleBtn ? toggleBottom + 4 : py + 8;
+
+      // Get direct child cards
+      const childGroups = levelDiv.querySelectorAll(':scope > .tree-level-group');
+      if (childGroups.length === 0) return;
+
+      const childPositions = [];
+      childGroups.forEach(g => {
+        const card = g.querySelector('.node-card');
+        if (!card) return;
+        const r = card.getBoundingClientRect();
+        childPositions.push({
+          x: r.left + r.width / 2 - wrapRect.left,
+          y: r.top - wrapRect.top
+        });
+      });
+
+      if (childPositions.length === 0) return;
+
+      const midY = startY + (childPositions[0].y - startY) / 2;
+
+      // Vertical line from parent down to midY
+      addLine(svg, px, startY, px, midY);
+
+      // Horizontal bar
+      const leftX = Math.min(px, ...childPositions.map(c => c.x));
+      const rightX = Math.max(px, ...childPositions.map(c => c.x));
+      addLine(svg, leftX, midY, rightX, midY);
+
+      // Vertical lines from midY down to each child
+      childPositions.forEach(cp => {
+        addLine(svg, cp.x, midY, cp.x, cp.y);
+      });
+    });
+
+    wrap.prepend(svg);
+  }
+}
+
+function addLine(svg, x1, y1, x2, y2) {
+  const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  line.setAttribute('x1', x1);
+  line.setAttribute('y1', y1);
+  line.setAttribute('x2', x2);
+  line.setAttribute('y2', y2);
+  line.setAttribute('stroke', '#475569');
+  line.setAttribute('stroke-width', '2');
+  line.setAttribute('stroke-linecap', 'round');
+  svg.appendChild(line);
 }
 
 function renderUnassigned(compId) {
   const ua = unassigned[compId] || [];
-  let html = `<div class="unassigned-section">`;
-  html += `<div class="unassigned-header"><h3>📋 Responsabilidades a definir</h3><button onclick="addUnassigned('${compId}')">+ Adicionar</button></div>`;
+  let html = `<div class="unassigned-section"><div class="unassigned-header"><h3>📋 Responsabilidades a definir</h3><button onclick="addUnassigned('${compId}')">+ Adicionar</button></div>`;
   if (ua.length > 0) {
     html += `<div class="unassigned-list">`;
-    ua.forEach((item, idx) => {
-      html += `<div class="unassigned-item" onclick="editUnassigned('${compId}',${idx})">${item}<button class="remove-ua" onclick="event.stopPropagation();removeUnassigned('${compId}',${idx})">✕</button></div>`;
-    });
+    ua.forEach((item, idx) => { html += `<div class="unassigned-item" onclick="editUnassigned('${compId}',${idx})">${item}<button class="remove-ua" onclick="event.stopPropagation();removeUnassigned('${compId}',${idx})">✕</button></div>`; });
     html += `</div>`;
   } else {
     html += `<div style="font-size:12px;color:var(--text-muted);font-style:italic;padding:4px 0">Nenhuma responsabilidade pendente</div>`;
   }
-  html += `</div>`;
-  return html;
+  return html + `</div>`;
 }
 
 function toggleCollapse(id) {
-  collapsed[id] = !collapsed[id];
+  if (collapsedSet.has(id)) collapsedSet.delete(id); else collapsedSet.add(id);
   render();
 }
 
@@ -348,137 +379,61 @@ function updateReportsTo(item) {
   const rs = document.getElementById('mReportsTo');
   const currentVal = item ? item.reportsTo : null;
   const people = data.filter(d => d.name && (!item || d.id !== item.id) && (d.company === company || d.company === 'lionx'));
-  rs.innerHTML = '<option value="">— Ninguém (topo) —</option>' + 
-    people.map(d => `<option value="${d.id}" ${currentVal===d.id?'selected':''}>${d.name} (${d.role})</option>`).join('');
+  rs.innerHTML = '<option value="">— Ninguém (topo) —</option>' + people.map(d => `<option value="${d.id}" ${currentVal===d.id?'selected':''}>${d.name} (${d.role})</option>`).join('');
 }
-
 function openModal(item) {
   editingId = item ? item.id : null;
   document.getElementById('modalTitle').textContent = item ? 'Editar Posição' : 'Nova Posição';
   document.getElementById('mName').value = item ? item.name : '';
   document.getElementById('mRole').value = item ? item.role : '';
   const cs = document.getElementById('mCompany');
-  cs.innerHTML = COMPANIES.map(c => `<option value="${c.id}" ${item && item.company===c.id?'selected':''}>${c.name}</option>`).join('');
+  cs.innerHTML = COMPANIES.map(c => `<option value="${c.id}" ${item&&item.company===c.id?'selected':''}>${c.name}</option>`).join('');
   document.getElementById('mLevel').value = item ? item.level : 2;
   updateReportsTo(item);
   document.getElementById('mCompany').onchange = () => updateReportsTo(item);
-  const rl = document.getElementById('mRespList');
-  rl.innerHTML = '';
-  (item ? (item.responsibilities || []) : []).forEach(r => addRespField(r));
+  const rl = document.getElementById('mRespList'); rl.innerHTML = '';
+  (item ? (item.responsibilities||[]) : []).forEach(r => addRespField(r));
   document.getElementById('modalOverlay').classList.add('active');
   document.getElementById('mName').focus();
 }
-
 function addRespField(value) {
   const rl = document.getElementById('mRespList');
-  const div = document.createElement('div');
-  div.className = 'resp-entry';
-  div.innerHTML = `<input class="resp-input" value="${value || ''}" placeholder="Ex: Gestão de infraestrutura cloud"><button type="button" onclick="this.parentElement.remove()">✕</button>`;
+  const div = document.createElement('div'); div.className = 'resp-entry';
+  div.innerHTML = `<input class="resp-input" value="${value||''}" placeholder="Ex: Gestão de infraestrutura"><button type="button" onclick="this.parentElement.remove()">✕</button>`;
   rl.appendChild(div);
 }
-
 function closeModal() { document.getElementById('modalOverlay').classList.remove('active'); editingId = null; }
-
 function saveModal() {
   const name = document.getElementById('mName').value.trim();
   const role = document.getElementById('mRole').value.trim();
   const company = document.getElementById('mCompany').value;
   const level = parseInt(document.getElementById('mLevel').value);
   const reportsTo = document.getElementById('mReportsTo').value ? parseInt(document.getElementById('mReportsTo').value) : null;
-  const responsibilities = Array.from(document.querySelectorAll('#mRespList .resp-input')).map(i => i.value.trim()).filter(v => v);
+  const responsibilities = Array.from(document.querySelectorAll('#mRespList .resp-input')).map(i=>i.value.trim()).filter(v=>v);
   if (!role) { alert('Cargo é obrigatório'); return; }
-  if (editingId !== null) {
-    const item = data.find(d => d.id === editingId);
-    Object.assign(item, {name, role, company, level, reportsTo, responsibilities});
-  } else {
-    data.push({id: nextId++, name, role, company, level, reportsTo, responsibilities});
-  }
+  if (editingId !== null) { const item = data.find(d=>d.id===editingId); Object.assign(item, {name,role,company,level,reportsTo,responsibilities}); }
+  else { data.push({id:nextId++,name,role,company,level,reportsTo,responsibilities}); }
   closeModal(); render(); saveLocal();
 }
-
-function editCard(id) { openModal(data.find(d => d.id === id)); }
+function editCard(id) { openModal(data.find(d=>d.id===id)); }
 function addPosition() { openModal(null); }
-function removeCard(id) {
-  if (confirm('Remover esta posição?')) {
-    data = data.filter(d => d.id !== id);
-    data.forEach(d => { if (d.reportsTo === id) d.reportsTo = null; });
-    render(); saveLocal();
-  }
-}
+function removeCard(id) { if(confirm('Remover esta posição?')){data=data.filter(d=>d.id!==id);data.forEach(d=>{if(d.reportsTo===id)d.reportsTo=null;});render();saveLocal();} }
 
 // --- Unassigned ---
-function addUnassigned(compId) {
-  uaEditCompany = compId; uaEditIndex = null;
-  document.getElementById('uaModalTitle').textContent = 'Nova Responsabilidade';
-  document.getElementById('uaDesc').value = '';
-  document.getElementById('uaAssignRow').style.display = 'none';
-  document.getElementById('uaAssignTo').value = '';
-  document.getElementById('uaModalOverlay').classList.add('active');
-  document.getElementById('uaDesc').focus();
-}
-function editUnassigned(compId, idx) {
-  uaEditCompany = compId; uaEditIndex = idx;
-  document.getElementById('uaModalTitle').textContent = 'Editar Responsabilidade';
-  document.getElementById('uaDesc').value = unassigned[compId][idx];
-  const assignRow = document.getElementById('uaAssignRow');
-  const assignSelect = document.getElementById('uaAssignTo');
-  const people = data.filter(d => d.company === compId && d.name);
-  assignSelect.innerHTML = '<option value="">— Manter pendente —</option>' + people.map(p => `<option value="${p.id}">${p.name} (${p.role})</option>`).join('');
-  assignRow.style.display = 'block';
-  document.getElementById('uaModalOverlay').classList.add('active');
-  document.getElementById('uaDesc').focus();
-}
-function closeUaModal() { document.getElementById('uaModalOverlay').classList.remove('active'); uaEditCompany = null; uaEditIndex = null; }
-function saveUaModal() {
-  const desc = document.getElementById('uaDesc').value.trim();
-  if (!desc) { alert('Descrição é obrigatória'); return; }
-  const assignTo = document.getElementById('uaAssignTo').value;
-  if (assignTo && uaEditIndex !== null) {
-    const person = data.find(d => d.id === parseInt(assignTo));
-    if (person) { if (!person.responsibilities) person.responsibilities = []; person.responsibilities.push(desc); unassigned[uaEditCompany].splice(uaEditIndex, 1); }
-  } else if (uaEditIndex !== null) { unassigned[uaEditCompany][uaEditIndex] = desc; }
-  else { if (!unassigned[uaEditCompany]) unassigned[uaEditCompany] = []; unassigned[uaEditCompany].push(desc); }
-  closeUaModal(); render(); saveLocal();
-}
-function removeUnassigned(compId, idx) { if (confirm('Remover?')) { unassigned[compId].splice(idx, 1); render(); saveLocal(); } }
+function addUnassigned(c){uaEditCompany=c;uaEditIndex=null;document.getElementById('uaModalTitle').textContent='Nova Responsabilidade';document.getElementById('uaDesc').value='';document.getElementById('uaAssignRow').style.display='none';document.getElementById('uaAssignTo').value='';document.getElementById('uaModalOverlay').classList.add('active');document.getElementById('uaDesc').focus();}
+function editUnassigned(c,i){uaEditCompany=c;uaEditIndex=i;document.getElementById('uaModalTitle').textContent='Editar Responsabilidade';document.getElementById('uaDesc').value=unassigned[c][i];const ar=document.getElementById('uaAssignRow'),as=document.getElementById('uaAssignTo');const p=data.filter(d=>d.company===c&&d.name);as.innerHTML='<option value="">— Manter pendente —</option>'+p.map(d=>`<option value="${d.id}">${d.name} (${d.role})</option>`).join('');ar.style.display='block';document.getElementById('uaModalOverlay').classList.add('active');document.getElementById('uaDesc').focus();}
+function closeUaModal(){document.getElementById('uaModalOverlay').classList.remove('active');uaEditCompany=null;uaEditIndex=null;}
+function saveUaModal(){const desc=document.getElementById('uaDesc').value.trim();if(!desc){alert('Descrição é obrigatória');return;}const at=document.getElementById('uaAssignTo').value;if(at&&uaEditIndex!==null){const p=data.find(d=>d.id===parseInt(at));if(p){if(!p.responsibilities)p.responsibilities=[];p.responsibilities.push(desc);unassigned[uaEditCompany].splice(uaEditIndex,1);}}else if(uaEditIndex!==null){unassigned[uaEditCompany][uaEditIndex]=desc;}else{if(!unassigned[uaEditCompany])unassigned[uaEditCompany]=[];unassigned[uaEditCompany].push(desc);}closeUaModal();render();saveLocal();}
+function removeUnassigned(c,i){if(confirm('Remover?')){unassigned[c].splice(i,1);render();saveLocal();}}
 
 // --- Export/Import ---
-function exportJSON() {
-  const blob = new Blob([JSON.stringify({people:data, unassigned}, null, 2)], {type:'application/json'});
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'lionx-organograma.json'; a.click();
-}
-function importJSON() {
-  const fi = document.getElementById('fileInput');
-  fi.onchange = e => {
-    const reader = new FileReader();
-    reader.onload = ev => {
-      try {
-        const parsed = JSON.parse(ev.target.result);
-        if (Array.isArray(parsed)) { data = parsed; } else { data = parsed.people || parsed; unassigned = parsed.unassigned || {lionx:[],pws:[],phiz:[],fabrica:[]}; }
-        nextId = Math.max(...data.map(d=>d.id))+1;
-        data.forEach(d => { if (!d.responsibilities) d.responsibilities = []; });
-        render(); saveLocal();
-      } catch(e) { alert('JSON inválido'); }
-    };
-    reader.readAsText(e.target.files[0]);
-  };
-  fi.click();
-}
+function exportJSON(){const b=new Blob([JSON.stringify({people:data,unassigned},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='lionx-organograma.json';a.click();}
+function importJSON(){const fi=document.getElementById('fileInput');fi.onchange=e=>{const r=new FileReader();r.onload=ev=>{try{const p=JSON.parse(ev.target.result);if(Array.isArray(p)){data=p;}else{data=p.people||p;unassigned=p.unassigned||{lionx:[],pws:[],phiz:[],fabrica:[]};}nextId=Math.max(...data.map(d=>d.id))+1;data.forEach(d=>{if(!d.responsibilities)d.responsibilities=[];});render();saveLocal();}catch(e){alert('JSON inválido');}};r.readAsText(e.target.files[0]);};fi.click();}
+function saveLocal(){try{localStorage.setItem('orgchart-dev',JSON.stringify({people:data,unassigned}));}catch(e){}}
+function loadLocal(){try{const s=localStorage.getItem('orgchart-dev');if(s){const p=JSON.parse(s);if(Array.isArray(p)){data=p;}else{data=p.people||p;unassigned=p.unassigned||{lionx:[],pws:[],phiz:[],fabrica:[]};}nextId=Math.max(...data.map(d=>d.id))+1;data.forEach(d=>{if(!d.responsibilities)d.responsibilities=[];});}}catch(e){}}
 
-function saveLocal() { try { localStorage.setItem('orgchart-dev', JSON.stringify({people:data, unassigned})); } catch(e){} }
-function loadLocal() {
-  try {
-    const s = localStorage.getItem('orgchart-dev');
-    if (s) {
-      const parsed = JSON.parse(s);
-      if (Array.isArray(parsed)) { data = parsed; } else { data = parsed.people || parsed; unassigned = parsed.unassigned || {lionx:[],pws:[],phiz:[],fabrica:[]}; }
-      nextId = Math.max(...data.map(d=>d.id))+1;
-      data.forEach(d => { if (!d.responsibilities) d.responsibilities = []; });
-    }
-  } catch(e){}
-}
-
-document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeUaModal(); } });
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeUaModal();}});
+window.addEventListener('resize', () => drawAllLines());
 
 loadLocal();
 render();
