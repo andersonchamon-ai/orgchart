@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LionX — Organograma</title>
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--card-vacant:#2d1b1b;--border:#334155;--border-vacant:#ef4444;--text:#e2e8f0;--text-muted:#94a3b8;--accent:#3b82f6;--accent2:#8b5cf6;--green:#22c55e;--red:#ef4444;--orange:#f59e0b}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif;overflow:auto}
+.toolbar{position:fixed;top:0;left:0;right:0;background:rgba(15,23,42,0.95);backdrop-filter:blur(10px);padding:12px 24px;display:flex;align-items:center;gap:16px;z-index:100;border-bottom:1px solid var(--border)}
+.toolbar h1{font-size:18px;font-weight:700;color:var(--accent)}
+.toolbar .stats{margin-left:auto;font-size:13px;color:var(--text-muted)}
+.toolbar button{background:var(--accent);color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600}
+.toolbar button:hover{opacity:0.85}
+.toolbar button.secondary{background:var(--border)}
+.container{padding:80px 24px 40px;min-height:100vh}
+.level-label{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin:30px 0 12px;padding-left:8px}
+.company-section{margin-bottom:40px}
+.company-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding:12px 16px;background:var(--card);border-radius:10px;border-left:4px solid var(--accent)}
+.company-header h2{font-size:16px;font-weight:700}
+.company-header .tag{font-size:11px;padding:3px 8px;border-radius:4px;font-weight:600}
+.tag-pws{background:#0e4429;color:#22c55e}
+.tag-phiz{background:#1e1b4b;color:#818cf8}
+.tag-fab{background:#422006;color:#f59e0b}
+.tag-holding{background:#172554;color:#60a5fa}
+.org-grid{display:flex;flex-direction:column;gap:8px;padding-left:20px;border-left:2px solid var(--border)}
+.level-row{display:flex;flex-wrap:wrap;gap:8px;padding:4px 0}
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px 16px;min-width:200px;max-width:280px;cursor:pointer;transition:all 0.2s;position:relative}
+.card:hover{border-color:var(--accent);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.3)}
+.card.vacant{background:var(--card-vacant);border:1px dashed var(--border-vacant)}
+.card.vacant .card-name{color:var(--red);font-style:italic}
+.card .card-name{font-size:14px;font-weight:600;margin-bottom:2px}
+.card .card-role{font-size:12px;color:var(--text-muted)}
+.card .card-level{position:absolute;top:8px;right:10px;font-size:10px;color:var(--text-muted);opacity:0.5}
+.card .remove-btn{position:absolute;top:6px;right:6px;background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;opacity:0;transition:opacity 0.2s;padding:2px 6px}
+.card:hover .remove-btn{opacity:0.7}
+.card .remove-btn:hover{opacity:1}
+.add-btn{background:transparent;border:1px dashed var(--border);border-radius:8px;padding:12px 16px;min-width:120px;cursor:pointer;color:var(--text-muted);font-size:13px;transition:all 0.2s}
+.add-btn:hover{border-color:var(--accent);color:var(--accent)}
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;justify-content:center;align-items:center}
+.modal-overlay.active{display:flex}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;width:90%;max-width:400px}
+.modal h3{margin-bottom:16px;font-size:16px}
+.modal label{display:block;font-size:12px;color:var(--text-muted);margin-bottom:4px;margin-top:12px}
+.modal input,.modal select{width:100%;padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:14px}
+.modal .btn-row{display:flex;gap:8px;margin-top:20px;justify-content:flex-end}
+.modal button{padding:8px 20px;border-radius:6px;border:none;cursor:pointer;font-weight:600;font-size:13px}
+.modal .btn-save{background:var(--accent);color:#fff}
+.modal .btn-cancel{background:var(--border);color:var(--text)}
+.modal .btn-vacant{background:var(--red);color:#fff}
+.legend{display:flex;gap:16px;align-items:center;font-size:12px;color:var(--text-muted);margin-left:16px}
+.legend span{display:flex;align-items:center;gap:4px}
+.legend .dot{width:10px;height:10px;border-radius:3px}
+.dot-filled{background:var(--accent)}
+.dot-vacant{background:var(--red);border:1px dashed var(--red)}
+</style>
+</head><body>
+
+<div class="toolbar">
+  <h1>🦁 LionX — Organograma</h1>
+  <div class="legend">
+    <span><span class="dot dot-filled"></span> Preenchido</span>
+    <span><span class="dot dot-vacant"></span> Vaga aberta</span>
+  </div>
+  <div class="stats" id="stats"></div>
+  <button class="secondary" onclick="exportJSON()">💾 Exportar JSON</button>
+  <button class="secondary" onclick="importJSON()">📂 Importar</button>
+  <button onclick="addPosition()">+ Posição</button>
+</div>
+
+<div class="container" id="container"></div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h3 id="modalTitle">Editar Posição</h3>
+    <label>Nome</label>
+    <input id="mName" placeholder="Nome da pessoa (vazio = vaga aberta)">
+    <label>Cargo / Role</label>
+    <input id="mRole" placeholder="Ex: CTO, Head of Engineering">
+    <label>Empresa</label>
+    <select id="mCompany"></select>
+    <label>Nível</label>
+    <select id="mLevel">
+      <option value="1">N-1 (C-Level / Direto ao CEO)</option>
+      <option value="2">N-2 (Diretoria / Head)</option>
+      <option value="3">N-3 (Gerência / Coordenação)</option>
+    </select>
+    <label>Reporta a</label>
+    <select id="mReportsTo"><option value="">— Ninguém (topo) —</option></select>
+    <div class="btn-row">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-save" onclick="saveModal()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="fileInput" accept=".json" style="display:none">
+
+<script>
+const COMPANIES = [
+  {id:'lionx', name:'LionX (Holding)', tag:'tag-holding', color:'#3b82f6'},
+  {id:'pws', name:'PWS Cloud', tag:'tag-pws', color:'#22c55e'},
+  {id:'phiz', name:'PhizChat (Fizz)', tag:'tag-phiz', color:'#818cf8'},
+  {id:'fabrica', name:'Fábrica de Software', tag:'tag-fab', color:'#f59e0b'},
+];
+
+let data = [
+  // Holding
+  {id:1, name:'Anderson Chamon', role:'CEO', company:'lionx', level:0, reportsTo:null},
+  // PWS
+  {id:10, name:'Márcio', role:'CEO', company:'pws', level:1, reportsTo:1},
+  {id:11, name:'', role:'CTO', company:'pws', level:2, reportsTo:10},
+  {id:12, name:'', role:'Head of Sales', company:'pws', level:2, reportsTo:10},
+  {id:13, name:'Kiko', role:'Consultor Cloud (ex-Magalu)', company:'pws', level:2, reportsTo:10},
+  {id:14, name:'', role:'Head of Engineering', company:'pws', level:3, reportsTo:11},
+  {id:15, name:'', role:'Head of Operations / SRE', company:'pws', level:3, reportsTo:11},
+  // PhizChat
+  {id:20, name:'Raphael', role:'CEO', company:'phiz', level:1, reportsTo:1},
+  {id:21, name:'', role:'CTO / VP Engineering', company:'phiz', level:2, reportsTo:20},
+  {id:22, name:'', role:'Head of Product', company:'phiz', level:2, reportsTo:20},
+  {id:23, name:'', role:'Head of Marketing', company:'phiz', level:2, reportsTo:20},
+  {id:24, name:'', role:'Head of Data / LGPD', company:'phiz', level:2, reportsTo:20},
+  {id:25, name:'', role:'QA Lead / War Room', company:'phiz', level:3, reportsTo:21},
+  {id:26, name:'', role:'Tech Lead - Call', company:'phiz', level:3, reportsTo:21},
+  {id:27, name:'', role:'Tech Lead - Chat', company:'phiz', level:3, reportsTo:21},
+  {id:28, name:'', role:'Designer Lead (UI/UX)', company:'phiz', level:3, reportsTo:22},
+  // Fábrica
+  {id:30, name:'Jenner', role:'CEO', company:'fabrica', level:1, reportsTo:1},
+  {id:31, name:'Gênero', role:'Gestor Operacional', company:'fabrica', level:2, reportsTo:30},
+  {id:32, name:'Wesley', role:'Líder Técnico', company:'fabrica', level:2, reportsTo:30},
+  {id:33, name:'', role:'Head de Vendas / Novos Projetos', company:'fabrica', level:2, reportsTo:30},
+  {id:34, name:'', role:'Coordenador de Squads', company:'fabrica', level:3, reportsTo:31},
+  // Holding - Suporte
+  {id:40, name:'Ju', role:'Financeiro', company:'lionx', level:2, reportsTo:1},
+  {id:41, name:'Bruna', role:'RH', company:'lionx', level:2, reportsTo:1},
+  {id:42, name:'André', role:'CFO (JTF)', company:'lionx', level:2, reportsTo:1},
+  {id:43, name:'', role:'Chief of Staff', company:'lionx', level:2, reportsTo:1},
+];
+
+let nextId = 100;
+let editingId = null;
+
+function render() {
+  const c = document.getElementById('container');
+  let html = '';
+  
+  // Group by company
+  for (const comp of COMPANIES) {
+    const items = data.filter(d => d.company === comp.id).sort((a,b) => a.level - b.level || a.name.localeCompare(b.name));
+    if (items.length === 0) continue;
+    
+    html += `<div class="company-section">`;
+    html += `<div class="company-header"><h2>${comp.name}</h2><span class="tag ${comp.tag}">${items.filter(i=>i.name).length}/${items.length} preenchidos</span></div>`;
+    
+    const levels = [0,1,2,3];
+    for (const lvl of levels) {
+      const levelItems = items.filter(i => i.level === lvl);
+      if (levelItems.length === 0) continue;
+      const levelNames = ['CEO Holding','N-1 (C-Level)','N-2 (Diretoria/Head)','N-3 (Gerência/Coord)'];
+      html += `<div class="org-grid"><div class="level-label">${levelNames[lvl]}</div><div class="level-row">`;
+      for (const item of levelItems) {
+        const vacant = !item.name;
+        const reportsToName = item.reportsTo ? data.find(d=>d.id===item.reportsTo)?.name || '?' : '';
+        html += `<div class="card ${vacant?'vacant':''}" onclick="editCard(${item.id})">
+          <div class="card-name">${vacant ? '⚠️ VAGA ABERTA' : item.name}</div>
+          <div class="card-role">${item.role}</div>
+          ${reportsToName ? `<div class="card-level">→ ${reportsToName}</div>` : ''}
+          <button class="remove-btn" onclick="event.stopPropagation();removeCard(${item.id})">✕</button>
+        </div>`;
+      }
+      html += `</div></div>`;
+    }
+    html += `</div>`;
+  }
+  
+  c.innerHTML = html;
+  
+  // Stats
+  const total = data.length;
+  const filled = data.filter(d => d.name).length;
+  const vacant = total - filled;
+  document.getElementById('stats').textContent = `${filled} preenchidos · ${vacant} vagas abertas · ${total} total`;
+}
+
+function openModal(item) {
+  editingId = item ? item.id : null;
+  document.getElementById('modalTitle').textContent = item ? 'Editar Posição' : 'Nova Posição';
+  document.getElementById('mName').value = item ? item.name : '';
+  document.getElementById('mRole').value = item ? item.role : '';
+  
+  // Populate company select
+  const cs = document.getElementById('mCompany');
+  cs.innerHTML = COMPANIES.map(c => `<option value="${c.id}" ${item && item.company===c.id?'selected':''}>${c.name}</option>`).join('');
+  
+  // Level
+  document.getElementById('mLevel').value = item ? item.level : 2;
+  
+  // Reports to
+  const rs = document.getElementById('mReportsTo');
+  rs.innerHTML = '<option value="">— Ninguém (topo) —</option>' + 
+    data.filter(d => d.name && (!item || d.id !== item.id)).map(d => 
+      `<option value="${d.id}" ${item && item.reportsTo===d.id?'selected':''}>${d.name} (${d.role})</option>`
+    ).join('');
+  
+  document.getElementById('modalOverlay').classList.add('active');
+  document.getElementById('mName').focus();
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('active');
+  editingId = null;
+}
+
+function saveModal() {
+  const name = document.getElementById('mName').value.trim();
+  const role = document.getElementById('mRole').value.trim();
+  const company = document.getElementById('mCompany').value;
+  const level = parseInt(document.getElementById('mLevel').value);
+  const reportsTo = document.getElementById('mReportsTo').value ? parseInt(document.getElementById('mReportsTo').value) : null;
+  
+  if (!role) { alert('Cargo é obrigatório'); return; }
+  
+  if (editingId !== null) {
+    const item = data.find(d => d.id === editingId);
+    Object.assign(item, {name, role, company, level, reportsTo});
+  } else {
+    data.push({id: nextId++, name, role, company, level, reportsTo});
+  }
+  
+  closeModal();
+  render();
+  saveLocal();
+}
+
+function editCard(id) { openModal(data.find(d => d.id === id)); }
+function addPosition() { openModal(null); }
+function removeCard(id) { 
+  if (confirm('Remover esta posição?')) { 
+    data = data.filter(d => d.id !== id); 
+    data.forEach(d => { if (d.reportsTo === id) d.reportsTo = null; });
+    render(); saveLocal(); 
+  } 
+}
+
+function exportJSON() {
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'lionx-organograma.json'; a.click();
+}
+
+function importJSON() {
+  const fi = document.getElementById('fileInput');
+  fi.onchange = e => {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try { data = JSON.parse(ev.target.result); nextId = Math.max(...data.map(d=>d.id))+1; render(); saveLocal(); }
+      catch(e) { alert('JSON inválido'); }
+    };
+    reader.readAsText(e.target.files[0]);
+  };
+  fi.click();
+}
+
+function saveLocal() { try { localStorage.setItem('orgchart', JSON.stringify(data)); } catch(e){} }
+function loadLocal() { 
+  try { 
+    const s = localStorage.getItem('orgchart'); 
+    if (s) { data = JSON.parse(s); nextId = Math.max(...data.map(d=>d.id))+1; }
+  } catch(e){} 
+}
+
+// Keyboard
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+loadLocal();
+render();
+</script>
+</body></html>
