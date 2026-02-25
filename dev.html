@@ -121,6 +121,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
   <div class="stats" id="stats"></div>
   <button class="secondary" onclick="exportJSON()">💾 Exportar</button>
   <button class="secondary" onclick="importJSON()">📂 Importar</button>
+  <button class="secondary" onclick="showBackups()">🔄 Backups</button>
   <button onclick="addPosition()">+ Posição</button>
 </div>
 <div class="container" id="container"></div>
@@ -456,9 +457,48 @@ function saveUaModal(){const desc=document.getElementById('uaDesc').value.trim()
 function removeUnassigned(c,i){if(confirm('Remover?')){unassigned[c].splice(i,1);render();saveLocal();}}
 
 // --- Export/Import ---
+function showBackups(){
+  const backups = JSON.parse(localStorage.getItem('orgchart-backups')||'[]');
+  if(backups.length===0){alert('Nenhum backup disponível.');return;}
+  const options = backups.map((b,i)=>{
+    const d = new Date(b.ts);
+    const parsed = JSON.parse(b.data);
+    const count = (parsed.people||[]).length;
+    return `${i+1}. ${d.toLocaleDateString('pt-BR')} ${d.toLocaleTimeString('pt-BR')} (${count} posições)`;
+  }).join('\n');
+  const choice = prompt(`Backups disponíveis (mais recente = último):\n\n${options}\n\nDigite o número para restaurar (ou cancele):`);
+  if(!choice) return;
+  const idx = parseInt(choice)-1;
+  if(idx<0||idx>=backups.length){alert('Número inválido');return;}
+  if(!confirm('Restaurar este backup? Os dados atuais serão substituídos.')) return;
+  const parsed = JSON.parse(backups[idx].data);
+  if(Array.isArray(parsed)){data=parsed;}else{data=parsed.people||parsed;unassigned=parsed.unassigned||{lionx:[],pws:[],phiz:[],fabrica:[]};}
+  nextId=Math.max(...data.map(d=>d.id))+1;
+  data.forEach(d=>{if(!d.responsibilities)d.responsibilities=[];});
+  localStorage.setItem('orgchart-dev',backups[idx].data);
+  render();
+  alert('Backup restaurado!');
+}
+
 function exportJSON(){const b=new Blob([JSON.stringify({people:data,unassigned},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='lionx-organograma.json';a.click();}
 function importJSON(){const fi=document.getElementById('fileInput');fi.onchange=e=>{const r=new FileReader();r.onload=ev=>{try{const p=JSON.parse(ev.target.result);if(Array.isArray(p)){data=p;}else{data=p.people||p;unassigned=p.unassigned||{lionx:[],pws:[],phiz:[],fabrica:[]};}nextId=Math.max(...data.map(d=>d.id))+1;data.forEach(d=>{if(!d.responsibilities)d.responsibilities=[];});render();saveLocal();}catch(e){alert('JSON inválido');}};r.readAsText(e.target.files[0]);};fi.click();}
-function saveLocal(){try{localStorage.setItem('orgchart-dev',JSON.stringify({people:data,unassigned}));}catch(e){}}
+function saveLocal(){
+  try{
+    const payload = JSON.stringify({people:data,unassigned});
+    localStorage.setItem('orgchart-dev', payload);
+    // Auto-backup: keep last 5 snapshots with timestamps
+    const backups = JSON.parse(localStorage.getItem('orgchart-backups')||'[]');
+    const now = Date.now();
+    const lastBackup = backups.length > 0 ? backups[backups.length-1].ts : 0;
+    // Backup at most every 5 minutes
+    if (now - lastBackup > 5*60*1000) {
+      backups.push({ts:now, data:payload});
+      // Keep last 10 backups
+      while(backups.length > 10) backups.shift();
+      localStorage.setItem('orgchart-backups', JSON.stringify(backups));
+    }
+  }catch(e){}
+}
 function loadLocal(){try{const s=localStorage.getItem('orgchart-dev');if(s){const p=JSON.parse(s);if(Array.isArray(p)){data=p;}else{data=p.people||p;unassigned=p.unassigned||{lionx:[],pws:[],phiz:[],fabrica:[]};}nextId=Math.max(...data.map(d=>d.id))+1;data.forEach(d=>{if(!d.responsibilities)d.responsibilities=[];});}}catch(e){}}
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeUaModal();}});
