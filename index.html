@@ -249,6 +249,16 @@ function render() {
   document.getElementById('stats').textContent = `${filled} preenchidos · ${vacant} vagas · ${totalUa} resp. a definir`;
 }
 
+function updateReportsTo(item) {
+  const company = document.getElementById('mCompany').value;
+  const rs = document.getElementById('mReportsTo');
+  const currentVal = item ? item.reportsTo : null;
+  // Include people from selected company + holding (for cross-company reporting to Anderson)
+  const people = data.filter(d => d.name && (!item || d.id !== item.id) && (d.company === company || d.company === 'lionx'));
+  rs.innerHTML = '<option value="">— Ninguém (topo) —</option>' + 
+    people.map(d => `<option value="${d.id}" ${currentVal===d.id?'selected':''}>${d.name} (${d.role})</option>`).join('');
+}
+
 // --- Person Modal ---
 function openModal(item) {
   editingId = item ? item.id : null;
@@ -261,11 +271,10 @@ function openModal(item) {
   
   document.getElementById('mLevel').value = item ? item.level : 2;
   
-  const rs = document.getElementById('mReportsTo');
-  rs.innerHTML = '<option value="">— Ninguém (topo) —</option>' + 
-    data.filter(d => d.name && (!item || d.id !== item.id)).map(d => 
-      `<option value="${d.id}" ${item && item.reportsTo===d.id?'selected':''}>${d.name} (${d.role})</option>`
-    ).join('');
+  updateReportsTo(item);
+  
+  // Update reportsTo when company changes
+  document.getElementById('mCompany').onchange = () => updateReportsTo(item);
   
   // Responsibilities
   const rl = document.getElementById('mRespList');
