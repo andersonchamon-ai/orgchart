@@ -31,28 +31,25 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 
 /* Tree org chart */
 .org-tree{display:flex;flex-direction:column;align-items:center;overflow-x:auto;padding:20px 0}
-.org-tree ul{display:flex;justify-content:center;padding-top:20px;position:relative;transition:all 0.3s}
+.org-tree ul{display:flex;justify-content:center;padding-top:20px;position:relative;transition:all 0.3s;list-style:none}
+/* Vertical line from parent down to horizontal bar */
 .org-tree ul::before{content:'';position:absolute;top:0;left:50%;border-left:2px solid var(--line);height:20px}
-.org-tree li{display:flex;flex-direction:column;align-items:center;position:relative;padding:20px 12px 0;list-style:none}
-/* Horizontal connector */
-.org-tree li::before,.org-tree li::after{content:'';position:absolute;top:0;width:50%;height:20px;border-top:2px solid var(--line)}
-.org-tree li::before{right:50%}
-.org-tree li::after{left:50%}
-.org-tree li:first-child::before{border:none}
-.org-tree li:last-child::after{border:none}
-.org-tree li:only-child::before,.org-tree li:only-child::after{border:none}
-/* Vertical line down from parent */
-.org-tree li:first-child::before{border-left:none}
-.org-tree li:last-child::after{border-right:none}
-/* Vertical line to children */
-.org-tree ul > li::before{border-left:2px solid var(--line)}
-.org-tree li:first-child::before{border-left:2px solid var(--line);border-top-left-radius:4px}
-.org-tree li:last-child::after{border:none}
-.org-tree li:last-child::before{border-top-right-radius:4px}
-/* Only child - just vertical line */
-.org-tree li:only-child{padding-top:20px}
-.org-tree li:only-child::before{height:20px;border-top:none}
-/* Root */
+.org-tree li{display:flex;flex-direction:column;align-items:center;position:relative;padding:20px 16px 0}
+/* Horizontal bar across siblings + vertical stub down to each child */
+.org-tree li::before{content:'';position:absolute;top:0;left:0;right:50%;height:20px;border-top:2px solid var(--line);border-left:2px solid var(--line);border-top-left-radius:4px}
+.org-tree li::after{content:'';position:absolute;top:0;left:50%;right:0;height:20px;border-top:2px solid var(--line);border-right:2px solid var(--line);border-top-right-radius:4px}
+/* First child: no left horizontal */
+.org-tree li:first-child::before{border-top:none;border-left:none;border-radius:0}
+/* Last child: no right horizontal */
+.org-tree li:last-child::after{border-top:none;border-right:none;border-radius:0}
+/* Middle children: straight horizontal, vertical comes from ul::before logic */
+.org-tree li:not(:first-child):not(:last-child)::before{border-radius:0;border-left:none}
+.org-tree li:not(:first-child):not(:last-child)::after{border-radius:0;border-right:none}
+/* Only child: just a vertical line */
+.org-tree li:only-child::before,
+.org-tree li:only-child::after{border:none}
+.org-tree li:only-child::before{content:'';position:absolute;top:0;left:50%;width:0;height:20px;border-left:2px solid var(--line);border-top:none;border-radius:0}
+/* Root level: no connectors */
 .org-tree > ul::before{display:none}
 .org-tree > ul > li::before,.org-tree > ul > li::after{border:none}
 
