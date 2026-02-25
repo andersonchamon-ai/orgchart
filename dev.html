@@ -1,61 +1,110 @@
 <!DOCTYPE html>
 <html lang="pt-BR"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LionX — Organograma</title>
+<title>LionX — Organograma (DEV)</title>
 <style>
-:root{--bg:#0f172a;--card:#1e293b;--card-vacant:#2d1b1b;--border:#334155;--border-vacant:#ef4444;--text:#e2e8f0;--text-muted:#94a3b8;--accent:#3b82f6;--accent2:#8b5cf6;--green:#22c55e;--red:#ef4444;--orange:#f59e0b;--yellow:#eab308}
+:root{--bg:#0f172a;--card:#1e293b;--card-vacant:#2d1b1b;--border:#334155;--border-vacant:#ef4444;--text:#e2e8f0;--text-muted:#94a3b8;--accent:#3b82f6;--green:#22c55e;--red:#ef4444;--orange:#f59e0b;--line:#475569}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif;overflow:auto}
-.toolbar{position:fixed;top:0;left:0;right:0;background:rgba(15,23,42,0.95);backdrop-filter:blur(10px);padding:12px 24px;display:flex;align-items:center;gap:16px;z-index:100;border-bottom:1px solid var(--border)}
+
+/* Banner */
+.dev-banner{background:#f59e0b;color:#000;text-align:center;padding:6px;font-size:13px;font-weight:700;position:fixed;top:0;left:0;right:0;z-index:200}
+.toolbar{position:fixed;top:32px;left:0;right:0;background:rgba(15,23,42,0.95);backdrop-filter:blur(10px);padding:12px 24px;display:flex;align-items:center;gap:16px;z-index:100;border-bottom:1px solid var(--border)}
 .toolbar h1{font-size:18px;font-weight:700;color:var(--accent)}
 .toolbar .stats{margin-left:auto;font-size:13px;color:var(--text-muted)}
 .toolbar button{background:var(--accent);color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600}
 .toolbar button:hover{opacity:0.85}
 .toolbar button.secondary{background:var(--border)}
 .container{padding:112px 24px 40px;min-height:100vh}
-.level-label{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin:30px 0 12px;padding-left:8px}
-.company-section{margin-bottom:40px}
-.company-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding:12px 16px;background:var(--card);border-radius:10px;border-left:4px solid var(--accent)}
-.company-header h2{font-size:16px;font-weight:700}
-.company-header .tag{font-size:11px;padding:3px 8px;border-radius:4px;font-weight:600}
+
+/* Tags */
+.tag{font-size:11px;padding:3px 8px;border-radius:4px;font-weight:600}
 .tag-pws{background:#0e4429;color:#22c55e}
 .tag-phiz{background:#1e1b4b;color:#818cf8}
 .tag-fab{background:#422006;color:#f59e0b}
 .tag-holding{background:#172554;color:#60a5fa}
-.org-grid{display:flex;flex-direction:column;gap:8px;padding-left:20px;border-left:2px solid var(--border)}
-.level-row{display:flex;flex-wrap:wrap;gap:8px;padding:4px 0}
-.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px 16px;min-width:200px;max-width:280px;cursor:pointer;transition:all 0.2s;position:relative}
-.card:hover{border-color:var(--accent);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.3)}
-.card.vacant{background:var(--card-vacant);border:1px dashed var(--border-vacant)}
-.card.vacant .card-name{color:var(--red);font-style:italic}
-.card .card-name{font-size:14px;font-weight:600;margin-bottom:2px}
-.card .card-role{font-size:12px;color:var(--text-muted)}
-.card .card-level{position:absolute;top:8px;right:10px;font-size:10px;color:var(--text-muted);opacity:0.5}
-.card .remove-btn{position:absolute;top:6px;right:6px;background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;opacity:0;transition:opacity 0.2s;padding:2px 6px}
-.card:hover .remove-btn{opacity:0.7}
-.card .remove-btn:hover{opacity:1}
-.add-btn{background:transparent;border:1px dashed var(--border);border-radius:8px;padding:12px 16px;min-width:120px;cursor:pointer;color:var(--text-muted);font-size:13px;transition:all 0.2s}
-.add-btn:hover{border-color:var(--accent);color:var(--accent)}
-/* Unassigned footer */
-.unassigned-section{margin-top:16px;padding:14px 16px;background:rgba(148,163,184,0.04);border:1px dashed var(--border);border-radius:10px}
+
+/* Company section */
+.company-section{margin-bottom:48px}
+.company-header{display:flex;align-items:center;gap:12px;margin-bottom:24px;padding:12px 16px;background:var(--card);border-radius:10px;border-left:4px solid var(--accent)}
+.company-header h2{font-size:16px;font-weight:700}
+
+/* Tree org chart */
+.org-tree{display:flex;flex-direction:column;align-items:center;overflow-x:auto;padding:20px 0}
+.org-tree ul{display:flex;justify-content:center;padding-top:20px;position:relative;transition:all 0.3s}
+.org-tree ul::before{content:'';position:absolute;top:0;left:50%;border-left:2px solid var(--line);height:20px}
+.org-tree li{display:flex;flex-direction:column;align-items:center;position:relative;padding:20px 12px 0;list-style:none}
+/* Horizontal connector */
+.org-tree li::before,.org-tree li::after{content:'';position:absolute;top:0;width:50%;height:20px;border-top:2px solid var(--line)}
+.org-tree li::before{right:50%}
+.org-tree li::after{left:50%}
+.org-tree li:first-child::before{border:none}
+.org-tree li:last-child::after{border:none}
+.org-tree li:only-child::before,.org-tree li:only-child::after{border:none}
+/* Vertical line down from parent */
+.org-tree li:first-child::before{border-left:none}
+.org-tree li:last-child::after{border-right:none}
+/* Vertical line to children */
+.org-tree ul > li::before{border-left:2px solid var(--line)}
+.org-tree li:first-child::before{border-left:2px solid var(--line);border-top-left-radius:4px}
+.org-tree li:last-child::after{border:none}
+.org-tree li:last-child::before{border-top-right-radius:4px}
+/* Only child - just vertical line */
+.org-tree li:only-child{padding-top:20px}
+.org-tree li:only-child::before{height:20px;border-top:none}
+/* Root */
+.org-tree > ul::before{display:none}
+.org-tree > ul > li::before,.org-tree > ul > li::after{border:none}
+
+/* Card */
+.node-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;min-width:180px;max-width:240px;cursor:pointer;transition:all 0.2s;text-align:center;position:relative}
+.node-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,0.3)}
+.node-card.vacant{background:var(--card-vacant);border:1px dashed var(--border-vacant)}
+.node-card.vacant .node-name{color:var(--red);font-style:italic}
+.node-card.ceo{border-color:var(--accent);border-width:2px}
+.node-name{font-size:14px;font-weight:600;margin-bottom:2px}
+.node-role{font-size:12px;color:var(--text-muted)}
+.node-card .remove-btn{position:absolute;top:4px;right:6px;background:none;border:none;color:var(--red);cursor:pointer;font-size:13px;opacity:0;transition:opacity 0.2s;padding:2px 4px}
+.node-card:hover .remove-btn{opacity:0.5}
+.node-card .remove-btn:hover{opacity:1}
+
+/* Collapse toggle */
+.toggle-btn{display:inline-block;background:var(--border);border:none;color:var(--text-muted);width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:12px;line-height:22px;text-align:center;margin-top:6px;transition:all 0.2s}
+.toggle-btn:hover{background:var(--accent);color:#fff}
+.collapsed > ul{display:none}
+.collapsed .toggle-btn{background:var(--accent);color:#fff}
+
+/* Holding section (simple) */
+.holding-row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:8px}
+.holding-section{text-align:center;margin-bottom:40px}
+.holding-section .level-label{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin:20px 0 12px}
+
+/* Unassigned */
+.unassigned-section{margin-top:20px;padding:14px 16px;background:rgba(148,163,184,0.04);border:1px dashed var(--border);border-radius:10px}
 .unassigned-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .unassigned-header h3{font-size:12px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px}
 .unassigned-header button{background:transparent;border:1px dashed var(--border);color:var(--text-muted);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500}
 .unassigned-header button:hover{border-color:var(--text-muted);color:var(--text)}
 .unassigned-list{display:flex;flex-wrap:wrap;gap:8px}
-.unassigned-item{background:transparent;border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:12px;color:var(--text-muted);cursor:pointer;transition:all 0.2s;position:relative;display:flex;align-items:center;gap:8px}
+.unassigned-item{background:transparent;border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:12px;color:var(--text-muted);cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:8px}
 .unassigned-item:hover{border-color:var(--text-muted);color:var(--text)}
-.unassigned-item .remove-ua{background:none;border:none;color:var(--red);cursor:pointer;font-size:12px;opacity:0;transition:opacity 0.2s;padding:0 2px}
+.unassigned-item .remove-ua{background:none;border:none;color:var(--red);cursor:pointer;font-size:12px;opacity:0;transition:opacity 0.2s}
 .unassigned-item:hover .remove-ua{opacity:0.7}
-.unassigned-item .remove-ua:hover{opacity:1}
+
+/* Legend */
+.legend{display:flex;gap:16px;align-items:center;font-size:12px;color:var(--text-muted);margin-left:16px}
+.legend span{display:flex;align-items:center;gap:4px}
+.legend .dot{width:10px;height:10px;border-radius:3px}
+.dot-filled{background:var(--accent)}
+.dot-vacant{background:var(--red);border:1px dashed var(--red)}
+
 /* Modal */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;justify-content:center;align-items:center}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:300;justify-content:center;align-items:center}
 .modal-overlay.active{display:flex}
 .modal{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;width:90%;max-width:450px;max-height:90vh;overflow-y:auto}
 .modal h3{margin-bottom:16px;font-size:16px}
 .modal label{display:block;font-size:12px;color:var(--text-muted);margin-bottom:4px;margin-top:12px}
-.modal input,.modal select,.modal textarea{width:100%;padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:14px;font-family:inherit}
-.modal textarea{resize:vertical;min-height:60px}
+.modal input,.modal select{width:100%;padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:14px;font-family:inherit}
 .modal .btn-row{display:flex;gap:8px;margin-top:20px;justify-content:flex-end}
 .modal button{padding:8px 20px;border-radius:6px;border:none;cursor:pointer;font-weight:600;font-size:13px}
 .modal .btn-save{background:var(--accent);color:#fff}
@@ -66,22 +115,19 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .modal .resp-entry button{background:var(--red);color:#fff;padding:6px 10px;border-radius:4px;border:none;cursor:pointer;font-size:12px}
 .modal .add-resp-btn{background:transparent;border:1px dashed var(--border);color:var(--text-muted);padding:6px 12px;border-radius:4px;cursor:pointer;font-size:12px;margin-top:4px}
 .modal .add-resp-btn:hover{border-color:var(--accent);color:var(--accent)}
-.legend{display:flex;gap:16px;align-items:center;font-size:12px;color:var(--text-muted);margin-left:16px}
-.legend span{display:flex;align-items:center;gap:4px}
-.legend .dot{width:10px;height:10px;border-radius:3px}
-.dot-filled{background:var(--accent)}
-.dot-vacant{background:var(--red);border:1px dashed var(--red)}
 </style>
 </head><body>
 
-<div style="background:#f59e0b;color:#000;text-align:center;padding:6px;font-size:13px;font-weight:700;position:fixed;top:0;left:0;right:0;z-index:200">⚠️ AMBIENTE DE TESTE — não é a versão final</div>
-<div class="toolbar" style="top:32px">
+<div class="dev-banner">⚠️ AMBIENTE DE TESTE — não é a versão final</div>
+
+<div class="toolbar">
+  <h1>🦁 LionX — Organograma</h1>
   <div class="legend">
     <span><span class="dot dot-filled"></span> Preenchido</span>
     <span><span class="dot dot-vacant"></span> Vaga aberta</span>
   </div>
   <div class="stats" id="stats"></div>
-  <button class="secondary" onclick="exportJSON()">💾 Exportar JSON</button>
+  <button class="secondary" onclick="exportJSON()">💾 Exportar</button>
   <button class="secondary" onclick="importJSON()">📂 Importar</button>
   <button onclick="addPosition()">+ Posição</button>
 </div>
@@ -116,7 +162,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
   </div>
 </div>
 
-<!-- Unassigned Responsibility Modal -->
+<!-- Unassigned Modal -->
 <div class="modal-overlay" id="uaModalOverlay">
   <div class="modal">
     <h3 id="uaModalTitle">Nova Responsabilidade</h3>
@@ -144,15 +190,12 @@ const COMPANIES = [
 ];
 
 let data = [
-  // Holding
   {id:1, name:'Anderson Chamon', role:'CEO', company:'lionx', level:0, reportsTo:null, responsibilities:[]},
-  // PWS
   {id:10, name:'Márcio Galbe', role:'CEO', company:'pws', level:1, reportsTo:1, responsibilities:[]},
   {id:11, name:'Henrique Weber', role:'CTO', company:'pws', level:2, reportsTo:10, responsibilities:[]},
   {id:12, name:'Dyane Caroliny', role:'Head Human Resources', company:'pws', level:2, reportsTo:10, responsibilities:[]},
   {id:13, name:'Rodrigo Lima', role:'Coordenador Financeiro', company:'pws', level:2, reportsTo:10, responsibilities:[]},
   {id:14, name:'Allan Yukio Oka', role:'Head Growth', company:'pws', level:2, reportsTo:10, responsibilities:[]},
-  // PhizChat
   {id:20, name:'Raphael', role:'CEO', company:'phiz', level:1, reportsTo:1, responsibilities:[]},
   {id:21, name:'Louis', role:'CTO', company:'phiz', level:2, reportsTo:20, responsibilities:[]},
   {id:22, name:'Luiz Felipe (Luizinho)', role:'CPO', company:'phiz', level:2, reportsTo:20, responsibilities:[]},
@@ -162,81 +205,112 @@ let data = [
   {id:26, name:'', role:'Tech Lead - Call', company:'phiz', level:3, reportsTo:21, responsibilities:[]},
   {id:27, name:'', role:'Tech Lead - Chat', company:'phiz', level:3, reportsTo:21, responsibilities:[]},
   {id:28, name:'', role:'Designer Lead (UI/UX)', company:'phiz', level:3, reportsTo:22, responsibilities:[]},
-  // Fábrica
   {id:30, name:'Jenner', role:'CEO', company:'fabrica', level:1, reportsTo:1, responsibilities:[]},
   {id:31, name:'Gênero', role:'Gestor Operacional', company:'fabrica', level:2, reportsTo:30, responsibilities:[]},
   {id:32, name:'Wesley', role:'Líder Técnico', company:'fabrica', level:2, reportsTo:30, responsibilities:[]},
   {id:33, name:'', role:'Head de Vendas / Novos Projetos', company:'fabrica', level:2, reportsTo:30, responsibilities:[]},
   {id:34, name:'', role:'Coordenador de Squads', company:'fabrica', level:3, reportsTo:31, responsibilities:[]},
-  // Holding - Suporte
   {id:40, name:'Ju', role:'Financeiro', company:'lionx', level:2, reportsTo:1, responsibilities:[]},
   {id:41, name:'Bruna', role:'RH', company:'lionx', level:2, reportsTo:1, responsibilities:[]},
   {id:42, name:'André', role:'CFO (JTF)', company:'lionx', level:2, reportsTo:1, responsibilities:[]},
   {id:43, name:'', role:'Chief of Staff', company:'lionx', level:2, reportsTo:1, responsibilities:[]},
 ];
 
-// Unassigned responsibilities per company
-let unassigned = {
-  lionx: [],
-  pws: [],
-  phiz: [],
-  fabrica: [],
-};
-
+let unassigned = { lionx:[], pws:[], phiz:[], fabrica:[] };
+let collapsed = {}; // id -> true/false
 let nextId = 100;
 let editingId = null;
 let uaEditCompany = null;
 let uaEditIndex = null;
 
+// Build tree from flat data for a given root
+function buildTree(rootId) {
+  const children = data.filter(d => d.reportsTo === rootId);
+  return children.map(child => ({
+    ...child,
+    children: buildTree(child.id)
+  }));
+}
+
+function renderCard(item) {
+  const vacant = !item.name;
+  const isCeo = item.level <= 1 ? 'ceo' : '';
+  const hasChildren = item.children && item.children.length > 0;
+  const isCollapsed = collapsed[item.id];
+  return `<div class="node-card ${vacant?'vacant':''} ${isCeo}" onclick="editCard(${item.id})">
+    <div class="node-name">${vacant ? '⚠️ VAGA' : item.name}</div>
+    <div class="node-role">${item.role}</div>
+    <button class="remove-btn" onclick="event.stopPropagation();removeCard(${item.id})">✕</button>
+  </div>${hasChildren ? `<button class="toggle-btn" onclick="event.stopPropagation();toggleCollapse(${item.id})">${isCollapsed ? '+' : '−'}</button>` : ''}`;
+}
+
+function renderTree(nodes) {
+  if (!nodes || nodes.length === 0) return '';
+  let html = '<ul>';
+  for (const node of nodes) {
+    const isCollapsed = collapsed[node.id];
+    html += `<li class="${isCollapsed ? 'collapsed' : ''}">`;
+    html += renderCard(node);
+    if (node.children && node.children.length > 0) {
+      html += renderTree(node.children);
+    }
+    html += '</li>';
+  }
+  html += '</ul>';
+  return html;
+}
+
 function render() {
   const c = document.getElementById('container');
   let html = '';
   
-  for (const comp of COMPANIES) {
-    const items = data.filter(d => d.company === comp.id).sort((a,b) => a.level - b.level || a.name.localeCompare(b.name));
-    if (items.length === 0 && (!unassigned[comp.id] || unassigned[comp.id].length === 0)) continue;
-    
-    html += `<div class="company-section">`;
-    html += `<div class="company-header"><h2>${comp.name}</h2><span class="tag ${comp.tag}">${items.filter(i=>i.name).length}/${items.length} preenchidos</span></div>`;
-    
-    const levels = [0,1,2,3];
-    for (const lvl of levels) {
-      const levelItems = items.filter(i => i.level === lvl);
-      if (levelItems.length === 0) continue;
-      const levelNames = ['CEO Holding',`CEO ${comp.name}`,'N-2 (Diretoria/Head)','N-3 (Gerência/Coord)'];
-      html += `<div class="org-grid"><div class="level-label">${levelNames[lvl]}</div><div class="level-row">`;
-      for (const item of levelItems) {
-        const vacant = !item.name;
-        const reportsToName = item.reportsTo ? data.find(d=>d.id===item.reportsTo)?.name || '?' : '';
-        const resps = item.responsibilities || [];
-        html += `<div class="card ${vacant?'vacant':''}" onclick="editCard(${item.id})">
-          <div class="card-name">${vacant ? '⚠️ VAGA ABERTA' : item.name}</div>
-          <div class="card-role">${item.role}</div>
-          ${reportsToName ? `<div class="card-level">→ ${reportsToName}</div>` : ''}
-          <button class="remove-btn" onclick="event.stopPropagation();removeCard(${item.id})">✕</button>
-        </div>`;
-      }
-      html += `</div></div>`;
-    }
-    
-    // Unassigned responsibilities footer
-    const ua = unassigned[comp.id] || [];
-    html += `<div class="unassigned-section">`;
-    html += `<div class="unassigned-header"><h3>📋 Responsabilidades a definir</h3><button onclick="addUnassigned('${comp.id}')">+ Adicionar</button></div>`;
-    if (ua.length > 0) {
-      html += `<div class="unassigned-list">`;
-      ua.forEach((item, idx) => {
-        html += `<div class="unassigned-item" onclick="editUnassigned('${comp.id}',${idx})">
-          ${item}
-          <button class="remove-ua" onclick="event.stopPropagation();removeUnassigned('${comp.id}',${idx})">✕</button>
-        </div>`;
-      });
-      html += `</div>`;
-    } else {
-      html += `<div style="font-size:12px;color:var(--text-muted);font-style:italic;padding:4px 0">Nenhuma responsabilidade pendente</div>`;
+  // --- Holding (simple layout) ---
+  const holdingComp = COMPANIES.find(c => c.id === 'lionx');
+  const ceo = data.find(d => d.id === 1);
+  const holdingDirect = data.filter(d => d.company === 'lionx' && d.reportsTo === 1);
+  
+  html += `<div class="holding-section">`;
+  html += `<div class="company-header" style="justify-content:center"><h2>${holdingComp.name}</h2><span class="tag ${holdingComp.tag}">${data.filter(d=>d.company==='lionx'&&d.name).length} preenchidos</span></div>`;
+  if (ceo) {
+    html += `<div style="display:flex;justify-content:center;margin:16px 0"><div class="node-card ceo" onclick="editCard(${ceo.id})"><div class="node-name">${ceo.name}</div><div class="node-role">${ceo.role}</div></div></div>`;
+  }
+  if (holdingDirect.length > 0) {
+    html += `<div class="level-label">Diretos ao CEO</div>`;
+    html += `<div class="holding-row">`;
+    for (const item of holdingDirect) {
+      const vacant = !item.name;
+      html += `<div class="node-card ${vacant?'vacant':''}" onclick="editCard(${item.id})">
+        <div class="node-name">${vacant ? '⚠️ VAGA' : item.name}</div>
+        <div class="node-role">${item.role}</div>
+        <button class="remove-btn" onclick="event.stopPropagation();removeCard(${item.id})">✕</button>
+      </div>`;
     }
     html += `</div>`;
+  }
+  // Holding unassigned
+  html += renderUnassigned('lionx');
+  html += `</div>`;
+  
+  // --- Company org trees ---
+  for (const comp of COMPANIES) {
+    if (comp.id === 'lionx') continue;
+    const compPeople = data.filter(d => d.company === comp.id);
+    if (compPeople.length === 0) continue;
     
+    // Find the CEO of this company
+    const compCeo = compPeople.find(d => d.level === 1);
+    if (!compCeo) continue;
+    
+    // Build tree from CEO
+    const tree = [{
+      ...compCeo,
+      children: buildTree(compCeo.id)
+    }];
+    
+    html += `<div class="company-section">`;
+    html += `<div class="company-header"><h2>${comp.name}</h2><span class="tag ${comp.tag}">${compPeople.filter(i=>i.name).length}/${compPeople.length} preenchidos</span></div>`;
+    html += `<div class="org-tree">${renderTree(tree)}</div>`;
+    html += renderUnassigned(comp.id);
     html += `</div>`;
   }
   
@@ -249,39 +323,51 @@ function render() {
   document.getElementById('stats').textContent = `${filled} preenchidos · ${vacant} vagas · ${totalUa} resp. a definir`;
 }
 
+function renderUnassigned(compId) {
+  const ua = unassigned[compId] || [];
+  let html = `<div class="unassigned-section">`;
+  html += `<div class="unassigned-header"><h3>📋 Responsabilidades a definir</h3><button onclick="addUnassigned('${compId}')">+ Adicionar</button></div>`;
+  if (ua.length > 0) {
+    html += `<div class="unassigned-list">`;
+    ua.forEach((item, idx) => {
+      html += `<div class="unassigned-item" onclick="editUnassigned('${compId}',${idx})">${item}<button class="remove-ua" onclick="event.stopPropagation();removeUnassigned('${compId}',${idx})">✕</button></div>`;
+    });
+    html += `</div>`;
+  } else {
+    html += `<div style="font-size:12px;color:var(--text-muted);font-style:italic;padding:4px 0">Nenhuma responsabilidade pendente</div>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+function toggleCollapse(id) {
+  collapsed[id] = !collapsed[id];
+  render();
+}
+
+// --- Person Modal ---
 function updateReportsTo(item) {
   const company = document.getElementById('mCompany').value;
   const rs = document.getElementById('mReportsTo');
   const currentVal = item ? item.reportsTo : null;
-  // Include people from selected company + holding (for cross-company reporting to Anderson)
   const people = data.filter(d => d.name && (!item || d.id !== item.id) && (d.company === company || d.company === 'lionx'));
   rs.innerHTML = '<option value="">— Ninguém (topo) —</option>' + 
     people.map(d => `<option value="${d.id}" ${currentVal===d.id?'selected':''}>${d.name} (${d.role})</option>`).join('');
 }
 
-// --- Person Modal ---
 function openModal(item) {
   editingId = item ? item.id : null;
   document.getElementById('modalTitle').textContent = item ? 'Editar Posição' : 'Nova Posição';
   document.getElementById('mName').value = item ? item.name : '';
   document.getElementById('mRole').value = item ? item.role : '';
-  
   const cs = document.getElementById('mCompany');
   cs.innerHTML = COMPANIES.map(c => `<option value="${c.id}" ${item && item.company===c.id?'selected':''}>${c.name}</option>`).join('');
-  
   document.getElementById('mLevel').value = item ? item.level : 2;
-  
   updateReportsTo(item);
-  
-  // Update reportsTo when company changes
   document.getElementById('mCompany').onchange = () => updateReportsTo(item);
-  
-  // Responsibilities
   const rl = document.getElementById('mRespList');
   rl.innerHTML = '';
-  const resps = item ? (item.responsibilities || []) : [];
-  resps.forEach(r => addRespField(r));
-  
+  (item ? (item.responsibilities || []) : []).forEach(r => addRespField(r));
   document.getElementById('modalOverlay').classList.add('active');
   document.getElementById('mName').focus();
 }
@@ -294,10 +380,7 @@ function addRespField(value) {
   rl.appendChild(div);
 }
 
-function closeModal() {
-  document.getElementById('modalOverlay').classList.remove('active');
-  editingId = null;
-}
+function closeModal() { document.getElementById('modalOverlay').classList.remove('active'); editingId = null; }
 
 function saveModal() {
   const name = document.getElementById('mName').value.trim();
@@ -305,38 +388,30 @@ function saveModal() {
   const company = document.getElementById('mCompany').value;
   const level = parseInt(document.getElementById('mLevel').value);
   const reportsTo = document.getElementById('mReportsTo').value ? parseInt(document.getElementById('mReportsTo').value) : null;
-  
-  const respInputs = document.querySelectorAll('#mRespList .resp-input');
-  const responsibilities = Array.from(respInputs).map(i => i.value.trim()).filter(v => v);
-  
+  const responsibilities = Array.from(document.querySelectorAll('#mRespList .resp-input')).map(i => i.value.trim()).filter(v => v);
   if (!role) { alert('Cargo é obrigatório'); return; }
-  
   if (editingId !== null) {
     const item = data.find(d => d.id === editingId);
     Object.assign(item, {name, role, company, level, reportsTo, responsibilities});
   } else {
     data.push({id: nextId++, name, role, company, level, reportsTo, responsibilities});
   }
-  
-  closeModal();
-  render();
-  saveLocal();
+  closeModal(); render(); saveLocal();
 }
 
 function editCard(id) { openModal(data.find(d => d.id === id)); }
 function addPosition() { openModal(null); }
-function removeCard(id) { 
-  if (confirm('Remover esta posição?')) { 
-    data = data.filter(d => d.id !== id); 
+function removeCard(id) {
+  if (confirm('Remover esta posição?')) {
+    data = data.filter(d => d.id !== id);
     data.forEach(d => { if (d.reportsTo === id) d.reportsTo = null; });
-    render(); saveLocal(); 
-  } 
+    render(); saveLocal();
+  }
 }
 
-// --- Unassigned Modal ---
+// --- Unassigned ---
 function addUnassigned(compId) {
-  uaEditCompany = compId;
-  uaEditIndex = null;
+  uaEditCompany = compId; uaEditIndex = null;
   document.getElementById('uaModalTitle').textContent = 'Nova Responsabilidade';
   document.getElementById('uaDesc').value = '';
   document.getElementById('uaAssignRow').style.display = 'none';
@@ -344,71 +419,37 @@ function addUnassigned(compId) {
   document.getElementById('uaModalOverlay').classList.add('active');
   document.getElementById('uaDesc').focus();
 }
-
 function editUnassigned(compId, idx) {
-  uaEditCompany = compId;
-  uaEditIndex = idx;
+  uaEditCompany = compId; uaEditIndex = idx;
   document.getElementById('uaModalTitle').textContent = 'Editar Responsabilidade';
   document.getElementById('uaDesc').value = unassigned[compId][idx];
-  // Show assign dropdown with people from this company
   const assignRow = document.getElementById('uaAssignRow');
   const assignSelect = document.getElementById('uaAssignTo');
   const people = data.filter(d => d.company === compId && d.name);
-  assignSelect.innerHTML = '<option value="">— Manter pendente —</option>' +
-    people.map(p => `<option value="${p.id}">${p.name} (${p.role})</option>`).join('');
+  assignSelect.innerHTML = '<option value="">— Manter pendente —</option>' + people.map(p => `<option value="${p.id}">${p.name} (${p.role})</option>`).join('');
   assignRow.style.display = 'block';
   document.getElementById('uaModalOverlay').classList.add('active');
   document.getElementById('uaDesc').focus();
 }
-
-function closeUaModal() {
-  document.getElementById('uaModalOverlay').classList.remove('active');
-  uaEditCompany = null;
-  uaEditIndex = null;
-}
-
+function closeUaModal() { document.getElementById('uaModalOverlay').classList.remove('active'); uaEditCompany = null; uaEditIndex = null; }
 function saveUaModal() {
   const desc = document.getElementById('uaDesc').value.trim();
   if (!desc) { alert('Descrição é obrigatória'); return; }
-  
   const assignTo = document.getElementById('uaAssignTo').value;
-  
   if (assignTo && uaEditIndex !== null) {
-    // Assign to person: add to their responsibilities, remove from unassigned
     const person = data.find(d => d.id === parseInt(assignTo));
-    if (person) {
-      if (!person.responsibilities) person.responsibilities = [];
-      person.responsibilities.push(desc);
-      unassigned[uaEditCompany].splice(uaEditIndex, 1);
-    }
-  } else if (uaEditIndex !== null) {
-    unassigned[uaEditCompany][uaEditIndex] = desc;
-  } else {
-    if (!unassigned[uaEditCompany]) unassigned[uaEditCompany] = [];
-    unassigned[uaEditCompany].push(desc);
-  }
-  
-  closeUaModal();
-  render();
-  saveLocal();
+    if (person) { if (!person.responsibilities) person.responsibilities = []; person.responsibilities.push(desc); unassigned[uaEditCompany].splice(uaEditIndex, 1); }
+  } else if (uaEditIndex !== null) { unassigned[uaEditCompany][uaEditIndex] = desc; }
+  else { if (!unassigned[uaEditCompany]) unassigned[uaEditCompany] = []; unassigned[uaEditCompany].push(desc); }
+  closeUaModal(); render(); saveLocal();
 }
-
-function removeUnassigned(compId, idx) {
-  if (confirm('Remover esta responsabilidade?')) {
-    unassigned[compId].splice(idx, 1);
-    render();
-    saveLocal();
-  }
-}
+function removeUnassigned(compId, idx) { if (confirm('Remover?')) { unassigned[compId].splice(idx, 1); render(); saveLocal(); } }
 
 // --- Export/Import ---
 function exportJSON() {
-  const exportData = {people: data, unassigned: unassigned};
-  const blob = new Blob([JSON.stringify(exportData, null, 2)], {type:'application/json'});
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-  a.download = 'lionx-organograma.json'; a.click();
+  const blob = new Blob([JSON.stringify({people:data, unassigned}, null, 2)], {type:'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'lionx-organograma.json'; a.click();
 }
-
 function importJSON() {
   const fi = document.getElementById('fileInput');
   fi.onchange = e => {
@@ -416,15 +457,8 @@ function importJSON() {
     reader.onload = ev => {
       try {
         const parsed = JSON.parse(ev.target.result);
-        if (Array.isArray(parsed)) {
-          // Legacy format
-          data = parsed;
-        } else {
-          data = parsed.people || parsed;
-          unassigned = parsed.unassigned || {lionx:[],pws:[],phiz:[],fabrica:[]};
-        }
+        if (Array.isArray(parsed)) { data = parsed; } else { data = parsed.people || parsed; unassigned = parsed.unassigned || {lionx:[],pws:[],phiz:[],fabrica:[]}; }
         nextId = Math.max(...data.map(d=>d.id))+1;
-        // Ensure responsibilities field
         data.forEach(d => { if (!d.responsibilities) d.responsibilities = []; });
         render(); saveLocal();
       } catch(e) { alert('JSON inválido'); }
@@ -434,32 +468,20 @@ function importJSON() {
   fi.click();
 }
 
-function saveLocal() { 
-  try { 
-    localStorage.setItem('orgchart', JSON.stringify({people: data, unassigned: unassigned})); 
-  } catch(e){} 
-}
-
-function loadLocal() { 
-  try { 
-    const s = localStorage.getItem('orgchart'); 
-    if (s) { 
+function saveLocal() { try { localStorage.setItem('orgchart-dev', JSON.stringify({people:data, unassigned})); } catch(e){} }
+function loadLocal() {
+  try {
+    const s = localStorage.getItem('orgchart-dev');
+    if (s) {
       const parsed = JSON.parse(s);
-      if (Array.isArray(parsed)) {
-        data = parsed;
-      } else {
-        data = parsed.people || parsed;
-        unassigned = parsed.unassigned || {lionx:[],pws:[],phiz:[],fabrica:[]};
-      }
+      if (Array.isArray(parsed)) { data = parsed; } else { data = parsed.people || parsed; unassigned = parsed.unassigned || {lionx:[],pws:[],phiz:[],fabrica:[]}; }
       nextId = Math.max(...data.map(d=>d.id))+1;
       data.forEach(d => { if (!d.responsibilities) d.responsibilities = []; });
     }
-  } catch(e){} 
+  } catch(e){}
 }
 
-document.addEventListener('keydown', e => { 
-  if (e.key === 'Escape') { closeModal(); closeUaModal(); }
-});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeUaModal(); } });
 
 loadLocal();
 render();
