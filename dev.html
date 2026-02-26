@@ -25,9 +25,10 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 
 /* Tree container */
 .tree-wrap{position:relative;overflow-x:auto;padding:20px 0;-webkit-overflow-scrolling:touch}
-.tree-wrap > .tree-level{display:inline-flex;min-width:100%;justify-content:center}
+.tree-wrap > .tree-level{display:inline-flex;min-width:100%;justify-content:center;flex-wrap:nowrap}
+.tree-inner{display:inline-block;min-width:100%;position:relative}
 .tree-wrap svg{position:absolute;top:0;left:0;pointer-events:none}
-.tree-level{display:flex;justify-content:center;gap:24px;margin-top:40px;position:relative}
+.tree-level{display:flex;justify-content:center;gap:24px;margin-top:40px;position:relative;flex-wrap:nowrap}
 .tree-level-group{display:flex;flex-direction:column;align-items:center;flex-shrink:0}
 
 /* Card */
@@ -279,9 +280,10 @@ function render() {
     html += `<div class="company-section">`;
     html += `<div class="company-header"><h2>${comp.name}</h2><span class="tag ${comp.tag}">${compPeople.filter(i=>i.name).length}/${compPeople.length} preenchidos</span></div>`;
     html += `<div class="tree-wrap" id="tree-${comp.id}">`;
+    html += `<div class="tree-inner">`;
     html += `<div class="tree-level" data-parent="root-${comp.id}">`;
     html += renderSubtree(compCeo);
-    html += `</div></div>`;
+    html += `</div></div></div>`;
     html += renderUnassigned(comp.id);
     html += `</div>`;
   }
@@ -298,7 +300,10 @@ function render() {
   // Draw SVG lines after DOM is rendered
   requestAnimationFrame(() => {
     drawAllLines();
-    document.querySelectorAll('.tree-wrap').forEach(el => el.addEventListener('scroll', () => drawAllLines()));
+    document.querySelectorAll('.tree-wrap').forEach(el => {
+      el.removeEventListener('scroll', drawAllLines);
+      el.addEventListener('scroll', drawAllLines);
+    });
   });
 }
 
@@ -307,20 +312,22 @@ function drawAllLines() {
     if (comp.id === 'lionx') continue;
     const wrap = document.getElementById(`tree-${comp.id}`);
     if (!wrap) continue;
+    const inner = wrap.querySelector('.tree-inner');
+    if (!inner) continue;
     // Remove old SVG
-    const oldSvg = wrap.querySelector('svg');
+    const oldSvg = inner.querySelector('svg');
     if (oldSvg) oldSvg.remove();
 
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.style.position = 'absolute';
     svg.style.top = '0';
     svg.style.left = '0';
-    svg.style.width = wrap.scrollWidth + 'px';
-    svg.style.height = wrap.scrollHeight + 'px';
+    svg.style.width = inner.scrollWidth + 'px';
+    svg.style.height = inner.scrollHeight + 'px';
     svg.style.pointerEvents = 'none';
     svg.style.zIndex = '0';
 
-    const wrapRect = wrap.getBoundingClientRect();
+    const wrapRect = inner.getBoundingClientRect();
 
     // For each parent that has visible children
     const parentLevels = wrap.querySelectorAll('.tree-level[data-parent]');
@@ -373,7 +380,7 @@ function drawAllLines() {
       });
     });
 
-    wrap.prepend(svg);
+    inner.prepend(svg);
   }
 }
 
