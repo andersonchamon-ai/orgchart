@@ -7,13 +7,13 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif;overflow:auto}
 .dev-banner{background:#f59e0b;color:#000;text-align:center;padding:6px;font-size:13px;font-weight:700;position:fixed;top:0;left:0;right:0;z-index:200}
-.toolbar{position:fixed;top:0;left:0;right:0;background:rgba(15,23,42,0.95);backdrop-filter:blur(10px);padding:12px 24px;display:flex;align-items:center;gap:16px;z-index:100;border-bottom:1px solid var(--border)}
+.toolbar{position:fixed;top:0;left:0;right:0;background:rgba(15,23,42,0.95);backdrop-filter:blur(10px);padding:12px 24px;display:flex;align-items:center;gap:12px;z-index:100;border-bottom:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch}
 .toolbar h1{font-size:18px;font-weight:700;color:var(--accent)}
 .toolbar .stats{margin-left:auto;font-size:13px;color:var(--text-muted)}
 .toolbar button{background:var(--accent);color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600}
 .toolbar button:hover{opacity:0.85}
 .toolbar button.secondary{background:var(--border)}
-.container{padding:80px 24px 40px;min-height:100vh}
+.container{padding:96px 24px 40px;min-height:100vh}
 .tag{font-size:11px;padding:3px 8px;border-radius:4px;font-weight:600}
 .tag-pws{background:#0e4429;color:#22c55e}
 .tag-phiz{background:#1e1b4b;color:#818cf8}
@@ -25,9 +25,10 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 
 /* Tree container */
 .tree-wrap{position:relative;overflow-x:auto;padding:20px 0;-webkit-overflow-scrolling:touch}
-.tree-wrap > .tree-level{display:inline-flex;min-width:100%;justify-content:center}
+.tree-wrap > .tree-level{display:inline-flex;min-width:100%;justify-content:center;flex-wrap:nowrap}
+.tree-inner{display:inline-block;min-width:100%;position:relative}
 .tree-wrap svg{position:absolute;top:0;left:0;pointer-events:none}
-.tree-level{display:flex;justify-content:center;gap:24px;margin-top:40px;position:relative}
+.tree-level{display:flex;justify-content:center;gap:24px;margin-top:40px;position:relative;flex-wrap:nowrap}
 .tree-level-group{display:flex;flex-direction:column;align-items:center;flex-shrink:0}
 
 /* Card */
@@ -51,6 +52,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 
 /* Unassigned */
 .unassigned-section{margin-top:20px;padding:14px 16px;background:rgba(148,163,184,0.04);border:1px dashed var(--border);border-radius:10px}
+.unassigned-section.collapsed-ua{padding:6px 16px}
+.unassigned-section.collapsed-ua .unassigned-header{margin-bottom:0}
 .unassigned-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .unassigned-header h3{font-size:12px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px}
 .unassigned-header button{background:transparent;border:1px dashed var(--border);color:var(--text-muted);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px}
@@ -77,7 +80,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
   .company-header h2{font-size:14px}
   .tag{font-size:10px}
   .toolbar h1{font-size:14px}
-  .toolbar{padding:8px 12px;gap:8px}
+  .toolbar{padding:8px 12px;gap:6px;flex-wrap:nowrap}
   .toolbar button{padding:6px 10px;font-size:11px}
   .container{padding:100px 12px 30px}
   .toggle-btn{width:18px;height:18px;font-size:10px;line-height:18px}
@@ -119,7 +122,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
     <span><span class="dot dot-vacant"></span> Vaga aberta</span>
   </div>
   <div id="syncStatus" style="font-size:11px;color:var(--text-muted);opacity:0.5;transition:opacity 0.3s">☁️</div>
-  <div class="stats" id="stats"></div>
+  <div class="stats" id="stats" style="display:none"></div>
   <button class="secondary" onclick="exportJSON()">💾 Exportar</button>
   <button class="secondary" onclick="importJSON()">📂 Importar</button>
   <button class="secondary" onclick="showBackups()">🔄 Backups</button>
@@ -205,6 +208,7 @@ let data = [
 
 let unassigned = {lionx:[],pws:[],phiz:[],fabrica:[]};
 let collapsedSet = new Set();
+let unassignedOpen = {lionx:false, pws:false, phiz:false, fabrica:false};
 let nextId = 100;
 let editingId = null;
 let uaEditCompany = null;
@@ -277,9 +281,10 @@ function render() {
     html += `<div class="company-section">`;
     html += `<div class="company-header"><h2>${comp.name}</h2><span class="tag ${comp.tag}">${compPeople.filter(i=>i.name).length}/${compPeople.length} preenchidos</span></div>`;
     html += `<div class="tree-wrap" id="tree-${comp.id}">`;
+    html += `<div class="tree-inner">`;
     html += `<div class="tree-level" data-parent="root-${comp.id}">`;
     html += renderSubtree(compCeo);
-    html += `</div></div>`;
+    html += `</div></div></div>`;
     html += renderUnassigned(comp.id);
     html += `</div>`;
   }
@@ -296,7 +301,10 @@ function render() {
   // Draw SVG lines after DOM is rendered
   requestAnimationFrame(() => {
     drawAllLines();
-    document.querySelectorAll('.tree-wrap').forEach(el => el.addEventListener('scroll', () => drawAllLines()));
+    document.querySelectorAll('.tree-wrap').forEach(el => {
+      el.removeEventListener('scroll', drawAllLines);
+      el.addEventListener('scroll', drawAllLines);
+    });
   });
 }
 
@@ -305,20 +313,22 @@ function drawAllLines() {
     if (comp.id === 'lionx') continue;
     const wrap = document.getElementById(`tree-${comp.id}`);
     if (!wrap) continue;
+    const inner = wrap.querySelector('.tree-inner');
+    if (!inner) continue;
     // Remove old SVG
-    const oldSvg = wrap.querySelector('svg');
+    const oldSvg = inner.querySelector('svg');
     if (oldSvg) oldSvg.remove();
 
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.style.position = 'absolute';
     svg.style.top = '0';
     svg.style.left = '0';
-    svg.style.width = wrap.scrollWidth + 'px';
-    svg.style.height = wrap.scrollHeight + 'px';
+    svg.style.width = inner.scrollWidth + 'px';
+    svg.style.height = inner.scrollHeight + 'px';
     svg.style.pointerEvents = 'none';
     svg.style.zIndex = '0';
 
-    const wrapRect = wrap.getBoundingClientRect();
+    const wrapRect = inner.getBoundingClientRect();
 
     // For each parent that has visible children
     const parentLevels = wrap.querySelectorAll('.tree-level[data-parent]');
@@ -371,7 +381,7 @@ function drawAllLines() {
       });
     });
 
-    wrap.prepend(svg);
+    inner.prepend(svg);
   }
 }
 
@@ -389,15 +399,29 @@ function addLine(svg, x1, y1, x2, y2) {
 
 function renderUnassigned(compId) {
   const ua = unassigned[compId] || [];
-  let html = `<div class="unassigned-section"><div class="unassigned-header"><h3>📋 Responsabilidades a definir</h3><button onclick="addUnassigned('${compId}')">+ Adicionar</button></div>`;
-  if (ua.length > 0) {
-    html += `<div class="unassigned-list">`;
-    ua.forEach((item, idx) => { html += `<div class="unassigned-item" onclick="editUnassigned('${compId}',${idx})">${item}<button class="remove-ua" onclick="event.stopPropagation();removeUnassigned('${compId}',${idx})">✕</button></div>`; });
-    html += `</div>`;
-  } else {
-    html += `<div style="font-size:12px;color:var(--text-muted);font-style:italic;padding:4px 0">Nenhuma responsabilidade pendente</div>`;
+  const isOpen = unassignedOpen[compId];
+  const count = ua.length;
+  const countBadge = count > 0 ? `<span style="background:var(--orange);color:#000;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;margin-left:8px">${count}</span>` : '';
+  let html = `<div class="unassigned-section ${isOpen?'':'collapsed-ua'}">`;
+  html += `<div class="unassigned-header" onclick="toggleUnassigned('${compId}')" style="cursor:pointer">`;
+  html += `<h3><span style="font-size:10px;margin-right:4px">${isOpen?'▼':'▶'}</span>Responsabilidades a definir${countBadge}</h3>`;
+  if (isOpen) html += `<button onclick="event.stopPropagation();addUnassigned('${compId}')">+ Adicionar</button>`;
+  html += `</div>`;
+  if (isOpen) {
+    if (count > 0) {
+      html += `<div class="unassigned-list">`;
+      ua.forEach((item, idx) => { html += `<div class="unassigned-item" onclick="editUnassigned('${compId}',${idx})">${item}<button class="remove-ua" onclick="event.stopPropagation();removeUnassigned('${compId}',${idx})">✕</button></div>`; });
+      html += `</div>`;
+    } else {
+      html += `<div style="font-size:12px;color:var(--text-muted);font-style:italic;padding:4px 0">Nenhuma responsabilidade pendente</div>`;
+    }
   }
   return html + `</div>`;
+}
+
+function toggleUnassigned(compId) {
+  unassignedOpen[compId] = !unassignedOpen[compId];
+  render();
 }
 
 function toggleCollapse(id) {
