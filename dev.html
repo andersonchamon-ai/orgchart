@@ -3,22 +3,22 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>LionX — Organograma (DEV)</title>
 <style>
-:root{--bg:#0f172a;--card:#1e293b;--card-vacant:#2d1b1b;--border:#334155;--border-vacant:#ef4444;--text:#e2e8f0;--text-muted:#94a3b8;--accent:#3b82f6;--green:#22c55e;--red:#ef4444;--orange:#f59e0b;--line:#475569}
+:root{--bg:#0a1f0a;--card:#132613;--card-vacant:#2d1b1b;--border:#1e3a1e;--border-vacant:#ef4444;--text:#e2e8f0;--text-muted:#94a3b8;--accent:#21c25e;--green:#21c25e;--red:#ef4444;--orange:#f59e0b;--line:#2d5a2d}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif;overflow:auto}
-.dev-banner{background:#f59e0b;color:#000;text-align:center;padding:6px;font-size:13px;font-weight:700;position:fixed;top:0;left:0;right:0;z-index:200}
-.toolbar{position:fixed;top:32px;left:0;right:0;background:rgba(15,23,42,0.95);backdrop-filter:blur(10px);padding:12px 24px;display:flex;align-items:center;gap:12px;z-index:100;border-bottom:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch}
+.dev-banner{background:#21c25e;color:#000;text-align:center;padding:6px;font-size:13px;font-weight:700;position:fixed;top:0;left:0;right:0;z-index:200}
+.toolbar{position:fixed;top:0;left:0;right:0;background:rgba(10,31,10,0.95);backdrop-filter:blur(10px);padding:12px 24px;display:flex;align-items:center;gap:12px;z-index:100;border-bottom:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch}
 .toolbar h1{font-size:18px;font-weight:700;color:var(--accent)}
 .toolbar .stats{margin-left:auto;font-size:13px;color:var(--text-muted)}
 .toolbar button{background:var(--accent);color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600}
 .toolbar button:hover{opacity:0.85}
 .toolbar button.secondary{background:var(--border)}
-.container{padding:130px 24px 40px;min-height:100vh}
+.container{padding:96px 24px 40px;min-height:100vh}
 .tag{font-size:11px;padding:3px 8px;border-radius:4px;font-weight:600}
-.tag-pws{background:#0e4429;color:#22c55e}
-.tag-phiz{background:#1e1b4b;color:#818cf8}
-.tag-fab{background:#422006;color:#f59e0b}
-.tag-holding{background:#172554;color:#60a5fa}
+.tag-pws{background:#0e4429;color:#21c25e}
+.tag-phiz{background:#0a3316;color:#4ade80}
+.tag-fab{background:#14421a;color:#86efac}
+.tag-holding{background:#052e16;color:#21c25e}
 .company-section{margin-bottom:48px}
 .company-header{display:flex;align-items:center;gap:12px;margin-bottom:8px;padding:12px 16px;background:var(--card);border-radius:10px;border-left:4px solid var(--accent)}
 .company-header h2{font-size:16px;font-weight:700}
@@ -39,6 +39,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .node-card.ceo{border-color:var(--accent);border-width:2px}
 .node-name{font-size:14px;font-weight:600;margin-bottom:2px}
 .node-role{font-size:12px;color:var(--text-muted)}
+.node-hc{font-size:11px;color:var(--accent);margin-top:2px;font-weight:600}
+.tag-hc{background:rgba(255,255,255,0.1);color:#fff;font-weight:600}
 .node-card .remove-btn{position:absolute;top:4px;right:6px;background:none;border:none;color:var(--red);cursor:pointer;font-size:13px;opacity:0;transition:opacity 0.2s}
 .node-card:hover .remove-btn{opacity:0.5}
 .toggle-btn{display:inline-block;background:var(--border);border:none;color:var(--text-muted);width:20px;height:20px;border-radius:50%;cursor:pointer;font-size:11px;line-height:20px;text-align:center;margin-top:4px;transition:all 0.2s;position:relative;z-index:2}
@@ -75,7 +77,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
   .node-card{width:130px;padding:10px 12px}
   .node-name{font-size:12px}
   .node-role{font-size:10px}
-  .tree-level{gap:12px;margin-top:32px}
+  .tree-level{gap:12px;margin-top:0}
   .holding-row{gap:8px}
   .company-header h2{font-size:14px}
   .tag{font-size:10px}
@@ -114,7 +116,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 </style>
 </head><body>
 
-<div class="dev-banner">⚠️ AMBIENTE DE TESTE — não é a versão final</div>
+
 <div class="toolbar">
   <h1>🦁 LionX — Organograma</h1>
   <div class="legend">
@@ -174,7 +176,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 <script>
 const COMPANIES = [
   {id:'lionx', name:'LionX (Holding)', tag:'tag-holding', color:'#3b82f6'},
-  {id:'pws', name:'PWS Cloud', tag:'tag-pws', color:'#22c55e'},
+  {id:'pws', name:'PWS Cloud', tag:'tag-pws', color:'#21c25e'},
   {id:'phiz', name:'PhizChat', tag:'tag-phiz', color:'#818cf8'},
   {id:'fabrica', name:'Fábrica de Software', tag:'tag-fab', color:'#f59e0b'},
 ];
@@ -218,6 +220,15 @@ function getChildren(parentId) {
   return data.filter(d => d.reportsTo === parentId);
 }
 
+function countHC(personId) {
+  const children = getChildren(personId);
+  let count = 0;
+  for (const c of children) {
+    count += 1 + countHC(c.id);
+  }
+  return count;
+}
+
 function renderCardHTML(item) {
   const vacant = !item.name;
   const isCeo = item.level <= 1;
@@ -228,6 +239,7 @@ function renderCardHTML(item) {
   return `<div class="node-card ${vacant?'vacant':''} ${isCeo?'ceo':''}" data-id="${item.id}" onclick="editCard(${item.id})">
     <div class="node-name">${vacant ? '⚠️ VAGA' : item.name}</div>
     <div class="node-role">${item.role}</div>
+    ${countHC(item.id) > 0 ? `<div class="node-hc">${countHC(item.id)}</div>` : ''}
     <button class="remove-btn" onclick="event.stopPropagation();removeCard(${item.id})">✕</button>
   </div>${showToggle ? `<button class="toggle-btn ${isCollapsed?'active':''}" data-toggle="${item.id}" onclick="event.stopPropagation();toggleCollapse(${item.id})">${isCollapsed?'+':'−'}</button>` : ''}`;
 }
@@ -257,13 +269,14 @@ function render() {
   const ceo = data.find(d => d.id === 1);
   const holdingDirect = data.filter(d => d.company === 'lionx' && d.reportsTo === 1);
   html += `<div class="holding-section">`;
-  html += `<div class="company-header" style="justify-content:center"><h2>LionX (Holding)</h2><span class="tag tag-holding">${data.filter(d=>d.company==='lionx'&&d.name).length} preenchidos</span></div>`;
-  if (ceo) html += `<div style="display:flex;justify-content:center;margin:16px 0"><div class="node-card ceo" onclick="editCard(${ceo.id})"><div class="node-name">${ceo.name}</div><div class="node-role">${ceo.role}</div></div></div>`;
+  const lionxPeople = data.filter(d=>d.company==='lionx');
+  html += `<div class="company-header"><h2>LionX (Holding)</h2><span class="tag tag-hc">Total HC: ${lionxPeople.length}</span><span class="tag tag-holding">${lionxPeople.filter(d=>d.name).length} preenchidos</span></div>`;
+  if (ceo) html += `<div style="display:flex;justify-content:center;margin:16px 0"><div class="node-card ceo" onclick="editCard(${ceo.id})"><div class="node-name">${ceo.name}</div><div class="node-role">${ceo.role}</div>${countHC(ceo.id) > 0 ? `<div class="node-hc">${countHC(ceo.id)}</div>` : ''}</div></div>`;
   if (holdingDirect.length > 0) {
     html += `<div class="level-label">Diretos ao CEO</div><div class="holding-row">`;
     for (const item of holdingDirect) {
       const vacant = !item.name;
-      html += `<div class="node-card ${vacant?'vacant':''}" onclick="editCard(${item.id})"><div class="node-name">${vacant?'⚠️ VAGA':item.name}</div><div class="node-role">${item.role}</div><button class="remove-btn" onclick="event.stopPropagation();removeCard(${item.id})">✕</button></div>`;
+      html += `<div class="node-card ${vacant?'vacant':''}" onclick="editCard(${item.id})"><div class="node-name">${vacant?'⚠️ VAGA':item.name}</div><div class="node-role">${item.role}</div>${countHC(item.id) > 0 ? `<div class="node-hc">${countHC(item.id)}</div>` : ''}<button class="remove-btn" onclick="event.stopPropagation();removeCard(${item.id})">✕</button></div>`;
     }
     html += `</div>`;
   }
@@ -279,7 +292,8 @@ function render() {
     if (!compCeo) continue;
 
     html += `<div class="company-section">`;
-    html += `<div class="company-header"><h2>${comp.name}</h2><span class="tag ${comp.tag}">${compPeople.filter(i=>i.name).length}/${compPeople.length} preenchidos</span></div>`;
+    const compTotalHC = compPeople.length;
+    html += `<div class="company-header"><h2>${comp.name}</h2><span class="tag tag-hc">Total HC: ${compTotalHC}</span><span class="tag ${comp.tag}">${compPeople.filter(i=>i.name).length}/${compPeople.length} preenchidos</span></div>`;
     html += `<div class="tree-wrap" id="tree-${comp.id}">`;
     html += `<div class="tree-inner">`;
     html += `<div class="tree-level" data-parent="root-${comp.id}">`;
@@ -529,6 +543,7 @@ function exportJSON(){const b=new Blob([JSON.stringify({people:data,unassigned},
 function importJSON(){const fi=document.getElementById('fileInput');fi.onchange=e=>{const r=new FileReader();r.onload=ev=>{try{const p=JSON.parse(ev.target.result);if(Array.isArray(p)){data=p;}else{data=p.people||p;unassigned=p.unassigned||{lionx:[],pws:[],phiz:[],fabrica:[]};}nextId=Math.max(...data.map(d=>d.id))+1;data.forEach(d=>{if(!d.responsibilities)d.responsibilities=[];});render();saveLocal();}catch(e){alert('JSON inválido');}};r.readAsText(e.target.files[0]);};fi.click();}
 // Try public tunnel first, fallback to localhost
 const API_URLS = [
+  'https://andersonchamon.ai',
   'https://org.andersonchamon.ai',
   'http://localhost:8790'
 ];
@@ -538,23 +553,37 @@ let lastServerSync = 0;
 function saveLocal(){
   try{
     const payload = JSON.stringify({people:data,unassigned});
-    localStorage.setItem('orgchart-dev', payload);
+    localStorage.setItem('orgchart', payload);
     // Auto-backup in localStorage
-    const backups = JSON.parse(localStorage.getItem('orgchart-backups')||'[]');
+    const backups = JSON.parse(localStorage.getItem('orgchart-prod-backups')||'[]');
     const now = Date.now();
     const lastBackup = backups.length > 0 ? backups[backups.length-1].ts : 0;
     if (now - lastBackup > 5*60*1000) {
       backups.push({ts:now, data:payload});
       while(backups.length > 10) backups.shift();
-      localStorage.setItem('orgchart-backups', JSON.stringify(backups));
+      localStorage.setItem('orgchart-prod-backups', JSON.stringify(backups));
     }
     // Auto-sync to SQLite on every save
     fetch(API_URL + '/api/save', {
-      method:'POST', headers:{'Content-Type':'application/json'}, body:payload, credentials:'include'
-    }).then(r => {
-      if(r.ok) updateSyncStatus('✅ Salvo');
-      else updateSyncStatus('⚠️ Erro');
-    }).catch(() => updateSyncStatus('⚠️ Offline'));
+      method:'POST', headers:{'Content-Type':'application/json'}, body:payload, credentials:'include',
+      redirect: 'error'
+    }).then(async r => {
+      if(!r.ok) { updateSyncStatus('⚠️ Erro HTTP ' + r.status); return; }
+      try {
+        const j = await r.json();
+        if(j.ok) { updateSyncStatus('✅ Salvo no banco'); lastServerSync = Date.now(); }
+        else updateSyncStatus('⚠️ Erro: ' + (j.error||'unknown'));
+      } catch(e) { updateSyncStatus('⚠️ Resposta inválida (auth?)'); }
+    }).catch(e => {
+      // redirect:'error' throws TypeError on 302 redirects (Cloudflare Access)
+      console.warn('Save failed, retrying via localhost...', e);
+      fetch('http://localhost:8790/api/save', {
+        method:'POST', headers:{'Content-Type':'application/json'}, body:payload
+      }).then(async r => {
+        if(r.ok) { const j = await r.json(); if(j.ok) { updateSyncStatus('✅ Salvo (local)'); lastServerSync = Date.now(); return; } }
+        updateSyncStatus('⚠️ Offline');
+      }).catch(() => updateSyncStatus('⚠️ Offline'));
+    });
   }catch(e){}
 }
 
@@ -565,7 +594,7 @@ function updateSyncStatus(msg) {
   el.style.opacity = '1';
   setTimeout(() => { el.style.opacity = '0.5'; }, 3000);
 }
-function loadLocal(){try{const s=localStorage.getItem('orgchart-dev');if(s){const p=JSON.parse(s);if(Array.isArray(p)){data=p;}else{data=p.people||p;unassigned=p.unassigned||{lionx:[],pws:[],phiz:[],fabrica:[]};}nextId=Math.max(...data.map(d=>d.id))+1;data.forEach(d=>{if(!d.responsibilities)d.responsibilities=[];});}}catch(e){}}
+function loadLocal(){try{const s=localStorage.getItem('orgchart');if(s){const p=JSON.parse(s);if(Array.isArray(p)){data=p;}else{data=p.people||p;unassigned=p.unassigned||{lionx:[],pws:[],phiz:[],fabrica:[]};}nextId=Math.max(...data.map(d=>d.id))+1;data.forEach(d=>{if(!d.responsibilities)d.responsibilities=[];});}}catch(e){}}
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeUaModal();}});
 window.addEventListener('resize', () => drawAllLines());
@@ -576,7 +605,11 @@ async function init() {
   for (const url of API_URLS) {
     try {
       const test = await fetch(url + '/api/health', {signal: AbortSignal.timeout(3000), credentials:'include'});
-      if (test.ok) { API_URL = url; break; }
+      if (test.ok) {
+        const ct = test.headers.get('content-type') || '';
+        if (ct.includes('application/json')) { API_URL = url; break; }
+        else { console.warn('API ' + url + ' returned non-JSON (auth redirect?), skipping'); }
+      }
     } catch(e) {}
   }
   try {
