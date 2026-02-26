@@ -486,7 +486,7 @@ function removeUnassigned(c,i){if(confirm('Remover?')){unassigned[c].splice(i,1)
 function syncToServer(){
   const payload = JSON.stringify({people:data, unassigned});
   fetch(API_URL + '/api/save', {
-    method:'POST', headers:{'Content-Type':'application/json'}, body:payload
+    method:'POST', headers:{'Content-Type':'application/json'}, body:payload, credentials:'include'
   }).then(r => r.json()).then(res => {
     if(res.ok) { updateSyncStatus('✅ Salvo no banco'); alert('Dados salvos no banco de dados com snapshot de segurança!'); }
     else { updateSyncStatus('⚠️ Erro'); alert('Erro: ' + (res.error||'desconhecido')); }
@@ -495,7 +495,7 @@ function syncToServer(){
 
 async function showBackups(){
   try {
-    const resp = await fetch(API_URL + '/api/snapshots');
+    const resp = await fetch(API_URL + '/api/snapshots', {credentials:'include'});
     const snapshots = await resp.json();
     if(snapshots.length===0){alert('Nenhum snapshot disponível.');return;}
     const options = snapshots.slice(0,20).map((s,i)=>
@@ -549,7 +549,7 @@ function saveLocal(){
     }
     // Auto-sync to SQLite on every save
     fetch(API_URL + '/api/save', {
-      method:'POST', headers:{'Content-Type':'application/json'}, body:payload
+      method:'POST', headers:{'Content-Type':'application/json'}, body:payload, credentials:'include'
     }).then(r => {
       if(r.ok) updateSyncStatus('✅ Salvo');
       else updateSyncStatus('⚠️ Erro');
@@ -574,12 +574,12 @@ async function init() {
   // Auto-detect working API
   for (const url of API_URLS) {
     try {
-      const test = await fetch(url + '/api/health', {signal: AbortSignal.timeout(3000)});
+      const test = await fetch(url + '/api/health', {signal: AbortSignal.timeout(3000), credentials:'include'});
       if (test.ok) { API_URL = url; break; }
     } catch(e) {}
   }
   try {
-    const resp = await fetch(API_URL + '/api/data?t=' + Date.now());
+    const resp = await fetch(API_URL + '/api/data?t=' + Date.now(, {credentials:'include'}));
     if (resp.ok) {
       const parsed = await resp.json();
       data = parsed.people || [];
