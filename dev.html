@@ -508,7 +508,8 @@ async function showBackups(){
     if(!confirm('Restaurar este snapshot? Um backup de segurança será criado automaticamente antes.')) return;
     const restoreResp = await fetch(API_URL + '/api/restore', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({snapshot_id: snapshots[idx].id})
+      body:JSON.stringify({snapshot_id: snapshots[idx].id}),
+      credentials:'include'
     });
     const result = await restoreResp.json();
     if(result.ok){
@@ -579,7 +580,7 @@ async function init() {
     } catch(e) {}
   }
   try {
-    const resp = await fetch(API_URL + '/api/data?t=' + Date.now(, {credentials:'include'}));
+    const resp = await fetch(API_URL + '/api/data?t=' + Date.now(), {credentials:'include'});
     if (resp.ok) {
       const parsed = await resp.json();
       data = parsed.people || [];
