@@ -52,7 +52,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 
 /* Unassigned */
 .unassigned-section{margin-top:20px;padding:14px 16px;background:rgba(148,163,184,0.04);border:1px dashed var(--border);border-radius:10px}
-.unassigned-section.collapsed-ua{padding:8px 16px}
+.unassigned-section.collapsed-ua{padding:6px 16px}
+.unassigned-section.collapsed-ua .unassigned-header{margin-bottom:0}
 .unassigned-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .unassigned-header h3{font-size:12px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px}
 .unassigned-header button{background:transparent;border:1px dashed var(--border);color:var(--text-muted);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px}
@@ -404,7 +405,8 @@ function renderUnassigned(compId) {
   let html = `<div class="unassigned-section ${isOpen?'':'collapsed-ua'}">`;
   html += `<div class="unassigned-header" onclick="toggleUnassigned('${compId}')" style="cursor:pointer">`;
   html += `<h3><span style="font-size:10px;margin-right:4px">${isOpen?'▼':'▶'}</span>Responsabilidades a definir${countBadge}</h3>`;
-  html += `<button onclick="event.stopPropagation();addUnassigned('${compId}')">+ Adicionar</button></div>`;
+  if (isOpen) html += `<button onclick="event.stopPropagation();addUnassigned('${compId}')">+ Adicionar</button>`;
+  html += `</div>`;
   if (isOpen) {
     if (count > 0) {
       html += `<div class="unassigned-list">`;
