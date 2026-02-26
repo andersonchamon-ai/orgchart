@@ -7,11 +7,11 @@ DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'orgchart.db'
 BACKUP_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'backups')
 
 def get_db():
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30)
     conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL")       # safe concurrent reads
+    conn.execute("PRAGMA journal_mode=DELETE")
     conn.execute("PRAGMA foreign_keys=ON")
-    conn.execute("PRAGMA busy_timeout=5000")
+    conn.execute("PRAGMA busy_timeout=30000")
     return conn
 
 def init_db():
@@ -159,16 +159,13 @@ def export_all(conn=None):
     return {'people': people, 'unassigned': unassigned}
 
 def import_all(data, conn=None, reason='import'):
-    """Import full dataset, replacing everything. Logs audit."""
+    """Import full dataset, replacing everything."""
     close = False
     if conn is None:
         conn = get_db()
         close = True
 
-    # Snapshot before destructive import
-    old_data = export_all(conn)
-    log_audit(conn, 'full_import', 'database', None, old_data, data)
-
+    conn.execute("PRAGMA foreign_keys=OFF")
     conn.execute("DELETE FROM responsibilities")
     conn.execute("DELETE FROM unassigned_responsibilities")
     conn.execute("DELETE FROM people")
@@ -186,6 +183,7 @@ def import_all(data, conn=None, reason='import'):
             conn.execute("INSERT INTO unassigned_responsibilities (company_id, description) VALUES (?,?)",
                         (company_id, desc))
 
+    conn.execute("PRAGMA foreign_keys=ON")
     conn.commit()
     if close:
         conn.close()
