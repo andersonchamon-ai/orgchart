@@ -51,6 +51,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 
 /* Unassigned */
 .unassigned-section{margin-top:20px;padding:14px 16px;background:rgba(148,163,184,0.04);border:1px dashed var(--border);border-radius:10px}
+.unassigned-section.collapsed-ua{padding:8px 16px}
 .unassigned-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .unassigned-header h3{font-size:12px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px}
 .unassigned-header button{background:transparent;border:1px dashed var(--border);color:var(--text-muted);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px}
@@ -205,6 +206,7 @@ let data = [
 
 let unassigned = {lionx:[],pws:[],phiz:[],fabrica:[]};
 let collapsedSet = new Set();
+let unassignedOpen = {lionx:false, pws:false, phiz:false, fabrica:false};
 let nextId = 100;
 let editingId = null;
 let uaEditCompany = null;
@@ -389,15 +391,28 @@ function addLine(svg, x1, y1, x2, y2) {
 
 function renderUnassigned(compId) {
   const ua = unassigned[compId] || [];
-  let html = `<div class="unassigned-section"><div class="unassigned-header"><h3>📋 Responsabilidades a definir</h3><button onclick="addUnassigned('${compId}')">+ Adicionar</button></div>`;
-  if (ua.length > 0) {
-    html += `<div class="unassigned-list">`;
-    ua.forEach((item, idx) => { html += `<div class="unassigned-item" onclick="editUnassigned('${compId}',${idx})">${item}<button class="remove-ua" onclick="event.stopPropagation();removeUnassigned('${compId}',${idx})">✕</button></div>`; });
-    html += `</div>`;
-  } else {
-    html += `<div style="font-size:12px;color:var(--text-muted);font-style:italic;padding:4px 0">Nenhuma responsabilidade pendente</div>`;
+  const isOpen = unassignedOpen[compId];
+  const count = ua.length;
+  const countBadge = count > 0 ? `<span style="background:var(--orange);color:#000;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;margin-left:8px">${count}</span>` : '';
+  let html = `<div class="unassigned-section ${isOpen?'':'collapsed-ua'}">`;
+  html += `<div class="unassigned-header" onclick="toggleUnassigned('${compId}')" style="cursor:pointer">`;
+  html += `<h3><span style="font-size:10px;margin-right:4px">${isOpen?'▼':'▶'}</span>Responsabilidades a definir${countBadge}</h3>`;
+  html += `<button onclick="event.stopPropagation();addUnassigned('${compId}')">+ Adicionar</button></div>`;
+  if (isOpen) {
+    if (count > 0) {
+      html += `<div class="unassigned-list">`;
+      ua.forEach((item, idx) => { html += `<div class="unassigned-item" onclick="editUnassigned('${compId}',${idx})">${item}<button class="remove-ua" onclick="event.stopPropagation();removeUnassigned('${compId}',${idx})">✕</button></div>`; });
+      html += `</div>`;
+    } else {
+      html += `<div style="font-size:12px;color:var(--text-muted);font-style:italic;padding:4px 0">Nenhuma responsabilidade pendente</div>`;
+    }
   }
   return html + `</div>`;
+}
+
+function toggleUnassigned(compId) {
+  unassignedOpen[compId] = !unassignedOpen[compId];
+  render();
 }
 
 function toggleCollapse(id) {
