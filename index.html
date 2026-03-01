@@ -813,7 +813,7 @@ function rebuildCatDropdown(selected){
   const val = selected !== undefined ? selected : sel.value;
   sel.innerHTML = '<option value="">Inbox</option>';
   for(const c of FIXED_CATS) sel.innerHTML += `<option value="${c}">${c}</option>`;
-  for(const c of customCats) sel.innerHTML += `<option value="${c}">${c} ✕</option>`;
+  for(const c of customCats) sel.innerHTML += `<option value="${c}">${c}</option>`;
   sel.innerHTML += '<option value="__new__">+ Nova categoria...</option>';
   sel.value = val || '';
 }
