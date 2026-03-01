@@ -882,6 +882,15 @@ async function loadTodos(){
   // Merge with localStorage
   const local = JSON.parse(localStorage.getItem('todos')||'[]');
   if(todos.length === 0 && local.length > 0) todos = local;
+  // Auto-discover categories from todos that aren't fixed or already custom
+  let changed = false;
+  todos.forEach(t => {
+    if(t.category && !FIXED_CATS.includes(t.category) && !customCats.includes(t.category)){
+      customCats.push(t.category);
+      changed = true;
+    }
+  });
+  if(changed){ saveCustomCats(); rebuildCatDropdown(); }
   updateTodoBadge();
   if(currentModule === 'todo') renderTodos();
 }
