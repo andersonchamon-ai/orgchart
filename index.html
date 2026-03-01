@@ -883,6 +883,7 @@ async function loadTodos(){
   const local = JSON.parse(localStorage.getItem('todos')||'[]');
   if(todos.length === 0 && local.length > 0) todos = local;
   updateTodoBadge();
+  if(currentModule === 'todo') renderTodos();
 }
 
 function saveTodosLocal(){
