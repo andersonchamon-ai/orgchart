@@ -33,6 +33,8 @@ def init_db():
             company_id TEXT NOT NULL REFERENCES companies(id),
             level INTEGER NOT NULL DEFAULT 2,
             reports_to INTEGER REFERENCES people(id) ON DELETE SET NULL,
+            hc_filled INTEGER NOT NULL DEFAULT 0,
+            hc_open INTEGER NOT NULL DEFAULT 0,
             created_at TEXT DEFAULT (datetime('now')),
             updated_at TEXT DEFAULT (datetime('now'))
         );
@@ -143,7 +145,9 @@ def export_all(conn=None):
         people.append({
             'id': row['id'], 'name': row['name'], 'role': row['role'],
             'company': row['company_id'], 'level': row['level'],
-            'reportsTo': row['reports_to'], 'responsibilities': resps
+            'reportsTo': row['reports_to'], 'responsibilities': resps,
+            'hcFilled': row['hc_filled'] if 'hc_filled' in row.keys() else 0,
+            'hcOpen': row['hc_open'] if 'hc_open' in row.keys() else 0,
         })
     
     unassigned = {}
@@ -172,8 +176,9 @@ def import_all(data, conn=None, reason='import'):
 
     for p in data.get('people', []):
         conn.execute(
-            "INSERT INTO people (id, name, role, company_id, level, reports_to) VALUES (?,?,?,?,?,?)",
-            (p['id'], p.get('name',''), p['role'], p['company'], p['level'], p.get('reportsTo'))
+            "INSERT INTO people (id, name, role, company_id, level, reports_to, hc_filled, hc_open) VALUES (?,?,?,?,?,?,?,?)",
+            (p['id'], p.get('name',''), p['role'], p['company'], p['level'], p.get('reportsTo'),
+             p.get('hcFilled', 0), p.get('hcOpen', 0))
         )
         for r in p.get('responsibilities', []):
             conn.execute("INSERT INTO responsibilities (person_id, description) VALUES (?,?)", (p['id'], r))
@@ -211,10 +216,11 @@ def upsert_person(person_data):
         if old:
             log_audit(conn, 'update', 'person', pid, dict(old), person_data)
             conn.execute("""
-                UPDATE people SET name=?, role=?, company_id=?, level=?, reports_to=?, updated_at=datetime('now')
+                UPDATE people SET name=?, role=?, company_id=?, level=?, reports_to=?, hc_filled=?, hc_open=?, updated_at=datetime('now')
                 WHERE id=?
             """, (person_data.get('name',''), person_data['role'], person_data['company'],
-                  person_data['level'], person_data.get('reportsTo'), pid))
+                  person_data['level'], person_data.get('reportsTo'),
+                  person_data.get('hcFilled', 0), person_data.get('hcOpen', 0), pid))
             # Replace responsibilities
             conn.execute("DELETE FROM responsibilities WHERE person_id=?", (pid,))
             for r in person_data.get('responsibilities', []):
@@ -226,9 +232,10 @@ def upsert_person(person_data):
     # Insert new
     log_audit(conn, 'create', 'person', None, None, person_data)
     cursor = conn.execute(
-        "INSERT INTO people (name, role, company_id, level, reports_to) VALUES (?,?,?,?,?)",
+        "INSERT INTO people (name, role, company_id, level, reports_to, hc_filled, hc_open) VALUES (?,?,?,?,?,?,?)",
         (person_data.get('name',''), person_data['role'], person_data['company'],
-         person_data['level'], person_data.get('reportsTo'))
+         person_data['level'], person_data.get('reportsTo'),
+         person_data.get('hcFilled', 0), person_data.get('hcOpen', 0))
     )
     pid = cursor.lastrowid
     for r in person_data.get('responsibilities', []):
@@ -265,6 +272,86 @@ def backup_db():
         os.remove(os.path.join(BACKUP_DIR, backups.pop(0)))
     return dest
 
+def migrate_hc_columns():
+    """Add hc_filled and hc_open columns if missing."""
+    conn = get_db()
+    cols = [r[1] for r in conn.execute("PRAGMA table_info(people)").fetchall()]
+    if 'hc_filled' not in cols:
+        conn.execute("ALTER TABLE people ADD COLUMN hc_filled INTEGER NOT NULL DEFAULT 0")
+    if 'hc_open' not in cols:
+        conn.execute("ALTER TABLE people ADD COLUMN hc_open INTEGER NOT NULL DEFAULT 0")
+    conn.commit()
+    conn.close()
+
+# --- Todos CRUD ---
+
+def init_todos():
+    """Create todos table if not exists."""
+    conn = get_db()
+    conn.executescript("""
+        CREATE TABLE IF NOT EXISTS todos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            text TEXT NOT NULL,
+            category TEXT DEFAULT '',
+            done INTEGER NOT NULL DEFAULT 0,
+            created_at TEXT DEFAULT (datetime('now')),
+            completed_at TEXT,
+            sort_order INTEGER DEFAULT 0
+        );
+    """)
+    conn.commit()
+    conn.close()
+
+def get_todos():
+    conn = get_db()
+    rows = conn.execute("SELECT * FROM todos ORDER BY done ASC, sort_order ASC, created_at DESC").fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+def create_todo(text, category=''):
+    conn = get_db()
+    cursor = conn.execute(
+        "INSERT INTO todos (text, category) VALUES (?,?)", (text, category or '')
+    )
+    tid = cursor.lastrowid
+    conn.commit()
+    conn.close()
+    return tid
+
+def update_todo(todo_id, updates):
+    conn = get_db()
+    fields = []
+    vals = []
+    for k in ('text', 'category', 'done', 'sort_order'):
+        if k in updates:
+            fields.append(f"{k}=?")
+            vals.append(updates[k])
+    if 'done' in updates and updates['done']:
+        fields.append("completed_at=datetime('now')")
+    elif 'done' in updates and not updates['done']:
+        fields.append("completed_at=NULL")
+    if not fields:
+        conn.close()
+        return
+    vals.append(todo_id)
+    conn.execute(f"UPDATE todos SET {','.join(fields)} WHERE id=?", vals)
+    conn.commit()
+    conn.close()
+
+def delete_todo(todo_id):
+    conn = get_db()
+    conn.execute("DELETE FROM todos WHERE id=?", (todo_id,))
+    conn.commit()
+    conn.close()
+
+def clear_done_todos():
+    conn = get_db()
+    conn.execute("DELETE FROM todos WHERE done=1")
+    conn.commit()
+    conn.close()
+
 # Initialize on import
 init_db()
 seed_companies()
+migrate_hc_columns()
+init_todos()

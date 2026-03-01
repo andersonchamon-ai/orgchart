@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LionX — Organograma (DEV)</title>
+<title>LionX — Sistema de Gestão (DEV)</title>
 <style>
 :root{--bg:#0f172a;--card:#1e293b;--card-vacant:#2d1b1b;--border:#334155;--border-vacant:#ef4444;--text:#e2e8f0;--text-muted:#94a3b8;--accent:#3b82f6;--green:#22c55e;--red:#ef4444;--orange:#f59e0b;--line:#475569}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -40,6 +40,10 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .node-name{font-size:14px;font-weight:600;margin-bottom:2px}
 .node-role{font-size:12px;color:var(--text-muted)}
 .node-hc{font-size:11px;color:var(--accent);margin-top:2px;font-weight:600}
+.hc-badges{display:flex;gap:4px;justify-content:center;margin-top:4px}
+.hc-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;line-height:1.3}
+.hc-badge-filled{background:#22c55e;color:#000}
+.hc-badge-open{background:#f59e0b;color:#000}
 .tag-hc{background:rgba(255,255,255,0.1);color:#fff;font-weight:600}
 .node-card .remove-btn{position:absolute;top:4px;right:6px;background:none;border:none;color:var(--red);cursor:pointer;font-size:13px;opacity:0;transition:opacity 0.2s}
 .node-card:hover .remove-btn{opacity:0.5}
@@ -113,25 +117,131 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .modal .resp-entry button{background:var(--red);color:#fff;padding:6px 10px;border-radius:4px;border:none;cursor:pointer;font-size:12px}
 .modal .add-resp-btn{background:transparent;border:1px dashed var(--border);color:var(--text-muted);padding:6px 12px;border-radius:4px;cursor:pointer;font-size:12px;margin-top:4px}
 .modal .add-resp-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* Sidebar */
+.sidebar-toggle{background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:4px 8px;border-radius:6px;line-height:1}
+.sidebar-toggle:hover{background:var(--border)}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:250}
+.sidebar-overlay.active{display:block}
+.sidebar{position:fixed;top:0;left:-280px;width:280px;height:100vh;background:var(--card);border-right:1px solid var(--border);z-index:260;transition:left 0.25s ease;padding:20px 0;overflow-y:auto}
+.sidebar.open{left:0}
+.sidebar-brand{padding:16px 20px;font-size:18px;font-weight:700;color:var(--accent);border-bottom:1px solid var(--border);margin-bottom:8px}
+.sidebar-item{display:flex;align-items:center;gap:12px;padding:12px 20px;cursor:pointer;font-size:14px;color:var(--text-muted);transition:all 0.15s;border-left:3px solid transparent}
+.sidebar-item:hover{background:rgba(59,130,246,0.08);color:var(--text)}
+.sidebar-item.active{color:var(--accent);background:rgba(59,130,246,0.12);border-left-color:var(--accent);font-weight:600}
+.sidebar-item .si-icon{font-size:18px;width:24px;text-align:center}
+.sidebar-item .si-badge{margin-left:auto;background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+
+/* To-Do GTD */
+.todo-container{max-width:800px;margin:0 auto}
+.todo-input-row{display:flex;gap:8px;margin-bottom:24px}
+.todo-input-row input[type="text"]{flex:1;padding:12px 16px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;font-family:inherit}
+.todo-input-row input[type="text"]:focus{outline:none;border-color:var(--accent)}
+.todo-input-row input[type="text"]::placeholder{color:var(--text-muted)}
+.todo-cat-select{padding:12px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;min-width:130px;font-family:inherit}
+.todo-cat-select:focus{outline:none;border-color:var(--accent)}
+.todo-add-btn{padding:12px 20px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer}
+.todo-add-btn:hover{opacity:0.85}
+.todo-group{margin-bottom:24px}
+.todo-group-header{font-size:12px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);padding:8px 0;border-bottom:1px solid var(--border);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.todo-group-header .cat-dot{width:8px;height:8px;border-radius:50%}
+.todo-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;transition:background 0.15s;position:relative}
+.todo-item:hover{background:rgba(255,255,255,0.03)}
+.todo-item input[type="checkbox"]{width:18px;height:18px;accent-color:var(--accent);cursor:pointer;flex-shrink:0}
+.todo-item .todo-text{flex:1;font-size:14px;line-height:1.4}
+.todo-item.done .todo-text{text-decoration:line-through;color:var(--text-muted)}
+.todo-item .todo-meta{font-size:11px;color:var(--text-muted);margin-left:auto;white-space:nowrap}
+.todo-item .todo-delete{background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;opacity:0;transition:opacity 0.15s;padding:4px}
+.todo-item:hover .todo-delete{opacity:0.6}
+.todo-item .todo-delete:hover{opacity:1}
+.todo-done-section{margin-top:32px;border-top:1px solid var(--border);padding-top:16px}
+.todo-done-header{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--text-muted);margin-bottom:8px}
+.todo-done-header:hover{color:var(--text)}
+.todo-clear-btn{margin-left:auto;background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:11px}
+.todo-clear-btn:hover{border-color:var(--red);color:var(--red)}
+.todo-empty{text-align:center;padding:60px 20px;color:var(--text-muted);font-size:14px}
+.cat-badge{font-size:18px;cursor:pointer;position:relative;line-height:1;padding:2px 4px;border-radius:4px;transition:all 0.15s;flex-shrink:0}
+.cat-badge:hover{background:rgba(255,255,255,0.08)}
+.cat-dropdown{position:absolute;top:100%;right:0;margin-top:4px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:4px;min-width:170px;z-index:50;box-shadow:0 8px 24px rgba(0,0,0,0.4)}
+.cat-dropdown-item{padding:8px 12px;font-size:12px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:8px;color:var(--text)}
+.cat-dropdown-item:hover{background:rgba(59,130,246,0.12)}
+.cat-dropdown-item.selected{color:var(--accent);font-weight:600}
+@media(max-width:768px){
+  .sidebar{width:260px;left:-260px}
+  .todo-input-row{flex-wrap:wrap}
+  .todo-cat-select{min-width:100%;order:3}
+}
 </style>
 </head><body>
 
 
+<!-- Sidebar -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-brand">LionX</div>
+  <div class="sidebar-item active" data-module="todo" onclick="switchModule('todo')">
+    <span class="si-icon">✅</span> To-Do / GTD
+    <span class="si-badge" id="todoBadge" style="display:none">0</span>
+  </div>
+  <div class="sidebar-item" data-module="orgchart" onclick="switchModule('orgchart')">
+    <span class="si-icon">👥</span> Organograma
+  </div>
+  <div class="sidebar-item" data-module="financeiro" onclick="switchModule('financeiro')" style="opacity:0.4;pointer-events:none">
+    <span class="si-icon">💰</span> Financeiro <span style="font-size:10px;color:var(--text-muted);margin-left:auto">em breve</span>
+  </div>
+  <div class="sidebar-item" data-module="docs" onclick="switchModule('docs')" style="opacity:0.4;pointer-events:none">
+    <span class="si-icon">📄</span> Documentos <span style="font-size:10px;color:var(--text-muted);margin-left:auto">em breve</span>
+  </div>
+</nav>
+
 <div class="toolbar">
-  <h1>🦁 LionX — Organograma</h1>
-  <div class="legend">
+  <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+  <h1 id="toolbarTitle">LionX — To-Do / GTD</h1>
+  <div class="legend" id="orgLegend" style="display:none">
     <span><span class="dot dot-filled"></span> Preenchido</span>
     <span><span class="dot dot-vacant"></span> Vaga aberta</span>
+    <span><span class="dot" style="background:#22c55e"></span> HC (badge)</span>
+    <span><span class="dot" style="background:#f59e0b"></span> Vagas (badge)</span>
   </div>
   <div id="syncStatus" style="font-size:11px;color:var(--text-muted);opacity:0.5;transition:opacity 0.3s">☁️</div>
   <div class="stats" id="stats" style="display:none"></div>
-  <button class="secondary" onclick="exportJSON()">💾 Exportar</button>
-  <button class="secondary" onclick="importJSON()">📂 Importar</button>
-  <button class="secondary" onclick="showBackups()">🔄 Backups</button>
-  <button class="secondary" onclick="syncToServer()">☁️ Sync</button>
-  <button onclick="addPosition()">+ Posição</button>
+  <!-- Orgchart buttons -->
+  <div id="orgButtons" style="display:none">
+    <button class="secondary" onclick="exportJSON()">💾 Exportar</button>
+    <button class="secondary" onclick="importJSON()">📂 Importar</button>
+    <button class="secondary" onclick="showBackups()">🔄 Backups</button>
+    <button class="secondary" onclick="syncToServer()">☁️ Sync</button>
+    <button onclick="addPosition()">+ Posição</button>
+  </div>
 </div>
-<div class="container" id="container"></div>
+
+<!-- Orgchart View -->
+<div class="container" id="container" style="display:none"></div>
+
+<!-- To-Do View -->
+<div class="container" id="todoView">
+  <div class="todo-container">
+    <div class="todo-input-row">
+      <input type="text" id="todoInput" placeholder="O que precisa ser feito?" onkeydown="if(event.key==='Enter')addTodo()">
+      <select class="todo-cat-select" id="todoCatInput" onchange="onCatChange()"></select>
+      <button class="sidebar-toggle" onclick="openCatManager()" title="Gerenciar categorias" style="font-size:16px;padding:4px 8px">⚙️</button>
+      <button class="todo-add-btn" onclick="addTodo()">+ Adicionar</button>
+    </div>
+    <div id="todoList"></div>
+  </div>
+</div>
+
+<!-- Category Manager Modal -->
+<div class="modal-overlay" id="catModalOverlay">
+  <div class="modal" style="max-width:360px">
+    <h3>⚙️ Gerenciar Categorias</h3>
+    <div style="margin-bottom:12px;font-size:12px;color:var(--text-muted)">Categorias fixas não podem ser removidas.</div>
+    <div id="catManagerList"></div>
+    <div class="btn-row">
+      <button class="btn-cancel" onclick="closeCatManager()">Fechar</button>
+    </div>
+  </div>
+</div>
 
 <!-- Person Modal -->
 <div class="modal-overlay" id="modalOverlay">
@@ -147,6 +257,10 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
       <option value="3">N-3 (Gerência / Coordenação)</option>
     </select>
     <label>Reporta a</label><select id="mReportsTo"><option value="">— Ninguém (topo) —</option></select>
+    <div style="display:flex;gap:12px;margin-top:12px">
+      <div style="flex:1"><label>HC Preenchido (abaixo, fora do org)</label><input id="mHcFilled" type="number" min="0" value="0"></div>
+      <div style="flex:1"><label>Vagas Abertas (abaixo, fora do org)</label><input id="mHcOpen" type="number" min="0" value="0"></div>
+    </div>
     <label>Responsabilidades</label>
     <div class="resp-list" id="mRespList"></div>
     <button class="add-resp-btn" type="button" onclick="addRespField()">+ Adicionar responsabilidade</button>
@@ -221,12 +335,33 @@ function getChildren(parentId) {
 }
 
 function countHC(personId) {
+  // Sum only manual hcFilled (people NOT visible in org chart), recursively
   const children = getChildren(personId);
-  let count = 0;
+  const self = data.find(d => d.id === personId);
+  let count = (self ? (self.hcFilled || 0) : 0);
   for (const c of children) {
-    count += 1 + countHC(c.id);
+    count += countHC(c.id);
   }
   return count;
+}
+function countHCOpen(personId) {
+  const children = getChildren(personId);
+  const self = data.find(d => d.id === personId);
+  let count = (self ? (self.hcOpen || 0) : 0);
+  for (const c of children) {
+    count += countHCOpen(c.id);
+  }
+  return count;
+}
+function hcBadgesHTML(personId) {
+  const filled = countHC(personId);
+  const open = countHCOpen(personId);
+  if (filled === 0 && open === 0) return '';
+  let html = '<div class="hc-badges">';
+  if (filled > 0) html += `<span class="hc-badge hc-badge-filled">${filled}</span>`;
+  if (open > 0) html += `<span class="hc-badge hc-badge-open">${open}</span>`;
+  html += '</div>';
+  return html;
 }
 
 function renderCardHTML(item) {
@@ -239,7 +374,7 @@ function renderCardHTML(item) {
   return `<div class="node-card ${vacant?'vacant':''} ${isCeo?'ceo':''}" data-id="${item.id}" onclick="editCard(${item.id})">
     <div class="node-name">${vacant ? '⚠️ VAGA' : item.name}</div>
     <div class="node-role">${item.role}</div>
-    ${countHC(item.id) > 0 ? `<div class="node-hc">${countHC(item.id)}</div>` : ''}
+    ${hcBadgesHTML(item.id)}
     <button class="remove-btn" onclick="event.stopPropagation();removeCard(${item.id})">✕</button>
   </div>${showToggle ? `<button class="toggle-btn ${isCollapsed?'active':''}" data-toggle="${item.id}" onclick="event.stopPropagation();toggleCollapse(${item.id})">${isCollapsed?'+':'−'}</button>` : ''}`;
 }
@@ -271,12 +406,12 @@ function render() {
   html += `<div class="holding-section">`;
   const lionxPeople = data.filter(d=>d.company==='lionx');
   html += `<div class="company-header"><h2>LionX (Holding)</h2><span class="tag tag-hc">Total HC: ${lionxPeople.length}</span><span class="tag tag-holding">${lionxPeople.filter(d=>d.name).length} preenchidos</span></div>`;
-  if (ceo) html += `<div style="display:flex;justify-content:center;margin:16px 0"><div class="node-card ceo" onclick="editCard(${ceo.id})"><div class="node-name">${ceo.name}</div><div class="node-role">${ceo.role}</div>${countHC(ceo.id) > 0 ? `<div class="node-hc">${countHC(ceo.id)}</div>` : ''}</div></div>`;
+  if (ceo) html += `<div style="display:flex;justify-content:center;margin:16px 0"><div class="node-card ceo" onclick="editCard(${ceo.id})"><div class="node-name">${ceo.name}</div><div class="node-role">${ceo.role}</div>${hcBadgesHTML(ceo.id)}</div></div>`;
   if (holdingDirect.length > 0) {
     html += `<div class="level-label">Diretos ao CEO</div><div class="holding-row">`;
     for (const item of holdingDirect) {
       const vacant = !item.name;
-      html += `<div class="node-card ${vacant?'vacant':''}" onclick="editCard(${item.id})"><div class="node-name">${vacant?'⚠️ VAGA':item.name}</div><div class="node-role">${item.role}</div>${countHC(item.id) > 0 ? `<div class="node-hc">${countHC(item.id)}</div>` : ''}<button class="remove-btn" onclick="event.stopPropagation();removeCard(${item.id})">✕</button></div>`;
+      html += `<div class="node-card ${vacant?'vacant':''}" onclick="editCard(${item.id})"><div class="node-name">${vacant?'⚠️ VAGA':item.name}</div><div class="node-role">${item.role}</div>${hcBadgesHTML(item.id)}<button class="remove-btn" onclick="event.stopPropagation();removeCard(${item.id})">✕</button></div>`;
     }
     html += `</div>`;
   }
@@ -459,6 +594,8 @@ function openModal(item) {
   const cs = document.getElementById('mCompany');
   cs.innerHTML = COMPANIES.map(c => `<option value="${c.id}" ${item&&item.company===c.id?'selected':''}>${c.name}</option>`).join('');
   document.getElementById('mLevel').value = item ? item.level : 2;
+  document.getElementById('mHcFilled').value = item ? (item.hcFilled || 0) : 0;
+  document.getElementById('mHcOpen').value = item ? (item.hcOpen || 0) : 0;
   updateReportsTo(item);
   document.getElementById('mCompany').onchange = () => updateReportsTo(item);
   const rl = document.getElementById('mRespList'); rl.innerHTML = '';
@@ -480,9 +617,11 @@ function saveModal() {
   const level = parseInt(document.getElementById('mLevel').value);
   const reportsTo = document.getElementById('mReportsTo').value ? parseInt(document.getElementById('mReportsTo').value) : null;
   const responsibilities = Array.from(document.querySelectorAll('#mRespList .resp-input')).map(i=>i.value.trim()).filter(v=>v);
+  const hcFilled = parseInt(document.getElementById('mHcFilled').value) || 0;
+  const hcOpen = parseInt(document.getElementById('mHcOpen').value) || 0;
   if (!role) { alert('Cargo é obrigatório'); return; }
-  if (editingId !== null) { const item = data.find(d=>d.id===editingId); Object.assign(item, {name,role,company,level,reportsTo,responsibilities}); }
-  else { data.push({id:nextId++,name,role,company,level,reportsTo,responsibilities}); }
+  if (editingId !== null) { const item = data.find(d=>d.id===editingId); Object.assign(item, {name,role,company,level,reportsTo,responsibilities,hcFilled,hcOpen}); }
+  else { data.push({id:nextId++,name,role,company,level,reportsTo,responsibilities,hcFilled,hcOpen}); }
   closeModal(); render(); saveLocal();
 }
 function editCard(id) { openModal(data.find(d=>d.id===id)); }
@@ -596,7 +735,7 @@ function updateSyncStatus(msg) {
 }
 function loadLocal(){try{const s=localStorage.getItem('orgchart');if(s){const p=JSON.parse(s);if(Array.isArray(p)){data=p;}else{data=p.people||p;unassigned=p.unassigned||{lionx:[],pws:[],phiz:[],fabrica:[]};}nextId=Math.max(...data.map(d=>d.id))+1;data.forEach(d=>{if(!d.responsibilities)d.responsibilities=[];});}}catch(e){}}
 
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeUaModal();}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeUaModal();closeCatManager();}});
 window.addEventListener('resize', () => drawAllLines());
 async function init() {
   // Priority: 1) SQLite via API  2) localStorage  3) hardcoded
@@ -619,7 +758,7 @@ async function init() {
       data = parsed.people || [];
       unassigned = parsed.unassigned || {lionx:[],pws:[],phiz:[],fabrica:[]};
       nextId = Math.max(...data.map(d=>d.id)) + 1;
-      data.forEach(d => { if (!d.responsibilities) d.responsibilities = []; });
+      data.forEach(d => { if (!d.responsibilities) d.responsibilities = []; d.hcFilled = d.hcFilled || 0; d.hcOpen = d.hcOpen || 0; });
       loaded = true;
       console.log('📀 Dados carregados do banco SQLite');
       updateSyncStatus('✅ Banco conectado');
@@ -634,5 +773,297 @@ async function init() {
   render();
 }
 init();
+
+// ===== SIDEBAR =====
+let currentModule = 'todo';
+function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('active'); }
+function closeSidebar(){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('active'); }
+function switchModule(mod){
+  currentModule = mod;
+  closeSidebar();
+  document.querySelectorAll('.sidebar-item').forEach(el => el.classList.toggle('active', el.dataset.module === mod));
+  document.getElementById('container').style.display = mod === 'orgchart' ? '' : 'none';
+  document.getElementById('todoView').style.display = mod === 'todo' ? '' : 'none';
+  document.getElementById('orgLegend').style.display = mod === 'orgchart' ? '' : 'none';
+  document.getElementById('orgButtons').style.display = mod === 'orgchart' ? '' : 'none';
+  const titles = {orgchart:'LionX — Organograma', todo:'LionX — To-Do / GTD', financeiro:'LionX — Financeiro', docs:'LionX — Documentos'};
+  document.getElementById('toolbarTitle').textContent = titles[mod] || titles.orgchart;
+  if(mod === 'todo') renderTodos();
+}
+
+// ===== TO-DO GTD =====
+let todos = [];
+let todoDoneOpen = false;
+
+const FIXED_CATS = ['PicPay','PhizChat','PWS Cloud','Fábrica','LionX','Pessoal'];
+let customCats = JSON.parse(localStorage.getItem('todo-custom-cats')||'[]');
+
+const CAT_COLORS = {
+  'PicPay':'#22c55e','PhizChat':'#818cf8','PWS Cloud':'#3b82f6',
+  'Fábrica':'#f59e0b','LionX':'#ef4444','Pessoal':'#ec4899','':'#64748b'
+};
+// Generate colors for custom cats
+const EXTRA_COLORS = ['#06b6d4','#a855f7','#f43f5e','#84cc16','#fb923c','#14b8a6','#e879f9','#facc15'];
+function catColor(cat){ return CAT_COLORS[cat] || EXTRA_COLORS[customCats.indexOf(cat) % EXTRA_COLORS.length] || '#64748b'; }
+
+function saveCustomCats(){ localStorage.setItem('todo-custom-cats', JSON.stringify(customCats)); }
+
+function rebuildCatDropdown(selected){
+  const sel = document.getElementById('todoCatInput');
+  const val = selected !== undefined ? selected : sel.value;
+  sel.innerHTML = '<option value="">Inbox</option>';
+  for(const c of FIXED_CATS) sel.innerHTML += `<option value="${c}">${c}</option>`;
+  for(const c of customCats) sel.innerHTML += `<option value="${c}">${c} ✕</option>`;
+  sel.innerHTML += '<option value="__new__">+ Nova categoria...</option>';
+  sel.value = val || '';
+}
+
+function onCatChange(){
+  const sel = document.getElementById('todoCatInput');
+  if(sel.value === '__new__'){
+    const name = prompt('Nome da nova categoria:');
+    if(name && name.trim()){
+      const cat = name.trim();
+      if(!FIXED_CATS.includes(cat) && !customCats.includes(cat)){
+        customCats.push(cat);
+        saveCustomCats();
+      }
+      rebuildCatDropdown(cat);
+    } else {
+      sel.value = '';
+    }
+  } else if(customCats.includes(sel.value)){
+    // Check if user clicked the ✕ (we can't detect that in a select, so we use a different approach)
+  }
+}
+
+function openCatManager(){
+  const list = document.getElementById('catManagerList');
+  let html = '';
+  for(const c of FIXED_CATS){
+    html += `<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <span class="cat-dot" style="background:${catColor(c)};width:10px;height:10px;border-radius:50%;flex-shrink:0"></span>
+      <span style="flex:1;font-size:14px">${c}</span>
+      <span style="font-size:11px;color:var(--text-muted)">fixa</span>
+    </div>`;
+  }
+  for(const c of customCats){
+    const count = todos.filter(t => t.category === c).length;
+    html += `<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <span class="cat-dot" style="background:${catColor(c)};width:10px;height:10px;border-radius:50%;flex-shrink:0"></span>
+      <span style="flex:1;font-size:14px">${escHtml(c)}</span>
+      <span style="font-size:11px;color:var(--text-muted)">${count} tarefa${count!==1?'s':''}</span>
+      <button onclick="deleteCustomCat('${escHtml(c).replace(/'/g,"\\'")}')" style="background:none;border:1px solid var(--border);color:var(--red);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:12px">🗑</button>
+    </div>`;
+  }
+  if(customCats.length === 0) html += '<div style="font-size:13px;color:var(--text-muted);padding:12px 0;text-align:center">Nenhuma categoria custom criada</div>';
+  list.innerHTML = html;
+  document.getElementById('catModalOverlay').classList.add('active');
+}
+function closeCatManager(){ document.getElementById('catModalOverlay').classList.remove('active'); }
+
+function deleteCustomCat(cat){
+  if(!confirm(`Remover categoria "${cat}"?\nAs tarefas dessa categoria ficarão "Inbox".`)) return;
+  customCats = customCats.filter(c => c !== cat);
+  saveCustomCats();
+  // Move todos in this cat to uncategorized
+  todos.forEach(t => { if(t.category === cat) t.category = ''; });
+  saveTodosLocal();
+  rebuildCatDropdown('');
+  renderTodos();
+  openCatManager(); // refresh modal
+}
+
+async function loadTodos(){
+  try {
+    const r = await fetch(API_URL + '/api/todos', {credentials:'include'});
+    if(r.ok) todos = await r.json();
+  } catch(e){ console.warn('Todos offline, using local'); }
+  // Merge with localStorage
+  const local = JSON.parse(localStorage.getItem('todos')||'[]');
+  if(todos.length === 0 && local.length > 0) todos = local;
+  updateTodoBadge();
+}
+
+function saveTodosLocal(){
+  localStorage.setItem('todos', JSON.stringify(todos));
+  updateTodoBadge();
+}
+
+function updateTodoBadge(){
+  const pending = todos.filter(t => !t.done).length;
+  const badge = document.getElementById('todoBadge');
+  if(pending > 0){ badge.style.display = ''; badge.textContent = pending; }
+  else { badge.style.display = 'none'; }
+}
+
+async function addTodo(){
+  const input = document.getElementById('todoInput');
+  const text = input.value.trim();
+  if(!text) return;
+  const cat = document.getElementById('todoCatInput').value;
+  input.value = '';
+  const todo = {text, category: cat, done: 0, created_at: new Date().toISOString(), completed_at: null};
+  try {
+    const r = await fetch(API_URL + '/api/todos', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({text, category: cat}), credentials:'include'
+    });
+    if(r.ok){ const j = await r.json(); todo.id = j.id; }
+  } catch(e){}
+  if(!todo.id) todo.id = Date.now();
+  todos.push(todo);
+  saveTodosLocal();
+  renderTodos();
+}
+
+async function toggleTodo(id){
+  const t = todos.find(x => x.id === id);
+  if(!t) return;
+  t.done = t.done ? 0 : 1;
+  t.completed_at = t.done ? new Date().toISOString() : null;
+  saveTodosLocal();
+  renderTodos();
+  try { await fetch(API_URL + '/api/todos/' + id, {
+    method:'PUT', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({done: t.done}), credentials:'include'
+  }); } catch(e){}
+}
+
+async function deleteTodo(id){
+  todos = todos.filter(t => t.id !== id);
+  saveTodosLocal();
+  renderTodos();
+  try { await fetch(API_URL + '/api/todos/' + id, {method:'DELETE', credentials:'include'}); } catch(e){}
+}
+
+async function clearDoneTodos(){
+  if(!confirm('Limpar todas as tarefas concluídas?')) return;
+  todos = todos.filter(t => !t.done);
+  saveTodosLocal();
+  renderTodos();
+  try { await fetch(API_URL + '/api/todos/clear-done', {method:'POST', credentials:'include'}); } catch(e){}
+}
+
+function fmtDate(iso){
+  if(!iso) return '';
+  const d = new Date(iso);
+  return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}) + ' ' + d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+}
+
+function isToday(isoStr){
+  if(!isoStr) return false;
+  const d = new Date(isoStr);
+  const now = new Date();
+  return d.getFullYear()===now.getFullYear() && d.getMonth()===now.getMonth() && d.getDate()===now.getDate();
+}
+
+function renderTodos(){
+  const list = document.getElementById('todoList');
+  // Split: active = pending + done-today; archived = done before today
+  const active = todos.filter(t => !t.done || isToday(t.completed_at));
+  const archived = todos.filter(t => t.done && !isToday(t.completed_at));
+
+  if(active.length === 0 && archived.length === 0){
+    list.innerHTML = '<div class="todo-empty">📝 Nenhuma tarefa ainda.<br>Adicione algo acima ou mande pelo chat!</div>';
+    return;
+  }
+
+  // Group active by category
+  const groups = {};
+  active.forEach(t => {
+    const cat = t.category || '';
+    if(!groups[cat]) groups[cat] = [];
+    groups[cat].push(t);
+  });
+
+  let html = '';
+  const sortedCats = Object.keys(groups).sort((a,b) => { if(a==='') return -1; if(b==='') return 1; return a.localeCompare(b); });
+  for(const cat of sortedCats){
+    const color = catColor(cat);
+    const label = cat || '📥 Inbox';
+    html += `<div class="todo-group">`;
+    html += `<div class="todo-group-header"><span class="cat-dot" style="background:${color}"></span>${label} (${groups[cat].length})</div>`;
+    for(const t of groups[cat]){
+      const isDone = t.done;
+      const bColor = catColor(t.category||'');
+      const bLabel = t.category || 'Inbox';
+      html += `<div class="todo-item ${isDone?'done':''}" data-id="${t.id}">
+        <input type="checkbox" ${isDone?'checked':''} onclick="toggleTodo(${t.id})">
+        <span class="todo-text">${escHtml(t.text)}</span>
+        <span class="cat-badge" style="color:${bColor}" onclick="event.stopPropagation();openCatDropdown(${t.id},this)" title="${escHtml(bLabel)}">●</span>
+        <span class="todo-meta">${fmtDate(isDone ? t.completed_at : t.created_at)}</span>
+        <button class="todo-delete" onclick="deleteTodo(${t.id})">✕</button>
+      </div>`;
+    }
+    html += `</div>`;
+  }
+
+  // Archived section (done before today)
+  if(archived.length > 0){
+    html += `<div class="todo-done-section">`;
+    html += `<div class="todo-done-header" onclick="todoDoneOpen=!todoDoneOpen;renderTodos()">
+      <span>${todoDoneOpen?'▼':'▶'}</span> 📦 Arquivadas (${archived.length})
+      <button class="todo-clear-btn" onclick="event.stopPropagation();clearDoneTodos()">🗑 Limpar</button>
+    </div>`;
+    if(todoDoneOpen){
+      for(const t of archived){
+        html += `<div class="todo-item done" data-id="${t.id}">
+          <input type="checkbox" checked onclick="toggleTodo(${t.id})">
+          <span class="todo-text">${escHtml(t.text)}</span>
+          <span class="todo-meta">${fmtDate(t.completed_at||t.created_at)}</span>
+          <button class="todo-delete" onclick="deleteTodo(${t.id})">✕</button>
+        </div>`;
+      }
+    }
+    html += `</div>`;
+  }
+
+  list.innerHTML = html;
+}
+
+function escHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+let openDropdownCleanup = null;
+function openCatDropdown(todoId, badgeEl){
+  // Close any existing
+  if(openDropdownCleanup){ openDropdownCleanup(); openDropdownCleanup=null; }
+  const t = todos.find(x=>x.id===todoId);
+  if(!t) return;
+  const currentCat = t.category || '';
+  const allCats = ['', ...FIXED_CATS, ...customCats];
+  let dd = document.createElement('div');
+  dd.className = 'cat-dropdown';
+  for(const c of allCats){
+    const label = c || 'Inbox';
+    const color = catColor(c);
+    const sel = c === currentCat;
+    dd.innerHTML += `<div class="cat-dropdown-item ${sel?'selected':''}" data-cat="${escHtml(c)}">
+      <span style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0"></span>
+      ${escHtml(label)}${sel?' ✓':''}
+    </div>`;
+  }
+  badgeEl.style.position = 'relative';
+  badgeEl.appendChild(dd);
+  dd.querySelectorAll('.cat-dropdown-item').forEach(item => {
+    item.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const newCat = item.dataset.cat;
+      t.category = newCat;
+      saveTodosLocal();
+      renderTodos();
+      try { await fetch(API_URL+'/api/todos/'+todoId,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({category:newCat}),credentials:'include'}); } catch(e){}
+      cleanup();
+    });
+  });
+  function cleanup(){ if(dd.parentNode) dd.remove(); document.removeEventListener('click',outsideClick); openDropdownCleanup=null; }
+  function outsideClick(e){ if(!dd.contains(e.target)&&e.target!==badgeEl) cleanup(); }
+  setTimeout(()=>document.addEventListener('click',outsideClick),0);
+  openDropdownCleanup = cleanup;
+}
+
+// Load todos on startup
+rebuildCatDropdown();
+loadTodos();
 </script>
 </body></html>

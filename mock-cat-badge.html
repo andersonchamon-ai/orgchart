@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--border:#334155;--text:#e2e8f0;--text-muted:#94a3b8;--accent:#3b82f6}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif;padding:32px;max-width:500px;margin:0 auto}
+h3{font-size:13px;color:var(--text-muted);margin-bottom:16px;text-transform:uppercase;letter-spacing:1px}
+.todo-item{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:8px;margin-bottom:6px;background:rgba(255,255,255,0.02)}
+.todo-item input[type="checkbox"]{width:18px;height:18px;accent-color:var(--accent);flex-shrink:0}
+.todo-text{flex:1;font-size:14px;line-height:1.4}
+.cat-badge{font-size:11px;padding:3px 10px;border-radius:12px;cursor:pointer;font-weight:600;white-space:nowrap;transition:all 0.15s;border:1px solid transparent}
+.cat-badge:hover{border-color:var(--accent);opacity:0.9}
+.cat-badge-picpay{background:rgba(34,197,94,0.15);color:#22c55e}
+.cat-badge-inbox{background:rgba(100,116,139,0.2);color:#94a3b8}
+.cat-badge-china{background:rgba(6,182,212,0.15);color:#06b6d4}
+.meta{font-size:11px;color:var(--text-muted);white-space:nowrap}
+
+/* Dropdown open state */
+.dropdown-demo{position:relative;display:inline-block}
+.dropdown-menu{position:absolute;top:100%;right:0;margin-top:4px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:4px;min-width:160px;z-index:10;box-shadow:0 8px 24px rgba(0,0,0,0.4)}
+.dropdown-item{padding:8px 12px;font-size:12px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:8px;color:var(--text)}
+.dropdown-item:hover{background:rgba(59,130,246,0.12)}
+.dropdown-item .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dropdown-item.selected{color:var(--accent);font-weight:600}
+.arrow{font-size:14px;margin-left:2px;color:var(--text-muted)}
+
+.label{text-align:center;font-size:11px;color:var(--accent);margin:20px 0 8px;padding:8px;border:1px dashed var(--border);border-radius:6px}
+</style>
+</head><body>
+
+<h3>📥 Inbox (2)</h3>
+
+<div class="todo-item">
+  <input type="checkbox">
+  <span class="todo-text">Revisar contrato da Fábrica</span>
+  <span class="cat-badge cat-badge-inbox">Inbox</span>
+  <span class="meta">28/02</span>
+</div>
+
+<div class="todo-item">
+  <input type="checkbox">
+  <span class="todo-text">Agendar call com time PWS</span>
+  <span class="cat-badge cat-badge-inbox">Inbox</span>
+  <span class="meta">28/02</span>
+</div>
+
+<h3 style="margin-top:24px">🟢 PicPay (1)</h3>
+
+<div class="todo-item">
+  <input type="checkbox">
+  <span class="todo-text">Enviar apresentação pro board</span>
+  <span class="cat-badge cat-badge-picpay">PicPay</span>
+  <span class="meta">28/02</span>
+</div>
+
+<h3 style="margin-top:24px">🔵 Missão viagem China (1)</h3>
+
+<div class="todo-item" style="background:rgba(59,130,246,0.05);border:1px solid rgba(59,130,246,0.2);border-radius:8px">
+  <input type="checkbox">
+  <span class="todo-text">Confirmar visto no consulado</span>
+  <div class="dropdown-demo">
+    <span class="cat-badge cat-badge-china">China <span class="arrow">▾</span></span>
+    <div class="dropdown-menu">
+      <div class="dropdown-item"><span class="dot" style="background:#64748b"></span> Inbox</div>
+      <div class="dropdown-item"><span class="dot" style="background:#22c55e"></span> PicPay</div>
+      <div class="dropdown-item"><span class="dot" style="background:#818cf8"></span> PhizChat</div>
+      <div class="dropdown-item"><span class="dot" style="background:#3b82f6"></span> PWS Cloud</div>
+      <div class="dropdown-item"><span class="dot" style="background:#f59e0b"></span> Fábrica</div>
+      <div class="dropdown-item"><span class="dot" style="background:#ef4444"></span> LionX</div>
+      <div class="dropdown-item"><span class="dot" style="background:#ec4899"></span> Pessoal</div>
+      <div class="dropdown-item selected"><span class="dot" style="background:#06b6d4"></span> Missão viagem China ✓</div>
+    </div>
+  </div>
+  <span class="meta">28/02</span>
+</div>
+
+<div class="label">☝️ Clicou no badge → abre dropdown inline pra trocar categoria</div>
+
+</body></html>

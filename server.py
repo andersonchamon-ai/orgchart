@@ -30,7 +30,7 @@ class Handler(SimpleHTTPRequestHandler):
     def do_OPTIONS(self):
         self.send_response(200)
         self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH')
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
         self.end_headers()
 
@@ -38,6 +38,8 @@ class Handler(SimpleHTTPRequestHandler):
         path = urlparse(self.path).path
         if path == '/api/data':
             self.send_json(db.export_all())
+        elif path == '/api/todos':
+            self.send_json(db.get_todos())
         elif path == '/api/snapshots':
             self.send_json(db.list_snapshots())
         elif path == '/api/health':
@@ -94,9 +96,36 @@ class Handler(SimpleHTTPRequestHandler):
                     data = db.restore_snapshot(snapshot_id)
                 self.send_json({'ok': True, 'data': data})
 
+            elif path == '/api/todos':
+                body = self.read_body()
+                text = body.get('text','').strip()
+                if not text:
+                    self.send_json({'error': 'text required'}, 400)
+                    return
+                tid = db.create_todo(text, body.get('category',''))
+                self.send_json({'ok': True, 'id': tid})
+
+            elif path == '/api/todos/clear-done':
+                db.clear_done_todos()
+                self.send_json({'ok': True})
+
             elif path == '/api/backup':
                 dest = db.backup_db()
                 self.send_json({'ok': True, 'path': dest})
+            else:
+                self.send_json({'error': 'Not found'}, 404)
+        except Exception as e:
+            self.send_json({'error': str(e)}, 500)
+
+    def do_PUT(self):
+        path = urlparse(self.path).path
+        try:
+            if path.startswith('/api/todos/'):
+                tid = int(path.split('/')[-1])
+                body = self.read_body()
+                with DB_LOCK:
+                    db.update_todo(tid, body)
+                self.send_json({'ok': True})
             else:
                 self.send_json({'error': 'Not found'}, 404)
         except Exception as e:
@@ -110,6 +139,11 @@ class Handler(SimpleHTTPRequestHandler):
                 with DB_LOCK:
                     db.delete_person(pid)
                 self.send_json({'ok': True})
+            elif path.startswith('/api/todos/'):
+                tid = int(path.split('/')[-1])
+                with DB_LOCK:
+                    db.delete_todo(tid)
+                self.send_json({'ok': True})
             else:
                 self.send_json({'error': 'Not found'}, 404)
         except Exception as e:
@@ -120,7 +154,10 @@ class Handler(SimpleHTTPRequestHandler):
         super().end_headers()
 
     def log_message(self, format, *args):
-        if '/api/' in (args[0] if args else ''):
+        try:
+            if args and isinstance(args[0], str) and '/api/' in args[0]:
+                super().log_message(format, *args)
+        except Exception:
             super().log_message(format, *args)
 
 # Background: snapshot every 2 hours, backup every 12 hours
