@@ -154,9 +154,10 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .todo-item .todo-text{flex:1;font-size:14px;line-height:1.4}
 .todo-item.done .todo-text{text-decoration:line-through;color:var(--text-muted)}
 .todo-item .todo-meta{font-size:11px;color:var(--text-muted);margin-left:auto;white-space:nowrap}
-.todo-item .todo-delete{background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;opacity:0;transition:opacity 0.15s;padding:4px}
-.todo-item:hover .todo-delete{opacity:0.6}
+.todo-item .todo-delete{background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;opacity:0;transition:opacity 0.15s;padding:4px;pointer-events:none}
+.todo-item:hover .todo-delete{opacity:0.6;pointer-events:auto}
 .todo-item .todo-delete:hover{opacity:1}
+.todo-item .todo-delete.revealed{opacity:0.7;pointer-events:auto}
 .todo-done-section{margin-top:32px;border-top:1px solid var(--border);padding-top:16px}
 .todo-done-header{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--text-muted);margin-bottom:8px}
 .todo-done-header:hover{color:var(--text)}
@@ -950,7 +951,23 @@ async function toggleTodo(id){
   }); } catch(e){}
 }
 
+let deleteRevealed = null;
+function revealDelete(id, btn, e){
+  e.stopPropagation();
+  if(deleteRevealed === id){
+    // Second tap — actually delete
+    deleteTodo(id);
+    return;
+  }
+  // First tap — reveal
+  document.querySelectorAll('.todo-delete.revealed').forEach(el => el.classList.remove('revealed'));
+  btn.classList.add('revealed');
+  deleteRevealed = id;
+  // Auto-hide after 3s
+  setTimeout(()=>{ if(deleteRevealed===id){ deleteRevealed=null; btn.classList.remove('revealed'); }}, 3000);
+}
 async function deleteTodo(id){
+  deleteRevealed = null;
   todos = todos.filter(t => t.id !== id);
   saveTodosLocal();
   renderTodos();
@@ -1013,7 +1030,7 @@ function renderTodos(){
         <span class="todo-text">${escHtml(t.text)}</span>
         <span class="cat-badge" style="color:${bColor}" onclick="event.stopPropagation();event.preventDefault();openCatDropdown(${t.id},this)" ontouchend="event.stopPropagation();event.preventDefault();openCatDropdown(${t.id},this)" title="${escHtml(bLabel)}">●</span>
         
-        <button class="todo-delete" onclick="deleteTodo(${t.id})">✕</button>
+        <button class="todo-delete" onclick="revealDelete(${t.id},this,event)">✕</button>
       </div>`;
     }
     html += `</div>`;
@@ -1031,7 +1048,7 @@ function renderTodos(){
         html += `<div class="todo-item done" data-id="${t.id}">
           <input type="checkbox" checked onclick="toggleTodo(${t.id})">
           <span class="todo-text">${escHtml(t.text)}</span>
-          <button class="todo-delete" onclick="deleteTodo(${t.id})">✕</button>
+          <button class="todo-delete" onclick="revealDelete(${t.id},this,event)">✕</button>
         </div>`;
       }
     }
