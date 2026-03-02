@@ -171,7 +171,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 @media(max-width:768px){
   .sidebar{width:260px;left:-260px}
   .todo-input-row{flex-wrap:wrap}
-  .todo-cat-select{min-width:100%;order:3}
+  .todo-input-row input[type="text"]{min-width:0;flex:1}
+  .todo-cat-select{min-width:0;width:auto;max-width:120px;font-size:12px;padding:10px 8px;order:0}
 }
 </style>
 </head><body>
@@ -1007,7 +1008,7 @@ function renderTodos(){
         <input type="checkbox" ${isDone?'checked':''} onclick="toggleTodo(${t.id})">
         <span class="todo-text">${escHtml(t.text)}</span>
         <span class="cat-badge" style="color:${bColor}" onclick="event.stopPropagation();event.preventDefault();openCatDropdown(${t.id},this)" ontouchend="event.stopPropagation();event.preventDefault();openCatDropdown(${t.id},this)" title="${escHtml(bLabel)}">●</span>
-        <span class="todo-meta">${fmtDate(isDone ? t.completed_at : t.created_at)}</span>
+        
         <button class="todo-delete" onclick="deleteTodo(${t.id})">✕</button>
       </div>`;
     }
@@ -1026,7 +1027,6 @@ function renderTodos(){
         html += `<div class="todo-item done" data-id="${t.id}">
           <input type="checkbox" checked onclick="toggleTodo(${t.id})">
           <span class="todo-text">${escHtml(t.text)}</span>
-          <span class="todo-meta">${fmtDate(t.completed_at||t.created_at)}</span>
           <button class="todo-delete" onclick="deleteTodo(${t.id})">✕</button>
         </div>`;
       }
