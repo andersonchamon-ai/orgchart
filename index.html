@@ -164,6 +164,15 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .todo-clear-btn{margin-left:auto;background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:11px}
 .todo-clear-btn:hover{border-color:var(--red);color:var(--red)}
 .todo-empty{text-align:center;padding:60px 20px;color:var(--text-muted);font-size:14px}
+.drag-grip{color:var(--text-muted);cursor:grab;font-size:16px;opacity:0.4;padding:6px 4px;touch-action:none;user-select:none;-webkit-user-select:none;flex-shrink:0;line-height:1}
+.drag-grip:hover{opacity:0.6}
+.drag-grip:active{cursor:grabbing}
+.todo-item.dragging,.todo-group.dragging{opacity:0.3}
+.todo-item.drag-over-above{box-shadow:0 -2px 0 0 var(--accent)}
+.todo-item.drag-over-below{box-shadow:0 2px 0 0 var(--accent)}
+.todo-group.drag-over-above{border-top:2px solid var(--accent)}
+.todo-group.drag-over-below{border-bottom:2px solid var(--accent)}
+.drag-ghost{position:fixed;pointer-events:none;z-index:500;opacity:0.85;background:var(--card);border:1px solid var(--accent);border-radius:8px;padding:10px 16px;font-size:13px;color:var(--text);box-shadow:0 8px 24px rgba(0,0,0,0.4);max-width:280px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .cat-badge{font-size:18px;cursor:pointer;position:relative;line-height:1;padding:2px 4px;border-radius:4px;transition:all 0.15s;flex-shrink:0}
 .cat-badge:hover{background:rgba(255,255,255,0.08)}
 .cat-dropdown{position:absolute;top:100%;right:0;margin-top:4px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:4px;min-width:170px;z-index:50;box-shadow:0 8px 24px rgba(0,0,0,0.4)}
@@ -1016,17 +1025,26 @@ function renderTodos(){
   });
 
   let html = '';
-  const sortedCats = Object.keys(groups).sort((a,b) => { if(a==='') return -1; if(b==='') return 1; return a.localeCompare(b); });
+  const catOrder = JSON.parse(localStorage.getItem('todo-cat-order')||'[]');
+  const sortedCats = Object.keys(groups).sort((a,b) => {
+    const ai = catOrder.indexOf(a), bi = catOrder.indexOf(b);
+    if(ai>=0 && bi>=0) return ai-bi;
+    if(ai>=0) return -1;
+    if(bi>=0) return 1;
+    if(a==='') return -1; if(b==='') return 1;
+    return a.localeCompare(b);
+  });
   for(const cat of sortedCats){
     const color = catColor(cat);
     const label = cat || '📥 Inbox';
-    html += `<div class="todo-group">`;
-    html += `<div class="todo-group-header"><span class="cat-dot" style="background:${color}"></span>${label} (${groups[cat].length})</div>`;
+    html += `<div class="todo-group" data-cat="${escHtml(cat)}">`;
+    html += `<div class="todo-group-header"><span class="drag-grip group-grip" data-cat="${escHtml(cat)}">⠿</span><span class="cat-dot" style="background:${color}"></span>${label} (${groups[cat].length})</div>`;
     for(const t of groups[cat]){
       const isDone = t.done;
       const bColor = catColor(t.category||'');
       const bLabel = t.category || 'Inbox';
       html += `<div class="todo-item ${isDone?'done':''}" data-id="${t.id}">
+        <span class="drag-grip item-grip" data-id="${t.id}">⠿</span>
         <input type="checkbox" ${isDone?'checked':''} onclick="toggleTodo(${t.id})">
         <span class="todo-text">${escHtml(t.text)}</span>
         <span class="cat-badge" style="color:${bColor}" onclick="event.stopPropagation();event.preventDefault();openCatDropdown(${t.id},this)" ontouchend="event.stopPropagation();event.preventDefault();openCatDropdown(${t.id},this)" title="${escHtml(bLabel)}">●</span>
@@ -1102,6 +1120,151 @@ function openCatDropdown(todoId, badgeEl){
   setTimeout(()=>{ document.addEventListener('click',outsideClick); document.addEventListener('touchend',outsideTouch); },300);
   openDropdownCleanup = cleanup;
 }
+
+// ===== DRAG & DROP =====
+let dragState = null;
+
+function initDrag(){
+  const list = document.getElementById('todoList');
+  if(!list) return;
+  list.addEventListener('touchstart', onDragStart, {passive:false});
+  list.addEventListener('mousedown', onDragStart);
+}
+
+function onDragStart(e){
+  const grip = e.target.closest('.drag-grip');
+  if(!grip) return;
+  e.preventDefault();
+  const isTouch = e.type === 'touchstart';
+  const point = isTouch ? e.touches[0] : e;
+  const isGroup = grip.classList.contains('group-grip');
+  const el = isGroup ? grip.closest('.todo-group') : grip.closest('.todo-item');
+  if(!el) return;
+
+  // Create ghost
+  const ghost = document.createElement('div');
+  ghost.className = 'drag-ghost';
+  ghost.textContent = isGroup ? (grip.dataset.cat || 'Inbox') : el.querySelector('.todo-text')?.textContent || '';
+  document.body.appendChild(ghost);
+
+  el.classList.add('dragging');
+  dragState = {el, isGroup, ghost, startY: point.clientY, isTouch,
+    id: isGroup ? null : parseInt(grip.dataset.id),
+    cat: isGroup ? grip.dataset.cat : null
+  };
+
+  ghost.style.left = (point.clientX - 20) + 'px';
+  ghost.style.top = (point.clientY - 20) + 'px';
+
+  if(isTouch){
+    document.addEventListener('touchmove', onDragMove, {passive:false});
+    document.addEventListener('touchend', onDragEnd);
+  } else {
+    document.addEventListener('mousemove', onDragMove);
+    document.addEventListener('mouseup', onDragEnd);
+  }
+}
+
+function onDragMove(e){
+  if(!dragState) return;
+  e.preventDefault();
+  const point = dragState.isTouch ? e.touches[0] : e;
+  dragState.ghost.style.left = (point.clientX - 20) + 'px';
+  dragState.ghost.style.top = (point.clientY - 20) + 'px';
+
+  // Clear all indicators
+  document.querySelectorAll('.drag-over-above,.drag-over-below').forEach(el => {
+    el.classList.remove('drag-over-above','drag-over-below');
+  });
+
+  // Find target
+  const selector = dragState.isGroup ? '.todo-group' : '.todo-item';
+  const targets = document.querySelectorAll(`#todoList ${selector}:not(.dragging)`);
+  for(const t of targets){
+    const rect = t.getBoundingClientRect();
+    const midY = rect.top + rect.height/2;
+    if(point.clientY > rect.top && point.clientY < rect.bottom){
+      if(point.clientY < midY) t.classList.add('drag-over-above');
+      else t.classList.add('drag-over-below');
+      break;
+    }
+  }
+}
+
+function onDragEnd(e){
+  if(!dragState) return;
+  const {el, isGroup, ghost, isTouch} = dragState;
+
+  // Find drop target
+  const above = document.querySelector('.drag-over-above');
+  const below = document.querySelector('.drag-over-below');
+  const target = above || below;
+  const position = above ? 'before' : 'after';
+
+  if(target){
+    if(isGroup) handleGroupDrop(dragState.cat, target.dataset.cat, position);
+    else handleItemDrop(dragState.id, parseInt(target.dataset.id), position);
+  }
+
+  // Cleanup
+  el.classList.remove('dragging');
+  ghost.remove();
+  document.querySelectorAll('.drag-over-above,.drag-over-below').forEach(el => {
+    el.classList.remove('drag-over-above','drag-over-below');
+  });
+
+  if(isTouch){
+    document.removeEventListener('touchmove', onDragMove);
+    document.removeEventListener('touchend', onDragEnd);
+  } else {
+    document.removeEventListener('mousemove', onDragMove);
+    document.removeEventListener('mouseup', onDragEnd);
+  }
+  dragState = null;
+}
+
+function handleGroupDrop(sourceCat, targetCat, position){
+  if(sourceCat === targetCat) return;
+  // Get current visible order from DOM
+  const groups = document.querySelectorAll('#todoList .todo-group');
+  let order = Array.from(groups).map(g => g.dataset.cat);
+  // Remove source
+  order = order.filter(c => c !== sourceCat);
+  // Insert at position
+  const idx = order.indexOf(targetCat);
+  if(position === 'before') order.splice(idx, 0, sourceCat);
+  else order.splice(idx + 1, 0, sourceCat);
+  localStorage.setItem('todo-cat-order', JSON.stringify(order));
+  renderTodos();
+}
+
+function handleItemDrop(sourceId, targetId, position){
+  if(sourceId === targetId) return;
+  const sourceIdx = todos.findIndex(t => t.id === sourceId);
+  const targetIdx = todos.findIndex(t => t.id === targetId);
+  if(sourceIdx < 0 || targetIdx < 0) return;
+  // Also move to same category as target
+  const targetTodo = todos[targetIdx];
+  const sourceTodo = todos[sourceIdx];
+  sourceTodo.category = targetTodo.category;
+  // Remove and reinsert
+  todos.splice(sourceIdx, 1);
+  const newTargetIdx = todos.findIndex(t => t.id === targetId);
+  if(position === 'before') todos.splice(newTargetIdx, 0, sourceTodo);
+  else todos.splice(newTargetIdx + 1, 0, sourceTodo);
+  // Update sort_order
+  todos.forEach((t, i) => t.sort_order = i);
+  saveTodosLocal();
+  renderTodos();
+  // Sync sort orders to server
+  todos.forEach(async (t, i) => {
+    try { await fetch(API_URL+'/api/todos/'+t.id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({sort_order:i,category:t.category}),credentials:'include'}); } catch(e){}
+  });
+}
+
+// Re-init drag after each render
+const origRenderTodos = renderTodos;
+renderTodos = function(){ origRenderTodos(); initDrag(); };
 
 // Load todos on startup
 rebuildCatDropdown();
