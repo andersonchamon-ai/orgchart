@@ -1060,20 +1060,24 @@ function openCatDropdown(todoId, badgeEl){
   }
   badgeEl.style.position = 'relative';
   badgeEl.appendChild(dd);
+  async function selectCat(e, item){
+    e.stopPropagation();
+    e.preventDefault();
+    const newCat = item.dataset.cat;
+    t.category = newCat;
+    saveTodosLocal();
+    cleanup();
+    renderTodos();
+    try { await fetch(API_URL+'/api/todos/'+todoId,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({category:newCat}),credentials:'include'}); } catch(e){}
+  }
   dd.querySelectorAll('.cat-dropdown-item').forEach(item => {
-    item.addEventListener('click', async (e) => {
-      e.stopPropagation();
-      const newCat = item.dataset.cat;
-      t.category = newCat;
-      saveTodosLocal();
-      renderTodos();
-      try { await fetch(API_URL+'/api/todos/'+todoId,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({category:newCat}),credentials:'include'}); } catch(e){}
-      cleanup();
-    });
+    item.addEventListener('click', (e) => selectCat(e, item));
+    item.addEventListener('touchend', (e) => selectCat(e, item));
   });
-  function cleanup(){ if(dd.parentNode) dd.remove(); document.removeEventListener('click',outsideClick); openDropdownCleanup=null; }
+  function cleanup(){ if(dd.parentNode) dd.remove(); document.removeEventListener('click',outsideClick); document.removeEventListener('touchend',outsideTouch); openDropdownCleanup=null; }
   function outsideClick(e){ if(!dd.contains(e.target)&&e.target!==badgeEl) cleanup(); }
-  setTimeout(()=>document.addEventListener('click',outsideClick),0);
+  function outsideTouch(e){ if(!dd.contains(e.target)&&e.target!==badgeEl) cleanup(); }
+  setTimeout(()=>{ document.addEventListener('click',outsideClick); document.addEventListener('touchend',outsideTouch); },300);
   openDropdownCleanup = cleanup;
 }
 
