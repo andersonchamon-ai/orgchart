@@ -447,9 +447,11 @@ function render() {
   const totalUa = Object.values(unassigned).reduce((s, a) => s + a.length, 0);
   document.getElementById('stats').textContent = `${filled} preenchidos · ${vacant} vagas · ${totalUa} resp. a definir`;
 
-  // Draw SVG lines after DOM is rendered
+  // Draw SVG lines after DOM is rendered (multiple passes for layout settling)
   requestAnimationFrame(() => {
     drawAllLines();
+    setTimeout(drawAllLines, 100);
+    setTimeout(drawAllLines, 500);
     document.querySelectorAll('.tree-wrap').forEach(el => {
       el.removeEventListener('scroll', drawAllLines);
       el.addEventListener('scroll', drawAllLines);
@@ -789,6 +791,7 @@ function switchModule(mod){
   const titles = {orgchart:'LionX — Organograma', todo:'LionX — To-Do / GTD', financeiro:'LionX — Financeiro', docs:'LionX — Documentos'};
   document.getElementById('toolbarTitle').textContent = titles[mod] || titles.orgchart;
   if(mod === 'todo') renderTodos();
+  if(mod === 'orgchart'){ requestAnimationFrame(()=>{ drawAllLines(); setTimeout(drawAllLines,100); }); }
 }
 
 // ===== TO-DO GTD =====
