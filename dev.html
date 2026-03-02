@@ -140,6 +140,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .todo-input-row input[type="text"]::placeholder{color:var(--text-muted)}
 .todo-cat-select{padding:12px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;min-width:130px;font-family:inherit}
 .todo-cat-select:focus{outline:none;border-color:var(--accent)}
+.todo-cat-row{display:contents}
 .todo-add-btn{padding:12px 20px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer}
 .todo-add-btn:hover{opacity:0.85}
 .todo-group{margin-bottom:24px}
@@ -170,9 +171,10 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .cat-dropdown-item.selected{color:var(--accent);font-weight:600}
 @media(max-width:768px){
   .sidebar{width:260px;left:-260px}
-  .todo-input-row{flex-wrap:wrap}
-  .todo-input-row input[type="text"]{min-width:0;flex:1}
-  .todo-cat-select{min-width:0;width:auto;max-width:120px;font-size:12px;padding:10px 8px;order:0}
+  .todo-input-row{flex-direction:column}
+  .todo-input-row input[type="text"]{width:100%}
+  .todo-cat-row{display:flex;gap:8px;align-items:center;width:100%}
+  .todo-cat-select{flex:1;font-size:13px}
 }
 </style>
 </head><body>
@@ -226,9 +228,11 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
   <div class="todo-container">
     <div class="todo-input-row">
       <input type="text" id="todoInput" placeholder="O que precisa ser feito?" onkeydown="if(event.key==='Enter')addTodo()">
-      <select class="todo-cat-select" id="todoCatInput" onchange="onCatChange()"></select>
-      <button class="sidebar-toggle" onclick="openCatManager()" title="Gerenciar categorias" style="font-size:16px;padding:4px 8px">⚙️</button>
-      <button class="todo-add-btn" onclick="addTodo()">+ Adicionar</button>
+      <div class="todo-cat-row">
+        <select class="todo-cat-select" id="todoCatInput" onchange="onCatChange()"></select>
+        <button class="sidebar-toggle" onclick="openCatManager()" title="Gerenciar categorias" style="font-size:16px;padding:4px 8px">⚙️</button>
+        <button class="todo-add-btn" onclick="addTodo()">+ Adicionar</button>
+      </div>
     </div>
     <div id="todoList"></div>
   </div>
