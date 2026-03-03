@@ -40,6 +40,9 @@ class Handler(SimpleHTTPRequestHandler):
             self.send_json(db.export_all())
         elif path == '/api/todos':
             self.send_json(db.get_todos())
+        elif path == '/api/settings/todo-cat-order':
+            val = db.get_setting('todo-cat-order')
+            self.send_json(json.loads(val) if val else [])
         elif path == '/api/snapshots':
             self.send_json(db.list_snapshots())
         elif path == '/api/health':
@@ -120,7 +123,12 @@ class Handler(SimpleHTTPRequestHandler):
     def do_PUT(self):
         path = urlparse(self.path).path
         try:
-            if path.startswith('/api/todos/'):
+            if path == '/api/settings/todo-cat-order':
+                body = self.read_body()
+                with DB_LOCK:
+                    db.set_setting('todo-cat-order', json.dumps(body))
+                self.send_json({'ok': True})
+            elif path.startswith('/api/todos/'):
                 tid = int(path.split('/')[-1])
                 body = self.read_body()
                 with DB_LOCK:

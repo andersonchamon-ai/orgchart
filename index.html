@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt-BR"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#0f172a">
+<link rel="manifest" href="/manifest-dev.json">
+<meta name="theme-color" content="#1a0a0a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="LionX">
-<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="apple-mobile-web-app-title" content="LionX DEV">
+<link rel="apple-touch-icon" href="/icon-dev-192.png">
 <title>LionX — Sistema de Gestão (DEV)</title>
 <style>
 :root{--bg:#0f172a;--card:#1e293b;--card-vacant:#2d1b1b;--border:#334155;--border-vacant:#ef4444;--text:#e2e8f0;--text-muted:#94a3b8;--accent:#3b82f6;--green:#22c55e;--red:#ef4444;--orange:#f59e0b;--line:#475569}
@@ -164,7 +164,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .todo-item:hover .todo-delete{opacity:0.6;pointer-events:auto}
 .todo-item .todo-delete:hover{opacity:1}
 .todo-item .todo-delete.revealed{opacity:0.7;pointer-events:auto}
-.todo-done-section{margin-top:0;border-top:1px solid var(--border);padding-top:16px}
+.todo-done-section{margin-top:32px;border-top:1px solid var(--border);padding-top:16px}
 .todo-done-header{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--text-muted);margin-bottom:8px}
 .todo-done-header:hover{color:var(--text)}
 .todo-clear-btn{margin-left:auto;background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:11px}
@@ -906,6 +906,8 @@ async function loadTodos(){
   try {
     const r = await fetch(API_URL + '/api/todos', {credentials:'include'});
     if(r.ok) todos = await r.json();
+    const cr = await fetch(API_URL + '/api/settings/todo-cat-order', {credentials:'include'});
+    if(cr.ok) window._todoCatOrder = await cr.json();
   } catch(e){ console.warn('Todos offline, using local'); }
   // Merge with localStorage
   const local = JSON.parse(localStorage.getItem('todos')||'[]');
@@ -1032,7 +1034,7 @@ function renderTodos(){
   });
 
   let html = '';
-  const catOrder = JSON.parse(localStorage.getItem('todo-cat-order')||'[]');
+  const catOrder = window._todoCatOrder || [];
   const sortedCats = Object.keys(groups).sort((a,b) => {
     const ai = catOrder.indexOf(a), bi = catOrder.indexOf(b);
     if(ai>=0 && bi>=0) return ai-bi;
@@ -1250,7 +1252,8 @@ function handleGroupDrop(sourceCat, targetCat, position){
   const idx = order.indexOf(targetCat);
   if(position === 'before') order.splice(idx, 0, sourceCat);
   else order.splice(idx + 1, 0, sourceCat);
-  localStorage.setItem('todo-cat-order', JSON.stringify(order));
+  window._todoCatOrder = order;
+  fetch(API_URL+'/api/settings/todo-cat-order',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(order),credentials:'include'}).catch(()=>{});
   renderTodos();
 }
 

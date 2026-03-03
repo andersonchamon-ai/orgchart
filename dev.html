@@ -906,6 +906,8 @@ async function loadTodos(){
   try {
     const r = await fetch(API_URL + '/api/todos', {credentials:'include'});
     if(r.ok) todos = await r.json();
+    const cr = await fetch(API_URL + '/api/settings/todo-cat-order', {credentials:'include'});
+    if(cr.ok) window._todoCatOrder = await cr.json();
   } catch(e){ console.warn('Todos offline, using local'); }
   // Merge with localStorage
   const local = JSON.parse(localStorage.getItem('todos')||'[]');
@@ -1032,7 +1034,7 @@ function renderTodos(){
   });
 
   let html = '';
-  const catOrder = JSON.parse(localStorage.getItem('todo-cat-order')||'[]');
+  const catOrder = window._todoCatOrder || [];
   const sortedCats = Object.keys(groups).sort((a,b) => {
     const ai = catOrder.indexOf(a), bi = catOrder.indexOf(b);
     if(ai>=0 && bi>=0) return ai-bi;
@@ -1250,7 +1252,8 @@ function handleGroupDrop(sourceCat, targetCat, position){
   const idx = order.indexOf(targetCat);
   if(position === 'before') order.splice(idx, 0, sourceCat);
   else order.splice(idx + 1, 0, sourceCat);
-  localStorage.setItem('todo-cat-order', JSON.stringify(order));
+  window._todoCatOrder = order;
+  fetch(API_URL+'/api/settings/todo-cat-order',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(order),credentials:'include'}).catch(()=>{});
   renderTodos();
 }
 

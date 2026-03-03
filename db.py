@@ -350,8 +350,34 @@ def clear_done_todos():
     conn.commit()
     conn.close()
 
+# --- Settings KV store ---
+
+def init_settings():
+    conn = get_db()
+    conn.executescript("""
+        CREATE TABLE IF NOT EXISTS settings (
+            key TEXT PRIMARY KEY,
+            value TEXT DEFAULT ''
+        );
+    """)
+    conn.commit()
+    conn.close()
+
+def get_setting(key):
+    conn = get_db()
+    row = conn.execute("SELECT value FROM settings WHERE key=?", (key,)).fetchone()
+    conn.close()
+    return row['value'] if row else None
+
+def set_setting(key, value):
+    conn = get_db()
+    conn.execute("INSERT OR REPLACE INTO settings (key, value) VALUES (?,?)", (key, value))
+    conn.commit()
+    conn.close()
+
 # Initialize on import
 init_db()
 seed_companies()
 migrate_hc_columns()
 init_todos()
+init_settings()
