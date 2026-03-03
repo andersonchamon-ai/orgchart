@@ -151,7 +151,7 @@ body{background:var(--bg);color:var(--text);font-family:ui-sans-serif,-apple-sys
 .todo-add-btn{padding:12px 20px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer}
 .todo-add-btn:hover{opacity:0.85}
 .todo-group{margin-bottom:32px}
-.todo-group-header{font-size:20px;text-transform:none;letter-spacing:0;color:#fff;padding:16px 0 8px;border-bottom:none;margin-bottom:4px;display:flex;align-items:center;gap:8px;font-weight:700}
+.todo-group-header{font-size:20px;text-transform:none;letter-spacing:0;color:#fff;padding:12px 0 4px;border-bottom:none;margin-bottom:2px;display:flex;align-items:center;gap:8px;font-weight:700}
 .todo-group-header .cat-dot{display:none}
 .todo-item{display:flex;align-items:center;gap:10px;padding:6px 4px;border-radius:4px;transition:background 0.15s;position:relative}
 .todo-item:hover{background:rgba(255,255,255,0.03)}
@@ -835,8 +835,7 @@ const CAT_COLORS = {
 // Generate colors for custom cats
 const EXTRA_COLORS = ['#06b6d4','#a855f7','#f43f5e','#84cc16','#fb923c','#14b8a6','#e879f9','#facc15'];
 function catColor(cat){ return CAT_COLORS[cat] || EXTRA_COLORS[customCats.indexOf(cat) % EXTRA_COLORS.length] || '#64748b'; }
-const CAT_EMOJIS = {'PicPay':'🏦','PhizChat':'💬','PWS Cloud':'☁️','Fábrica':'⚙️','LionX':'🦁','Pessoal':'🏠','Instituto JF':'🏛️','':'📥'};
-function catEmoji(cat){ return CAT_EMOJIS[cat] || '📋'; }
+/* emoji helpers removed */
 
 function saveCustomCats(){ localStorage.setItem('todo-custom-cats', JSON.stringify(customCats)); }
 
