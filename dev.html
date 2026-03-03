@@ -148,7 +148,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .todo-group-header .cat-dot{width:8px;height:8px;border-radius:50%}
 .todo-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;transition:background 0.15s;position:relative}
 .todo-item:hover{background:rgba(255,255,255,0.03)}
-.todo-item input[type="checkbox"]{-webkit-appearance:none;appearance:none;width:22px;height:22px;border:2px solid var(--text-muted);border-radius:4px;cursor:pointer;flex-shrink:0;background:transparent;position:relative;transition:all 0.15s}
+.todo-item input[type="checkbox"]{-webkit-appearance:none;appearance:none;width:26px;height:26px;border:2px solid var(--text-muted);border-radius:4px;cursor:pointer;flex-shrink:0;background:transparent;position:relative;transition:all 0.15s;touch-action:manipulation}
 .todo-item input[type="checkbox"]:checked{border-color:var(--accent);background:var(--accent)}
 .todo-item input[type="checkbox"]:checked::after{content:'✓';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:14px;font-weight:700}
 .todo-item .todo-text{flex:1;font-size:14px;line-height:1.4}
@@ -1046,7 +1046,7 @@ function renderTodos(){
       const bLabel = t.category || 'Inbox';
       html += `<div class="todo-item ${isDone?'done':''}" data-id="${t.id}">
         <span class="drag-grip item-grip" data-id="${t.id}">⠿</span>
-        <input type="checkbox" ${isDone?'checked':''} onclick="toggleTodo(${t.id})">
+        <input type="checkbox" ${isDone?'checked':''} ontouchend="event.preventDefault();toggleTodo(${t.id})" onclick="toggleTodo(${t.id})">
         <span class="todo-text">${escHtml(t.text)}</span>
         <span class="cat-badge" style="color:${bColor}" onclick="event.stopPropagation();event.preventDefault();openCatDropdown(${t.id},this)" ontouchend="event.stopPropagation();event.preventDefault();openCatDropdown(${t.id},this)" title="${escHtml(bLabel)}">●</span>
         
@@ -1066,7 +1066,7 @@ function renderTodos(){
     if(todoDoneOpen){
       for(const t of archived){
         html += `<div class="todo-item done" data-id="${t.id}">
-          <input type="checkbox" checked onclick="toggleTodo(${t.id})">
+          <input type="checkbox" checked ontouchend="event.preventDefault();toggleTodo(${t.id})" onclick="toggleTodo(${t.id})">
           <span class="todo-text">${escHtml(t.text)}</span>
           <button class="todo-delete" onclick="revealDelete(${t.id},this,event)">✕</button>
         </div>`;
