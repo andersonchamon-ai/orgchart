@@ -696,10 +696,10 @@ function removeUnassigned(c,i){if(confirm('Remover?')){unassigned[c].splice(i,1)
 
 // --- Export single company orgchart as symmetric PNG ---
 function exportOrgImage(companyId){
-  const CARD_W = 260, CARD_H = 84, GAP_X = 56, GAP_Y = 150, PAD = 90;
-  const FONT_NAME = 'bold 18px ui-sans-serif,-apple-system,BlinkMacSystemFont,sans-serif';
-  const FONT_ROLE = '15px ui-sans-serif,-apple-system,BlinkMacSystemFont,sans-serif';
-  const FONT_TITLE = 'bold 30px ui-sans-serif,-apple-system,BlinkMacSystemFont,sans-serif';
+  const CARD_W = 320, CARD_H = 100, GAP_X = 64, GAP_Y = 160, PAD = 100;
+  const FONT_NAME = 'bold 24px ui-sans-serif,-apple-system,BlinkMacSystemFont,sans-serif';
+  const FONT_ROLE = '19px ui-sans-serif,-apple-system,BlinkMacSystemFont,sans-serif';
+  const FONT_TITLE = 'bold 40px ui-sans-serif,-apple-system,BlinkMacSystemFont,sans-serif';
   const comp = COMPANIES.find(c => c.id === companyId);
   if(!comp) return;
 
@@ -802,18 +802,18 @@ function exportOrgImage(companyId){
     // Border
     roundRect(x,y,CARD_W,CARD_H,10);
     ctx.strokeStyle = isCeo ? '#2eaadc' : 'rgba(255,255,255,0.1)';
-    ctx.lineWidth = isCeo ? 2.5 : 1;
+    ctx.lineWidth = isCeo ? 3 : 1.5;
     ctx.stroke();
     // Name
     ctx.textAlign = 'center';
     ctx.font = FONT_NAME;
     ctx.fillStyle = vacant ? '#e03e3e' : '#fff';
-    ctx.fillText(vacant ? 'VAGA' : truncText(node.person.name, CARD_W-28), x+CARD_W/2, y + (node.person.role ? 35 : 46));
+    ctx.fillText(vacant ? 'VAGA' : truncText(node.person.name, CARD_W-32), x+CARD_W/2, y + (node.person.role ? 42 : 55));
     // Role
     if(node.person.role){
       ctx.font = FONT_ROLE;
       ctx.fillStyle = 'rgba(255,255,255,0.5)';
-      ctx.fillText(truncText(node.person.role, CARD_W-28), x+CARD_W/2, y+58);
+      ctx.fillText(truncText(node.person.role, CARD_W-32), x+CARD_W/2, y+70);
     }
     for(const child of node.children) drawCard(child);
   }
