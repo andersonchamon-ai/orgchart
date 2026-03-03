@@ -693,6 +693,38 @@ function closeUaModal(){document.getElementById('uaModalOverlay').classList.remo
 function saveUaModal(){const desc=document.getElementById('uaDesc').value.trim();if(!desc){alert('Descrição é obrigatória');return;}const at=document.getElementById('uaAssignTo').value;if(at&&uaEditIndex!==null){const p=data.find(d=>d.id===parseInt(at));if(p){if(!p.responsibilities)p.responsibilities=[];p.responsibilities.push(desc);unassigned[uaEditCompany].splice(uaEditIndex,1);}}else if(uaEditIndex!==null){unassigned[uaEditCompany][uaEditIndex]=desc;}else{if(!unassigned[uaEditCompany])unassigned[uaEditCompany]=[];unassigned[uaEditCompany].push(desc);}closeUaModal();render();saveLocal();}
 function removeUnassigned(c,i){if(confirm('Remover?')){unassigned[c].splice(i,1);render();saveLocal();}}
 
+// --- Drag choice modal ---
+function showDragChoice(dragPerson, targetPerson){
+  const dn = dragPerson.name||dragPerson.role;
+  const tn = targetPerson.name||targetPerson.role;
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay active';
+  overlay.innerHTML = `<div class="modal" style="max-width:360px;text-align:center">
+    <h3 style="margin-bottom:8px">"${dn}" → "${tn}"</h3>
+    <p style="color:var(--text-muted);font-size:14px;margin-bottom:20px">Ambos estão no mesmo nível. O que deseja fazer?</p>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <button class="btn-save" style="width:100%;padding:12px" id="dcSwap">↔️ Trocar posição</button>
+      <button class="btn-save" style="width:100%;padding:12px;background:var(--orange)" id="dcReport">📎 Fazer "${dn}" reportar a "${tn}"</button>
+      <button class="btn-cancel" style="width:100%;padding:12px" id="dcCancel">Cancelar</button>
+    </div>
+  </div>`;
+  document.body.appendChild(overlay);
+  overlay.querySelector('#dcSwap').onclick = () => {
+    const siblings = getChildren(dragPerson.reportsTo);
+    siblings.forEach((s, i) => { if(s.sortOrder === undefined) s.sortOrder = i; });
+    const dragS = siblings.find(s => s.id === dragPerson.id);
+    const targetS = siblings.find(s => s.id === targetPerson.id);
+    const tmp = dragS.sortOrder; dragS.sortOrder = targetS.sortOrder; targetS.sortOrder = tmp;
+    overlay.remove(); render(); saveLocal();
+  };
+  overlay.querySelector('#dcReport').onclick = () => {
+    dragPerson.reportsTo = targetPerson.id;
+    overlay.remove(); render(); saveLocal();
+  };
+  overlay.querySelector('#dcCancel').onclick = () => overlay.remove();
+  overlay.onclick = e => { if(e.target === overlay) overlay.remove(); };
+}
+
 // --- Orgchart: reorder siblings ---
 function moveCard(id, direction){
   const person = data.find(d => d.id === id);
@@ -746,18 +778,7 @@ function initOrgDrag(){
       if(!dragPerson || !targetPerson) return;
       // Siblings: ask what to do
       if(dragPerson.reportsTo === targetPerson.reportsTo){
-        const choice = prompt(`"${dragPerson.name||dragPerson.role}" e "${targetPerson.name||targetPerson.role}" são do mesmo nível.\n\nDigite:\n1 — Trocar posição (esquerda/direita)\n2 — Fazer reportar a "${targetPerson.name||targetPerson.role}"\n\nOu cancele.`);
-        if(choice === '1'){
-          const siblings = getChildren(dragPerson.reportsTo);
-          siblings.forEach((s, i) => { if(s.sortOrder === undefined) s.sortOrder = i; });
-          const dragS = siblings.find(s => s.id === orgDragId);
-          const targetS = siblings.find(s => s.id === targetId);
-          const tmp = dragS.sortOrder; dragS.sortOrder = targetS.sortOrder; targetS.sortOrder = tmp;
-          render(); saveLocal();
-        } else if(choice === '2'){
-          dragPerson.reportsTo = targetId;
-          render(); saveLocal();
-        }
+        showDragChoice(dragPerson, targetPerson);
         return;
       }
       // Prevent dropping onto own descendant (circular)
