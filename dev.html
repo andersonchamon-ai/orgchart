@@ -359,7 +359,7 @@ let uaEditCompany = null;
 let uaEditIndex = null;
 
 function getChildren(parentId) {
-  return data.filter(d => d.reportsTo === parentId);
+  return data.filter(d => d.reportsTo === parentId).sort((a,b) => (a.sortOrder||0) - (b.sortOrder||0));
 }
 
 function countHC(personId) {
@@ -726,6 +726,18 @@ function initOrgDrag(){
       const dragPerson = data.find(d => d.id === orgDragId);
       const targetPerson = data.find(d => d.id === targetId);
       if(!dragPerson || !targetPerson) return;
+      // Same parent = reorder siblings
+      if(dragPerson.reportsTo === targetPerson.reportsTo){
+        const siblings = getChildren(dragPerson.reportsTo);
+        const dragIdx = siblings.findIndex(s => s.id === orgDragId);
+        const targetIdx = siblings.findIndex(s => s.id === targetId);
+        // Swap sort orders
+        siblings.forEach((s, i) => s.sortOrder = i);
+        siblings[dragIdx].sortOrder = targetIdx;
+        siblings[targetIdx].sortOrder = dragIdx;
+        render(); saveLocal();
+        return;
+      }
       // Prevent dropping onto own descendant (circular)
       let pid = targetPerson.reportsTo, depth = 0;
       while(pid && depth < 50){ if(pid === orgDragId){ alert('Não é possível mover para um subordinado próprio.'); return; } const p = data.find(d=>d.id===pid); pid = p ? p.reportsTo : null; depth++; }

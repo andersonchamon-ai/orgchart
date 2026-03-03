@@ -148,6 +148,7 @@ def export_all(conn=None):
             'reportsTo': row['reports_to'], 'responsibilities': resps,
             'hcFilled': row['hc_filled'] if 'hc_filled' in row.keys() else 0,
             'hcOpen': row['hc_open'] if 'hc_open' in row.keys() else 0,
+            'sortOrder': row['sort_order'] if 'sort_order' in row.keys() else 0,
         })
     
     unassigned = {}
@@ -176,9 +177,9 @@ def import_all(data, conn=None, reason='import'):
 
     for p in data.get('people', []):
         conn.execute(
-            "INSERT INTO people (id, name, role, company_id, level, reports_to, hc_filled, hc_open) VALUES (?,?,?,?,?,?,?,?)",
-            (p['id'], p.get('name',''), p['role'], p['company'], p['level'], p.get('reportsTo'),
-             p.get('hcFilled', 0), p.get('hcOpen', 0))
+            "INSERT INTO people (id, name, role, company_id, level, reports_to, hc_filled, hc_open, sort_order) VALUES (?,?,?,?,?,?,?,?,?)",
+            (p['id'], p.get('name',''), p.get('role',''), p['company'], p['level'], p.get('reportsTo'),
+             p.get('hcFilled', 0), p.get('hcOpen', 0), p.get('sortOrder', 0))
         )
         for r in p.get('responsibilities', []):
             conn.execute("INSERT INTO responsibilities (person_id, description) VALUES (?,?)", (p['id'], r))
@@ -280,6 +281,8 @@ def migrate_hc_columns():
         conn.execute("ALTER TABLE people ADD COLUMN hc_filled INTEGER NOT NULL DEFAULT 0")
     if 'hc_open' not in cols:
         conn.execute("ALTER TABLE people ADD COLUMN hc_open INTEGER NOT NULL DEFAULT 0")
+    if 'sort_order' not in cols:
+        conn.execute("ALTER TABLE people ADD COLUMN sort_order INTEGER DEFAULT 0")
     conn.commit()
     conn.close()
 
