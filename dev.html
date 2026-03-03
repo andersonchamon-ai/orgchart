@@ -54,10 +54,7 @@ body{background:var(--bg);color:var(--text);font-family:ui-sans-serif,-apple-sys
 .node-card .remove-btn{position:absolute;top:4px;right:6px;background:none;border:none;color:var(--red);cursor:pointer;font-size:13px;opacity:0;transition:opacity 0.2s}
 .node-card:hover .remove-btn{opacity:0.5}
 .node-card.drag-target{border:2px solid var(--accent);box-shadow:0 0 12px rgba(46,170,220,0.4)}
-.node-arrows{position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);display:flex;gap:2px;opacity:0;transition:opacity 0.15s;z-index:3}
-.node-card:hover .node-arrows{opacity:1}
-.node-arrow{background:var(--accent);color:#fff;border:none;border-radius:3px;width:20px;height:16px;font-size:10px;cursor:pointer;line-height:16px;text-align:center;padding:0}
-.node-arrow:hover{opacity:0.8}
+/* arrows removed — reorder via drop prompt */
 .toggle-btn{display:inline-block;background:var(--border);border:none;color:var(--text-muted);width:20px;height:20px;border-radius:50%;cursor:pointer;font-size:11px;line-height:20px;text-align:center;margin-top:4px;transition:all 0.2s;position:relative;z-index:2}
 .toggle-btn:hover{background:var(--accent);color:#fff}
 .toggle-btn.active{background:var(--accent);color:#fff}
@@ -403,17 +400,11 @@ function renderCardHTML(item) {
   const hasChildren = children.length > 0 && !collapsedSet.has(item.id);
   const isCollapsed = collapsedSet.has(item.id);
   const showToggle = getChildren(item.id).length > 0;
-  const siblings = item.reportsTo !== null ? getChildren(item.reportsTo) : [];
-  const myIdx = siblings.findIndex(s => s.id === item.id);
-  const showLeft = siblings.length > 1 && myIdx > 0;
-  const showRight = siblings.length > 1 && myIdx < siblings.length - 1;
-  const arrowsHTML = (showLeft || showRight) ? `<div class="node-arrows">${showLeft ? `<button class="node-arrow" onclick="event.stopPropagation();moveCard(${item.id},-1)" title="Mover para esquerda">◀</button>` : ''}${showRight ? `<button class="node-arrow" onclick="event.stopPropagation();moveCard(${item.id},1)" title="Mover para direita">▶</button>` : ''}</div>` : '';
   return `<div class="node-card ${vacant?'vacant':''} ${isCeo?'ceo':''}" data-id="${item.id}" onclick="editCard(${item.id})">
     <div class="node-name">${vacant ? '⚠️ VAGA' : item.name}</div>
     <div class="node-role">${item.role}</div>
     ${hcBadgesHTML(item.id)}
     <button class="remove-btn" onclick="event.stopPropagation();removeCard(${item.id})">✕</button>
-    ${arrowsHTML}
   </div>${showToggle ? `<button class="toggle-btn ${isCollapsed?'active':''}" data-toggle="${item.id}" onclick="event.stopPropagation();toggleCollapse(${item.id})">${isCollapsed?'+':'−'}</button>` : ''}`;
 }
 
@@ -753,6 +744,22 @@ function initOrgDrag(){
       const dragPerson = data.find(d => d.id === orgDragId);
       const targetPerson = data.find(d => d.id === targetId);
       if(!dragPerson || !targetPerson) return;
+      // Siblings: ask what to do
+      if(dragPerson.reportsTo === targetPerson.reportsTo){
+        const choice = prompt(`"${dragPerson.name||dragPerson.role}" e "${targetPerson.name||targetPerson.role}" são do mesmo nível.\n\nDigite:\n1 — Trocar posição (esquerda/direita)\n2 — Fazer reportar a "${targetPerson.name||targetPerson.role}"\n\nOu cancele.`);
+        if(choice === '1'){
+          const siblings = getChildren(dragPerson.reportsTo);
+          siblings.forEach((s, i) => { if(s.sortOrder === undefined) s.sortOrder = i; });
+          const dragS = siblings.find(s => s.id === orgDragId);
+          const targetS = siblings.find(s => s.id === targetId);
+          const tmp = dragS.sortOrder; dragS.sortOrder = targetS.sortOrder; targetS.sortOrder = tmp;
+          render(); saveLocal();
+        } else if(choice === '2'){
+          dragPerson.reportsTo = targetId;
+          render(); saveLocal();
+        }
+        return;
+      }
       // Prevent dropping onto own descendant (circular)
       let pid = targetPerson.reportsTo, depth = 0;
       while(pid && depth < 50){ if(pid === orgDragId){ alert('Não é possível mover para um subordinado próprio.'); return; } const p = data.find(d=>d.id===pid); pid = p ? p.reportsTo : null; depth++; }
