@@ -1009,9 +1009,10 @@ function fmtDate(iso){
 
 function isToday(isoStr){
   if(!isoStr) return false;
-  const d = new Date(isoStr);
+  // completed_at from SQLite is UTC (no timezone suffix) — treat as UTC
+  const d = new Date(isoStr.endsWith('Z') ? isoStr : isoStr + 'Z');
   const now = new Date();
-  return d.getFullYear()===now.getFullYear() && d.getMonth()===now.getMonth() && d.getDate()===now.getDate();
+  return d.toLocaleDateString() === now.toLocaleDateString();
 }
 
 function renderTodos(){
