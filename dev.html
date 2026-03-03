@@ -53,6 +53,7 @@ body{background:var(--bg);color:var(--text);font-family:ui-sans-serif,-apple-sys
 .tag-hc{background:rgba(255,255,255,0.06);color:var(--text);font-weight:600}
 .node-card .remove-btn{position:absolute;top:4px;right:6px;background:none;border:none;color:var(--red);cursor:pointer;font-size:13px;opacity:0;transition:opacity 0.2s}
 .node-card:hover .remove-btn{opacity:0.5}
+.node-card.drag-target{border:2px solid var(--accent);box-shadow:0 0 12px rgba(46,170,220,0.4)}
 .toggle-btn{display:inline-block;background:var(--border);border:none;color:var(--text-muted);width:20px;height:20px;border-radius:50%;cursor:pointer;font-size:11px;line-height:20px;text-align:center;margin-top:4px;transition:all 0.2s;position:relative;z-index:2}
 .toggle-btn:hover{background:var(--accent);color:#fff}
 .toggle-btn.active{background:var(--accent);color:#fff}
@@ -690,6 +691,54 @@ function editUnassigned(c,i){uaEditCompany=c;uaEditIndex=i;document.getElementBy
 function closeUaModal(){document.getElementById('uaModalOverlay').classList.remove('active');uaEditCompany=null;uaEditIndex=null;}
 function saveUaModal(){const desc=document.getElementById('uaDesc').value.trim();if(!desc){alert('Descrição é obrigatória');return;}const at=document.getElementById('uaAssignTo').value;if(at&&uaEditIndex!==null){const p=data.find(d=>d.id===parseInt(at));if(p){if(!p.responsibilities)p.responsibilities=[];p.responsibilities.push(desc);unassigned[uaEditCompany].splice(uaEditIndex,1);}}else if(uaEditIndex!==null){unassigned[uaEditCompany][uaEditIndex]=desc;}else{if(!unassigned[uaEditCompany])unassigned[uaEditCompany]=[];unassigned[uaEditCompany].push(desc);}closeUaModal();render();saveLocal();}
 function removeUnassigned(c,i){if(confirm('Remover?')){unassigned[c].splice(i,1);render();saveLocal();}}
+
+// --- Orgchart Drag & Drop (move cards between nodes) ---
+let orgDragId = null;
+function initOrgDrag(){
+  document.querySelectorAll('.node-card[data-id]').forEach(card => {
+    card.setAttribute('draggable', 'true');
+    card.addEventListener('dragstart', e => {
+      orgDragId = parseInt(card.dataset.id);
+      card.style.opacity = '0.4';
+      e.dataTransfer.effectAllowed = 'move';
+      e.stopPropagation();
+    });
+    card.addEventListener('dragend', e => {
+      card.style.opacity = '1';
+      document.querySelectorAll('.node-card.drag-target').forEach(c => c.classList.remove('drag-target'));
+      orgDragId = null;
+    });
+    card.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      const targetId = parseInt(card.dataset.id);
+      if(targetId !== orgDragId) card.classList.add('drag-target');
+    });
+    card.addEventListener('dragleave', e => {
+      card.classList.remove('drag-target');
+    });
+    card.addEventListener('drop', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      card.classList.remove('drag-target');
+      const targetId = parseInt(card.dataset.id);
+      if(!orgDragId || targetId === orgDragId) return;
+      const dragPerson = data.find(d => d.id === orgDragId);
+      const targetPerson = data.find(d => d.id === targetId);
+      if(!dragPerson || !targetPerson) return;
+      // Prevent dropping onto own descendant (circular)
+      let pid = targetPerson.reportsTo, depth = 0;
+      while(pid && depth < 50){ if(pid === orgDragId){ alert('Não é possível mover para um subordinado próprio.'); return; } const p = data.find(d=>d.id===pid); pid = p ? p.reportsTo : null; depth++; }
+      if(confirm(`Mover "${dragPerson.name || dragPerson.role}" para reportar a "${targetPerson.name || targetPerson.role}"?`)){
+        dragPerson.reportsTo = targetId;
+        render(); saveLocal();
+      }
+    });
+  });
+}
+// Hook into render
+const _origRender = render;
+render = function(){ _origRender(); initOrgDrag(); };
 
 // --- Export/Import ---
 function syncToServer(){
