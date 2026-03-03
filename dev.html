@@ -648,7 +648,7 @@ function saveModal() {
   const responsibilities = Array.from(document.querySelectorAll('#mRespList .resp-input')).map(i=>i.value.trim()).filter(v=>v);
   const hcFilled = parseInt(document.getElementById('mHcFilled').value) || 0;
   const hcOpen = parseInt(document.getElementById('mHcOpen').value) || 0;
-  if (!role) { alert('Cargo é obrigatório'); return; }
+  /* role can be empty */
   if (editingId !== null) { const item = data.find(d=>d.id===editingId); Object.assign(item, {name,role,company,level,reportsTo,responsibilities,hcFilled,hcOpen}); }
   else { data.push({id:nextId++,name,role,company,level,reportsTo,responsibilities,hcFilled,hcOpen}); }
   closeModal(); render(); saveLocal();
