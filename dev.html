@@ -696,10 +696,10 @@ function removeUnassigned(c,i){if(confirm('Remover?')){unassigned[c].splice(i,1)
 
 // --- Export single company orgchart as symmetric PNG ---
 function exportOrgImage(companyId){
-  const CARD_W = 220, CARD_H = 72, GAP_X = 48, GAP_Y = 140, PAD = 80;
-  const FONT_NAME = 'bold 15px ui-sans-serif,-apple-system,BlinkMacSystemFont,sans-serif';
-  const FONT_ROLE = '13px ui-sans-serif,-apple-system,BlinkMacSystemFont,sans-serif';
-  const FONT_TITLE = 'bold 24px ui-sans-serif,-apple-system,BlinkMacSystemFont,sans-serif';
+  const CARD_W = 260, CARD_H = 84, GAP_X = 56, GAP_Y = 150, PAD = 90;
+  const FONT_NAME = 'bold 18px ui-sans-serif,-apple-system,BlinkMacSystemFont,sans-serif';
+  const FONT_ROLE = '15px ui-sans-serif,-apple-system,BlinkMacSystemFont,sans-serif';
+  const FONT_TITLE = 'bold 30px ui-sans-serif,-apple-system,BlinkMacSystemFont,sans-serif';
   const comp = COMPANIES.find(c => c.id === companyId);
   if(!comp) return;
 
@@ -808,12 +808,12 @@ function exportOrgImage(companyId){
     ctx.textAlign = 'center';
     ctx.font = FONT_NAME;
     ctx.fillStyle = vacant ? '#e03e3e' : '#fff';
-    ctx.fillText(vacant ? 'VAGA' : truncText(node.person.name, CARD_W-24), x+CARD_W/2, y + (node.person.role ? 30 : 40));
+    ctx.fillText(vacant ? 'VAGA' : truncText(node.person.name, CARD_W-28), x+CARD_W/2, y + (node.person.role ? 35 : 46));
     // Role
     if(node.person.role){
       ctx.font = FONT_ROLE;
       ctx.fillStyle = 'rgba(255,255,255,0.5)';
-      ctx.fillText(truncText(node.person.role, CARD_W-24), x+CARD_W/2, y+50);
+      ctx.fillText(truncText(node.person.role, CARD_W-28), x+CARD_W/2, y+58);
     }
     for(const child of node.children) drawCard(child);
   }
