@@ -649,6 +649,33 @@ function saveModal() {
   const hcFilled = parseInt(document.getElementById('mHcFilled').value) || 0;
   const hcOpen = parseInt(document.getElementById('mHcOpen').value) || 0;
   /* role can be empty */
+
+  // Validate: warn if this edit would make the person invisible in the orgchart
+  const newPerson = {name,role,company,level,reportsTo,responsibilities,hcFilled,hcOpen};
+  const isCompanyCeo = (company !== 'lionx' && level === 1);
+  const parentExists = reportsTo === null || data.some(d => d.id === reportsTo);
+  const wouldBeVisible = (function(){
+    if (company === 'lionx') return true; // holding always shows
+    // For company people: need a level-1 CEO in that company to anchor the tree
+    const otherCeos = data.filter(d => d.company === company && d.level === 1 && d.id !== editingId);
+    if (isCompanyCeo) return true; // this person IS the CEO
+    if (otherCeos.length > 0) {
+      // Check if reportsTo chain reaches a company member
+      let pid = reportsTo;
+      let depth = 0;
+      while (pid && depth < 20) {
+        const p = data.find(d => d.id === pid);
+        if (!p) break;
+        if (p.company === company) return true;
+        pid = p.reportsTo;
+        depth++;
+      }
+      return false;
+    }
+    return false;
+  })();
+  if (!wouldBeVisible && !confirm('⚠️ Atenção: com essas configurações, esta pessoa não vai aparecer no organograma. O "Reporta a" precisa ser alguém da mesma empresa, ou o nível precisa ser 1 (CEO da empresa).\n\nDeseja salvar mesmo assim?')) return;
+
   if (editingId !== null) { const item = data.find(d=>d.id===editingId); Object.assign(item, {name,role,company,level,reportsTo,responsibilities,hcFilled,hcOpen}); }
   else { data.push({id:nextId++,name,role,company,level,reportsTo,responsibilities,hcFilled,hcOpen}); }
   closeModal(); render(); saveLocal();
