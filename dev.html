@@ -1051,9 +1051,8 @@ function renderTodos(){
   for(const cat of sortedCats){
     const color = catColor(cat);
     const label = cat || 'Inbox';
-    const emoji = catEmoji(cat);
     html += `<div class="todo-group" data-cat="${escHtml(cat)}">`;
-    html += `<div class="todo-group-header"><span class="drag-grip group-grip" data-cat="${escHtml(cat)}">⠿</span>${emoji} ${label}</div>`;
+    html += `<div class="todo-group-header"><span class="drag-grip group-grip" data-cat="${escHtml(cat)}">⠿</span>${label}</div>`;
     for(const t of groups[cat]){
       const isDone = t.done;
       const bColor = catColor(t.category||'');
