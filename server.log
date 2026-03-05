@@ -1,7 +1,7 @@
 🦁 Orgchart server on http://localhost:8790
 📀 Database: /Users/bob/.openclaw/workspace/orgchart/orgchart.db
 Traceback (most recent call last):
-  File "/Users/bob/.openclaw/workspace/orgchart/server.py", line 210, in <module>
+  File "/Users/bob/.openclaw/workspace/orgchart/server.py", line 213, in <module>
     HTTPServer(('0.0.0.0', PORT), Handler).serve_forever()
     ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "/opt/homebrew/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/socketserver.py", line 457, in __init__

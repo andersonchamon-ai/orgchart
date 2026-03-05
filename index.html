@@ -711,7 +711,9 @@ function showDragChoice(dragPerson, targetPerson){
   document.body.appendChild(overlay);
   overlay.querySelector('#dcSwap').onclick = () => {
     const siblings = getChildren(dragPerson.reportsTo);
-    siblings.forEach((s, i) => { if(s.sortOrder === undefined) s.sortOrder = i; });
+    // Ensure unique sortOrder for all siblings (fix: all-zero case)
+    const allSame = siblings.every(s => (s.sortOrder||0) === (siblings[0].sortOrder||0));
+    if(allSame) siblings.forEach((s, i) => s.sortOrder = i);
     const dragS = siblings.find(s => s.id === dragPerson.id);
     const targetS = siblings.find(s => s.id === targetPerson.id);
     const tmp = dragS.sortOrder; dragS.sortOrder = targetS.sortOrder; targetS.sortOrder = tmp;
@@ -733,8 +735,9 @@ function moveCard(id, direction){
   const idx = siblings.findIndex(s => s.id === id);
   const swapIdx = idx + direction;
   if(swapIdx < 0 || swapIdx >= siblings.length) return;
-  // Ensure all siblings have sortOrder
-  siblings.forEach((s, i) => { if(s.sortOrder === undefined) s.sortOrder = i; });
+  // Ensure unique sortOrder for all siblings (fix: all-zero case)
+  const allSame2 = siblings.every(s => (s.sortOrder||0) === (siblings[0].sortOrder||0));
+  if(allSame2) siblings.forEach((s, i) => s.sortOrder = i);
   // Swap
   const tmp = siblings[idx].sortOrder;
   siblings[idx].sortOrder = siblings[swapIdx].sortOrder;
@@ -860,9 +863,10 @@ const API_URLS = [
 let API_URL = API_URLS[0];
 let lastServerSync = 0;
 
-function saveLocal(){
+async function saveLocal(){
   try{
     const payload = JSON.stringify({people:data,unassigned});
+    console.log('[saveLocal] called, people:', data.length);
     localStorage.setItem('orgchart', payload);
     // Auto-backup in localStorage
     const backups = JSON.parse(localStorage.getItem('orgchart-prod-backups')||'[]');
@@ -873,36 +877,44 @@ function saveLocal(){
       while(backups.length > 10) backups.shift();
       localStorage.setItem('orgchart-prod-backups', JSON.stringify(backups));
     }
-    // Auto-sync to SQLite on every save
-    fetch(API_URL + '/api/save', {
-      method:'POST', headers:{'Content-Type':'application/json'}, body:payload, credentials:'include',
-      redirect: 'error'
-    }).then(async r => {
-      if(!r.ok) { updateSyncStatus('⚠️ Erro HTTP ' + r.status); return; }
+    // Auto-sync to SQLite — try all known URLs
+    const urls = [...new Set([API_URL, ...API_URLS])];
+    let saved = false;
+    for (const url of urls) {
       try {
+        const r = await fetch(url + '/api/save', {
+          method:'POST', headers:{'Content-Type':'application/json'}, body:payload, credentials:'include'
+        });
+        if (!r.ok) continue;
+        const ct = r.headers.get('content-type') || '';
+        if (!ct.includes('application/json')) continue; // auth redirect returned HTML
         const j = await r.json();
-        if(j.ok) { updateSyncStatus('✅ Salvo no banco'); lastServerSync = Date.now(); }
-        else updateSyncStatus('⚠️ Erro: ' + (j.error||'unknown'));
-      } catch(e) { updateSyncStatus('⚠️ Resposta inválida (auth?)'); }
-    }).catch(e => {
-      // redirect:'error' throws TypeError on 302 redirects (Cloudflare Access)
-      console.warn('Save failed, retrying via localhost...', e);
-      fetch('http://localhost:8790/api/save', {
-        method:'POST', headers:{'Content-Type':'application/json'}, body:payload
-      }).then(async r => {
-        if(r.ok) { const j = await r.json(); if(j.ok) { updateSyncStatus('✅ Salvo (local)'); lastServerSync = Date.now(); return; } }
-        updateSyncStatus('⚠️ Offline');
-      }).catch(() => updateSyncStatus('⚠️ Offline'));
-    });
-  }catch(e){}
+        if (j.ok) { updateSyncStatus('✅ Salvo no banco'); lastServerSync = Date.now(); saved = true; break; }
+      } catch(e) { continue; }
+    }
+    if (!saved) {
+      updateSyncStatus('🔴 NÃO SALVOU! Mudanças só no navegador.', true);
+      console.error('[saveLocal] FAILED to save to any URL');
+    } else {
+      console.log('[saveLocal] saved OK');
+    }
+  }catch(e){ updateSyncStatus('🔴 ERRO: ' + e.message, true); }
 }
 
-function updateSyncStatus(msg) {
+function updateSyncStatus(msg, isError) {
   let el = document.getElementById('syncStatus');
   if(!el) return;
   el.textContent = msg;
   el.style.opacity = '1';
-  setTimeout(() => { el.style.opacity = '0.5'; }, 3000);
+  el.style.color = isError ? '#ff4444' : 'var(--text-muted)';
+  el.style.fontWeight = isError ? '600' : 'normal';
+  if (isError) {
+    el.style.fontSize = '13px';
+    // Keep error visible until next successful save
+  } else {
+    el.style.fontSize = '11px';
+    setTimeout(() => { el.style.opacity = '0.5'; }, 3000);
+  }
 }
 function loadLocal(){try{const s=localStorage.getItem('orgchart');if(s){const p=JSON.parse(s);if(Array.isArray(p)){data=p;}else{data=p.people||p;unassigned=p.unassigned||{lionx:[],pws:[],phiz:[],fabrica:[]};}nextId=Math.max(...data.map(d=>d.id))+1;data.forEach(d=>{if(!d.responsibilities)d.responsibilities=[];});}}catch(e){}}
 
