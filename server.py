@@ -63,6 +63,18 @@ class Handler(SimpleHTTPRequestHandler):
             rows = conn.execute("SELECT * FROM audit_log ORDER BY timestamp DESC LIMIT 100").fetchall()
             conn.close()
             self.send_json([dict(r) for r in rows])
+        elif path == '/api/threads':
+            self.send_json(db.get_threads())
+        elif path.startswith('/api/threads/') and path.count('/') == 3:
+            try:
+                tid = int(path.split('/')[-1])
+                t = db.get_thread(tid)
+                if t:
+                    self.send_json(t)
+                else:
+                    self.send_json({'error': 'Not found'}, 404)
+            except ValueError:
+                self.send_json({'error': 'Invalid id'}, 400)
         else:
             super().do_GET()
 
@@ -115,6 +127,29 @@ class Handler(SimpleHTTPRequestHandler):
             elif path == '/api/backup':
                 dest = db.backup_db()
                 self.send_json({'ok': True, 'path': dest})
+            elif path == '/api/threads':
+                body = self.read_body()
+                title = body.get('title','').strip()
+                if not title:
+                    self.send_json({'error': 'title required'}, 400)
+                    return
+                with DB_LOCK:
+                    tid = db.create_thread(title, body.get('summary',''))
+                self.send_json({'ok': True, 'id': tid})
+            elif path.endswith('/attachments') and '/api/threads/' in path:
+                parts = path.split('/')
+                tid = int(parts[3])
+                body = self.read_body()
+                with DB_LOCK:
+                    aid = db.add_thread_attachment(tid, body.get('label',''), body.get('url',''), body.get('type','link'))
+                self.send_json({'ok': True, 'id': aid})
+            elif path.endswith('/notes') and '/api/threads/' in path:
+                parts = path.split('/')
+                tid = int(parts[3])
+                body = self.read_body()
+                with DB_LOCK:
+                    nid = db.add_thread_note(tid, body.get('content',''))
+                self.send_json({'ok': True, 'id': nid})
             else:
                 self.send_json({'error': 'Not found'}, 404)
         except Exception as e:
@@ -134,6 +169,18 @@ class Handler(SimpleHTTPRequestHandler):
                 with DB_LOCK:
                     db.update_todo(tid, body)
                 self.send_json({'ok': True})
+            elif path.startswith('/api/threads/notes/'):
+                nid = int(path.split('/')[-1])
+                body = self.read_body()
+                with DB_LOCK:
+                    db.update_thread_note(nid, body.get('content',''))
+                self.send_json({'ok': True})
+            elif path.startswith('/api/threads/') and path.count('/') == 3:
+                tid = int(path.split('/')[-1])
+                body = self.read_body()
+                with DB_LOCK:
+                    db.update_thread(tid, body)
+                self.send_json({'ok': True})
             else:
                 self.send_json({'error': 'Not found'}, 404)
         except Exception as e:
@@ -151,6 +198,21 @@ class Handler(SimpleHTTPRequestHandler):
                 tid = int(path.split('/')[-1])
                 with DB_LOCK:
                     db.delete_todo(tid)
+                self.send_json({'ok': True})
+            elif path.startswith('/api/threads/attachments/'):
+                aid = int(path.split('/')[-1])
+                with DB_LOCK:
+                    db.delete_thread_attachment(aid)
+                self.send_json({'ok': True})
+            elif path.startswith('/api/threads/notes/'):
+                nid = int(path.split('/')[-1])
+                with DB_LOCK:
+                    db.delete_thread_note(nid)
+                self.send_json({'ok': True})
+            elif path.startswith('/api/threads/') and path.count('/') == 3:
+                tid = int(path.split('/')[-1])
+                with DB_LOCK:
+                    db.delete_thread(tid)
                 self.send_json({'ok': True})
             else:
                 self.send_json({'error': 'Not found'}, 404)

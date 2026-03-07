@@ -378,9 +378,147 @@ def set_setting(key, value):
     conn.commit()
     conn.close()
 
+# --- Threads CRUD ---
+
+def init_threads():
+    """Create threads tables if not exists."""
+    conn = get_db()
+    conn.executescript("""
+        CREATE TABLE IF NOT EXISTS threads (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            summary TEXT DEFAULT '',
+            created_at TEXT DEFAULT (datetime('now')),
+            updated_at TEXT DEFAULT (datetime('now'))
+        );
+        CREATE TABLE IF NOT EXISTS thread_attachments (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            thread_id INTEGER NOT NULL REFERENCES threads(id) ON DELETE CASCADE,
+            label TEXT NOT NULL,
+            url TEXT NOT NULL,
+            type TEXT DEFAULT 'link',
+            created_at TEXT DEFAULT (datetime('now'))
+        );
+        CREATE TABLE IF NOT EXISTS thread_notes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            thread_id INTEGER NOT NULL REFERENCES threads(id) ON DELETE CASCADE,
+            content TEXT NOT NULL,
+            created_at TEXT DEFAULT (datetime('now')),
+            updated_at TEXT DEFAULT (datetime('now'))
+        );
+    """)
+    conn.commit()
+    conn.close()
+
+def get_threads():
+    conn = get_db()
+    rows = conn.execute("SELECT * FROM threads ORDER BY updated_at DESC").fetchall()
+    result = []
+    for r in rows:
+        note_count = conn.execute("SELECT COUNT(*) FROM thread_notes WHERE thread_id=?", (r['id'],)).fetchone()[0]
+        att_count = conn.execute("SELECT COUNT(*) FROM thread_attachments WHERE thread_id=?", (r['id'],)).fetchone()[0]
+        result.append({**dict(r), 'note_count': note_count, 'attachment_count': att_count})
+    conn.close()
+    return result
+
+def get_thread(thread_id):
+    conn = get_db()
+    row = conn.execute("SELECT * FROM threads WHERE id=?", (thread_id,)).fetchone()
+    if not row:
+        conn.close()
+        return None
+    t = dict(row)
+    t['attachments'] = [dict(a) for a in conn.execute(
+        "SELECT * FROM thread_attachments WHERE thread_id=? ORDER BY created_at", (thread_id,)
+    )]
+    t['notes'] = [dict(n) for n in conn.execute(
+        "SELECT * FROM thread_notes WHERE thread_id=? ORDER BY created_at", (thread_id,)
+    )]
+    conn.close()
+    return t
+
+def create_thread(title, summary=''):
+    conn = get_db()
+    cursor = conn.execute("INSERT INTO threads (title, summary) VALUES (?,?)", (title, summary))
+    tid = cursor.lastrowid
+    conn.commit()
+    conn.close()
+    return tid
+
+def update_thread(thread_id, updates):
+    conn = get_db()
+    fields, vals = [], []
+    for k in ('title', 'summary'):
+        if k in updates:
+            fields.append(f"{k}=?")
+            vals.append(updates[k])
+    if fields:
+        fields.append("updated_at=datetime('now')")
+        vals.append(thread_id)
+        conn.execute(f"UPDATE threads SET {','.join(fields)} WHERE id=?", vals)
+        conn.commit()
+    conn.close()
+
+def delete_thread(thread_id):
+    conn = get_db()
+    conn.execute("DELETE FROM threads WHERE id=?", (thread_id,))
+    conn.commit()
+    conn.close()
+
+def add_thread_attachment(thread_id, label, url, atype='link'):
+    conn = get_db()
+    cursor = conn.execute(
+        "INSERT INTO thread_attachments (thread_id, label, url, type) VALUES (?,?,?,?)",
+        (thread_id, label, url, atype)
+    )
+    aid = cursor.lastrowid
+    conn.execute("UPDATE threads SET updated_at=datetime('now') WHERE id=?", (thread_id,))
+    conn.commit()
+    conn.close()
+    return aid
+
+def delete_thread_attachment(att_id):
+    conn = get_db()
+    row = conn.execute("SELECT thread_id FROM thread_attachments WHERE id=?", (att_id,)).fetchone()
+    conn.execute("DELETE FROM thread_attachments WHERE id=?", (att_id,))
+    if row:
+        conn.execute("UPDATE threads SET updated_at=datetime('now') WHERE id=?", (row['thread_id'],))
+    conn.commit()
+    conn.close()
+
+def add_thread_note(thread_id, content):
+    conn = get_db()
+    cursor = conn.execute(
+        "INSERT INTO thread_notes (thread_id, content) VALUES (?,?)", (thread_id, content)
+    )
+    nid = cursor.lastrowid
+    conn.execute("UPDATE threads SET updated_at=datetime('now') WHERE id=?", (thread_id,))
+    conn.commit()
+    conn.close()
+    return nid
+
+def update_thread_note(note_id, content):
+    conn = get_db()
+    row = conn.execute("SELECT thread_id FROM thread_notes WHERE id=?", (note_id,)).fetchone()
+    conn.execute("UPDATE thread_notes SET content=?, updated_at=datetime('now') WHERE id=?", (content, note_id))
+    if row:
+        conn.execute("UPDATE threads SET updated_at=datetime('now') WHERE id=?", (row['thread_id'],))
+    conn.commit()
+    conn.close()
+
+def delete_thread_note(note_id):
+    conn = get_db()
+    row = conn.execute("SELECT thread_id FROM thread_notes WHERE id=?", (note_id,)).fetchone()
+    conn.execute("DELETE FROM thread_notes WHERE id=?", (note_id,))
+    if row:
+        conn.execute("UPDATE threads SET updated_at=datetime('now') WHERE id=?", (row['thread_id'],))
+    conn.commit()
+    conn.close()
+
 # Initialize on import
 init_db()
 seed_companies()
 migrate_hc_columns()
 init_todos()
 init_settings()
+init_threads()

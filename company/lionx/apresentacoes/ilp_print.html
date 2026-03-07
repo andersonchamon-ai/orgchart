@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>ILP — PhizChat & PWS Cloud</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  @page {
+    size: 1280px 720px;
+    margin: 0;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #0a0a0f;
+    color: #e8e8f0;
+    line-height: 1.5;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .slide {
+    width: 1280px;
+    height: 720px;
+    padding: 56px 64px;
+    position: relative;
+    overflow: hidden;
+    page-break-after: always;
+    page-break-inside: avoid;
+    background: #0a0a0f;
+  }
+  .slide:last-child { page-break-after: auto; }
+
+  .slide-num {
+    position: absolute;
+    top: 28px; right: 40px;
+    font-size: 12px; color: #666;
+    font-weight: 500; letter-spacing: 2px;
+  }
+  .tag {
+    display: inline-block;
+    background: #6366f1;
+    color: white;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 2.5px; text-transform: uppercase;
+    padding: 5px 14px; border-radius: 4px;
+    margin-bottom: 14px;
+  }
+  .tag-green { background: #22c55e; }
+
+  h1 { font-size: 44px; font-weight: 800; line-height: 1.15; margin-bottom: 12px; }
+  h2 { font-size: 32px; font-weight: 800; line-height: 1.2; margin-bottom: 10px; }
+  h3 { font-size: 18px; font-weight: 700; color: #818cf8; margin-bottom: 8px; }
+  h4 { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+  .lead { font-size: 15px; color: #8888a0; max-width: 640px; margin-bottom: 28px; line-height: 1.6; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 14px; }
+
+  .card {
+    background: #12121a;
+    border: 1px solid #2a2a3a;
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+  }
+  .badge {
+    position: absolute; top: 10px; right: 10px;
+    font-size: 9px; font-weight: 700;
+    padding: 3px 8px; border-radius: 4px;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .badge-rec { background: #22c55e; color: #000; }
+  .badge-warn { background: #f59e0b; color: #000; }
+  .badge-bad { background: #ef4444; color: #fff; }
+  .badge-alt { background: #06b6d4; color: #000; }
+
+  .check { color: #22c55e; }
+  .cross { color: #ef4444; }
+  .warn { color: #f59e0b; }
+  .muted { color: #8888a0; }
+
+  .list { list-style: none; }
+  .list li {
+    padding: 5px 0;
+    font-size: 13px;
+    display: flex; align-items: flex-start; gap: 8px;
+  }
+  .list li .ic { flex-shrink: 0; font-size: 14px; }
+
+  /* Cover */
+  .cover {
+    background: linear-gradient(135deg, #0a0a1a 0%, #1a1040 40%, #0f0a2a 100%);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+  }
+  .cover h1 {
+    font-size: 48px;
+    background: linear-gradient(135deg, #e8e8f0, #818cf8);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .cover .sub { font-size: 18px; color: #8888a0; margin-bottom: 36px; }
+  .cover .meta { display: flex; gap: 36px; font-size: 12px; color: #666; letter-spacing: 1px; text-transform: uppercase; }
+  .cover .meta span { color: #818cf8; font-weight: 600; }
+  .logos span {
+    display: inline-block; width: 52px; height: 52px;
+    border-radius: 14px; line-height: 52px;
+    font-size: 24px; font-weight: 900; color: white;
+    margin: 0 6px 24px;
+  }
+
+  /* Table */
+  .tbl {
+    width: 100%; border-collapse: separate; border-spacing: 0;
+    background: #12121a; border-radius: 12px; overflow: hidden;
+    border: 1px solid #2a2a3a; font-size: 12px;
+  }
+  .tbl th {
+    background: #1a1a26; padding: 10px 14px; text-align: left;
+    font-weight: 600; font-size: 10px; text-transform: uppercase;
+    letter-spacing: 1px; color: #8888a0; border-bottom: 1px solid #2a2a3a;
+  }
+  .tbl td {
+    padding: 9px 14px; border-bottom: 1px solid #2a2a3a; vertical-align: top;
+  }
+  .tbl tr:last-child td { border-bottom: none; }
+  .tbl .hl { background: rgba(99,102,241,0.08); }
+  .tbl th.hl { background: rgba(99,102,241,0.15); color: #818cf8; }
+
+  /* Dots */
+  .dots { display: flex; gap: 3px; }
+  .dots .d { width: 8px; height: 8px; border-radius: 50%; background: #2a2a3a; }
+  .dots .d.on { background: #818cf8; }
+  .dots .d.g { background: #22c55e; }
+
+  /* Stat */
+  .stat { background: #12121a; border: 1px solid #2a2a3a; border-radius: 10px; padding: 16px; text-align: center; }
+  .stat .n { font-size: 32px; font-weight: 800; color: #818cf8; line-height: 1; }
+  .stat .l { font-size: 10px; color: #8888a0; text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+  /* Vesting bar */
+  .vbar { height: 32px; background: #1a1a26; border-radius: 6px; display: flex; overflow: hidden; margin: 8px 0; }
+  .vbar div { display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white; }
+
+  /* Callout */
+  .co {
+    border-radius: 10px; padding: 16px 20px; margin-top: 14px; font-size: 13px;
+  }
+  .co-green { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); border-left: 3px solid #22c55e; }
+  .co-blue { background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2); border-left: 3px solid #3b82f6; }
+  .co-orange { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); border-left: 3px solid #f59e0b; }
+
+  /* Scenario */
+  .sc { background: #12121a; border: 1px solid #2a2a3a; border-radius: 12px; padding: 20px; text-align: center; }
+  .sc .sv { font-size: 30px; font-weight: 800; }
+  .sc .sl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+  .sc .ss { font-size: 11px; color: #8888a0; }
+  .sc .sm { display: inline-block; margin-top: 6px; padding: 3px 10px; border-radius: 16px; font-size: 11px; font-weight: 700; }
+
+  /* Case */
+  .case {
+    background: linear-gradient(135deg, rgba(99,102,241,0.06), rgba(168,85,247,0.03));
+    border: 1px solid rgba(99,102,241,0.15);
+    border-radius: 12px; padding: 16px;
+  }
+  .case .cn { font-size: 10px; font-weight: 700; color: #818cf8; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 4px; }
+  .pill {
+    display: inline-block; padding: 3px 10px; border-radius: 16px;
+    font-size: 10px; font-weight: 600;
+  }
+  .pill-g { background: rgba(34,197,94,0.15); color: #22c55e; }
+  .pill-p { background: rgba(168,85,247,0.15); color: #a855f7; }
+  .pill-b { background: rgba(59,130,246,0.15); color: #3b82f6; }
+  .pill-k { background: rgba(236,72,153,0.15); color: #ec4899; }
+
+  .footer {
+    position: absolute; bottom: 20px; left: 64px; right: 64px;
+    font-size: 10px; color: #444; display: flex; justify-content: space-between;
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== SLIDE 1: COVER ========== -->
+<div class="slide cover">
+  <div class="logos">
+    <span style="background:#6366f1;">P</span><span style="background:#a855f7;">P</span>
+  </div>
+  <h1>Programa de Incentivo<br>de Longo Prazo</h1>
+  <p class="sub">Modelo de equity para retenção de talentos em<br><strong style="color:#818cf8;">PhizChat</strong> e <strong style="color:#a855f7;">PWS Cloud</strong></p>
+  <div class="meta">
+    <div>Preparado para <span>Anderson Chamon</span></div>
+    <div>Março 2026</div>
+    <div>Confidencial</div>
+  </div>
+</div>
+
+<!-- ========== SLIDE 2: POR QUÊ ========== -->
+<div class="slide">
+  <span class="slide-num">01</span>
+  <span class="tag">O Problema</span>
+  <h2>Por que um programa de ILP?</h2>
+  <p class="lead">Sem equity, a retenção depende apenas de salário — uma corrida impossível de vencer contra big techs e startups capitalizadas.</p>
+  <div class="grid-4" style="margin-bottom:20px;">
+    <div class="stat"><div class="n">2.3</div><div class="l">Anos permanência<br>média em tech (BR)</div></div>
+    <div class="stat"><div class="n">R$180k</div><div class="l">Custo médio reposição<br>(senior engineer)</div></div>
+    <div class="stat"><div class="n">78%</div><div class="l">Devs consideram<br>equity na oferta</div></div>
+    <div class="stat"><div class="n">3-5×</div><div class="l">Retenção maior<br>com ILP</div></div>
+  </div>
+  <div class="co co-blue" style="margin-top:12px;">
+    <strong style="color:#3b82f6;">📊 Index Ventures (20.000+ grants):</strong> Empresas de tech que distribuem equity retêm 3-5× mais top performers. Diluição anual de 3.5-5% é insignificante vs. custo de turnover.
+  </div>
+  <div class="co co-orange" style="margin-top:10px;">
+    <strong style="color:#f59e0b;">⚠️ Cenário competitivo:</strong> PhizChat e PWS competem com Nubank, iFood, Stone, Mercado Livre e big techs — todos com programas de equity maduros.
+  </div>
+  <div class="footer"><span>Confidencial — LionX Group</span><span>1</span></div>
+</div>
+
+<!-- ========== SLIDE 3: MODELOS ========== -->
+<div class="slide" style="padding:40px 56px;">
+  <span class="slide-num">02</span>
+  <span class="tag">Modelos de Mercado</span>
+  <h2 style="font-size:28px; margin-bottom:6px;">Os 4 modelos mais usados em tech</h2>
+  <p style="font-size:13px; color:#8888a0; margin-bottom:16px;">Cada modelo tem trade-offs. O melhor depende do estágio, liquidez e complexidade desejada.</p>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+    <div class="card" style="padding:14px 16px;">
+      <span class="badge badge-warn">Complexo</span>
+      <h3 style="color:#3b82f6; font-size:15px; margin-bottom:4px;">📈 Stock Options</h3>
+      <p style="font-size:11px; color:#8888a0; margin-bottom:6px;">Direito de comprar ações a preço fixo. Ganho = diferença entre strike e valor de mercado.</p>
+      <ul class="list" style="font-size:11px;">
+        <li style="padding:2px 0;"><span class="ic check">✓</span> Padrão Silicon Valley há 50+ anos</li>
+        <li style="padding:2px 0;"><span class="ic check">✓</span> Upside ilimitado</li>
+        <li style="padding:2px 0;"><span class="ic cross">✗</span> Funcionário paga pelo exercício</li>
+        <li style="padding:2px 0;"><span class="ic cross">✗</span> Requer valuation formal</li>
+        <li style="padding:2px 0;"><span class="ic cross">✗</span> Sem valor sem evento de saída</li>
+      </ul>
+      <p style="font-size:9px; color:#555; margin-top:4px;">Stripe, Nubank (pré-IPO), startups SV</p>
+    </div>
+    <div class="card" style="padding:14px 16px;">
+      <span class="badge badge-bad">Requer liquidez</span>
+      <h3 style="color:#a855f7; font-size:15px; margin-bottom:4px;">🏦 RSU (Restricted Stock Units)</h3>
+      <p style="font-size:11px; color:#8888a0; margin-bottom:6px;">Ações reais entregues conforme vesting. Sem custo de exercício.</p>
+      <ul class="list" style="font-size:11px;">
+        <li style="padding:2px 0;"><span class="ic check">✓</span> Simples: sempre tem valor</li>
+        <li style="padding:2px 0;"><span class="ic check">✓</span> Padrão big techs listadas</li>
+        <li style="padding:2px 0;"><span class="ic cross">✗</span> Diluição real dos sócios</li>
+        <li style="padding:2px 0;"><span class="ic cross">✗</span> Tributado como renda na entrega</li>
+        <li style="padding:2px 0;"><span class="ic cross">✗</span> Impraticável sem mercado público</li>
+      </ul>
+      <p style="font-size:9px; color:#555; margin-top:4px;">Google, Amazon, Meta, Apple, Nubank (pós-IPO)</p>
+    </div>
+    <div class="card" style="padding:14px 16px;">
+      <span class="badge badge-rec">Recomendado</span>
+      <h3 style="color:#22c55e; font-size:15px; margin-bottom:4px;">👻 Phantom Shares</h3>
+      <p style="font-size:11px; color:#8888a0; margin-bottom:6px;">Unidades virtuais que espelham o valor da ação. Payout em dinheiro ou conversão em ações reais.</p>
+      <ul class="list" style="font-size:11px;">
+        <li style="padding:2px 0;"><span class="ic check">✓</span> Zero impacto societário</li>
+        <li style="padding:2px 0;"><span class="ic check">✓</span> Funcionário entende em 30 segundos</li>
+        <li style="padding:2px 0;"><span class="ic check">✓</span> Funciona sem IPO</li>
+        <li style="padding:2px 0;"><span class="ic check">✓</span> Conversível em ações reais na saída</li>
+        <li style="padding:2px 0;"><span class="ic warn">⚡</span> Custo de caixa se liquidar em cash</li>
+      </ul>
+      <p style="font-size:9px; color:#555; margin-top:4px;">iFood, Cargill, Koch Industries, empresas private</p>
+    </div>
+    <div class="card" style="padding:14px 16px;">
+      <span class="badge badge-alt">Variante</span>
+      <h3 style="color:#06b6d4; font-size:15px; margin-bottom:4px;">📊 SAR (Stock Appreciation Rights)</h3>
+      <p style="font-size:11px; color:#8888a0; margin-bottom:6px;">Paga apenas a valorização (não o valor total). Equivale a uma option sem exercício.</p>
+      <ul class="list" style="font-size:11px;">
+        <li style="padding:2px 0;"><span class="ic check">✓</span> Menor custo de caixa</li>
+        <li style="padding:2px 0;"><span class="ic check">✓</span> Incentivo puro de valorização</li>
+        <li style="padding:2px 0;"><span class="ic cross">✗</span> Zero valor se não valorizar</li>
+        <li style="padding:2px 0;"><span class="ic cross">✗</span> Menos tangível pro funcionário</li>
+      </ul>
+      <p style="font-size:9px; color:#555; margin-top:4px;">Private equity, complemento a programas maiores</p>
+    </div>
+  </div>
+  <div class="footer"><span>Confidencial — LionX Group</span><span>2</span></div>
+</div>
+
+<!-- ========== SLIDE 4: COMPARATIVO ========== -->
+<div class="slide">
+  <span class="slide-num">03</span>
+  <span class="tag">Análise Comparativa</span>
+  <h2>Matriz de Decisão</h2>
+  <p class="lead" style="margin-bottom:16px;">Avaliação lado a lado dos modelos para empresas de capital fechado.</p>
+  <table class="tbl">
+    <thead>
+      <tr>
+        <th style="width:180px;">Critério</th>
+        <th>Stock Options</th>
+        <th>RSU</th>
+        <th class="hl">Phantom Shares ★</th>
+        <th>SAR</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Simplicidade</strong></td>
+        <td><div class="dots"><span class="d on"></span><span class="d on"></span><span class="d"></span><span class="d"></span><span class="d"></span></div></td>
+        <td><div class="dots"><span class="d on"></span><span class="d on"></span><span class="d on"></span><span class="d"></span><span class="d"></span></div></td>
+        <td class="hl"><div class="dots"><span class="d g"></span><span class="d g"></span><span class="d g"></span><span class="d g"></span><span class="d g"></span></div></td>
+        <td><div class="dots"><span class="d on"></span><span class="d on"></span><span class="d on"></span><span class="d on"></span><span class="d"></span></div></td>
+      </tr>
+      <tr>
+        <td><strong>Complexidade jurídica (BR)</strong></td>
+        <td><span class="warn">Alta</span></td>
+        <td><span class="cross">Muito Alta</span></td>
+        <td class="hl"><span class="check">Baixa</span></td>
+        <td><span class="check">Baixa</span></td>
+      </tr>
+      <tr>
+        <td><strong>Sem diluição societária</strong></td>
+        <td><span class="cross">✗ Dilui</span></td>
+        <td><span class="cross">✗ Dilui</span></td>
+        <td class="hl"><span class="check">✓ Zero</span></td>
+        <td><span class="check">✓ Zero</span></td>
+      </tr>
+      <tr>
+        <td><strong>Funciona sem IPO</strong></td>
+        <td><span class="cross">Ruim</span></td>
+        <td><span class="cross">Muito ruim</span></td>
+        <td class="hl"><span class="check">Excelente</span></td>
+        <td><span class="check">Bom</span></td>
+      </tr>
+      <tr>
+        <td><strong>Poder de retenção</strong></td>
+        <td><div class="dots"><span class="d on"></span><span class="d on"></span><span class="d on"></span><span class="d on"></span><span class="d"></span></div></td>
+        <td><div class="dots"><span class="d on"></span><span class="d on"></span><span class="d on"></span><span class="d on"></span><span class="d on"></span></div></td>
+        <td class="hl"><div class="dots"><span class="d g"></span><span class="d g"></span><span class="d g"></span><span class="d g"></span><span class="d"></span></div></td>
+        <td><div class="dots"><span class="d on"></span><span class="d on"></span><span class="d on"></span><span class="d"></span><span class="d"></span></div></td>
+      </tr>
+      <tr>
+        <td><strong>Mentalidade de "dono"</strong></td>
+        <td><div class="dots"><span class="d on"></span><span class="d on"></span><span class="d on"></span><span class="d on"></span><span class="d on"></span></div></td>
+        <td><div class="dots"><span class="d on"></span><span class="d on"></span><span class="d on"></span><span class="d on"></span><span class="d on"></span></div></td>
+        <td class="hl"><div class="dots"><span class="d g"></span><span class="d g"></span><span class="d g"></span><span class="d g"></span><span class="d"></span></div></td>
+        <td><div class="dots"><span class="d on"></span><span class="d on"></span><span class="d on"></span><span class="d"></span><span class="d"></span></div></td>
+      </tr>
+      <tr>
+        <td><strong>Adaptável a futuro IPO</strong></td>
+        <td><span class="check">Sim</span></td>
+        <td><span class="check">Nativo</span></td>
+        <td class="hl"><span class="check">Migra fácil</span></td>
+        <td><span class="check">Migra fácil</span></td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="co co-green" style="margin-top:16px;">
+    <strong style="color:#22c55e;">🏆 Veredicto:</strong> Para empresas de capital fechado, sem IPO no horizonte, Phantom Shares é o modelo que melhor equilibra simplicidade, retenção e zero complexidade societária.
+  </div>
+  <div class="footer"><span>Confidencial — LionX Group</span><span>3</span></div>
+</div>
+
+<!-- ========== SLIDE 5: O MODELO ========== -->
+<div class="slide" style="background: linear-gradient(180deg, #0a0a0f 0%, #0f0a20 100%);">
+  <span class="slide-num">04</span>
+  <span class="tag tag-green">O Modelo</span>
+  <h2>Phantom Equity Plan</h2>
+  <p class="lead" style="margin-bottom:20px;">O funcionário recebe uma quantidade de Phantom Shares (unidades virtuais) com valor atrelado à ação real da empresa.</p>
+
+  <div class="grid-3" style="margin-bottom:24px;">
+    <div class="card" style="text-align:center; border-color:#22c55e;">
+      <h4 style="color:#22c55e;">Instrumento</h4>
+      <div style="font-size:28px; font-weight:900; color:#22c55e; margin:8px 0;">Phantom Shares</div>
+      <p style="font-size:11px; color:#8888a0;">Unidades virtuais que espelham o valor da ação real</p>
+    </div>
+    <div class="card" style="text-align:center; border-color:#818cf8;">
+      <h4 style="color:#818cf8;">Vesting</h4>
+      <div style="font-size:40px; font-weight:900; color:#818cf8; margin:8px 0;">4 anos</div>
+      <p style="font-size:11px; color:#8888a0;">25% ao ano, no aniversário do grant</p>
+    </div>
+    <div class="card" style="text-align:center; border-color:#a855f7;">
+      <h4 style="color:#a855f7;">Tipo</h4>
+      <div style="font-size:28px; font-weight:900; color:#a855f7; margin:8px 0;">Full Value</div>
+      <p style="font-size:11px; color:#8888a0;">Recebe valor total, não só valorização</p>
+    </div>
+  </div>
+
+  <div class="grid-2" style="gap:16px;">
+    <div class="card" style="border-left:3px solid #6366f1; padding:16px 20px;">
+      <h4>1. Concessão</h4>
+      <p style="font-size:12px; color:#8888a0;">Funcionário recebe X Phantom Shares com valor base definido. <em>"Você recebeu 5.000 shares a R$200 cada."</em></p>
+    </div>
+    <div class="card" style="border-left:3px solid #3b82f6; padding:16px 20px;">
+      <h4>2. Vesting anual</h4>
+      <p style="font-size:12px; color:#8888a0;">25% vestem a cada aniversário. Nada veste antes de completar 12 meses.</p>
+    </div>
+    <div class="card" style="border-left:3px solid #06b6d4; padding:16px 20px;">
+      <h4>3. Valorização</h4>
+      <p style="font-size:12px; color:#8888a0;">Se a empresa valoriza, o valor da share sobe. Valuation atualizada periodicamente pelo board.</p>
+    </div>
+    <div class="card" style="border-left:3px solid #22c55e; padding:16px 20px;">
+      <h4>4. Liquidez</h4>
+      <p style="font-size:12px; color:#8888a0;">No evento de liquidez, shares vestidas são convertidas em dinheiro ou ações reais.</p>
+    </div>
+  </div>
+
+  <div style="margin-top:16px;">
+    <div style="display:flex; justify-content:space-between; font-size:11px; color:#666; margin-bottom:4px;">
+      <span>Início</span><span>Ano 1</span><span>Ano 2</span><span>Ano 3</span><span>Ano 4</span>
+    </div>
+    <div class="vbar">
+      <div style="width:25%; background:#6366f1;">25%</div>
+      <div style="width:25%; background:#3b82f6;">50%</div>
+      <div style="width:25%; background:#06b6d4;">75%</div>
+      <div style="width:25%; background:#22c55e;">100%</div>
+    </div>
+  </div>
+  <div class="footer"><span>Confidencial — LionX Group</span><span>4</span></div>
+</div>
+
+<!-- ========== SLIDE 6: REGRAS ========== -->
+<div class="slide">
+  <span class="slide-num">05</span>
+  <span class="tag">Regras do Programa</span>
+  <h2>O que acontece em cada cenário</h2>
+  <p class="lead" style="margin-bottom:14px;">Regras claras de saída para cada situação.</p>
+
+  <table class="tbl">
+    <thead>
+      <tr>
+        <th style="width:40px;"></th>
+        <th style="width:200px;">Situação</th>
+        <th>Shares Vestidas</th>
+        <th>Shares Não Vestidas</th>
+        <th>Obs.</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="text-align:center;">🟢</td>
+        <td><strong>Permanece até evento de liquidez</strong></td>
+        <td><span class="check">Convertidas em $ ou ações</span></td>
+        <td style="color:#666;">— (tudo vestido)</td>
+        <td style="color:#666; font-size:11px;">Cenário ideal. Payout automático.</td>
+      </tr>
+      <tr>
+        <td style="text-align:center;">🟡</td>
+        <td><strong>Pede demissão</strong><br><span style="font-size:10px; color:#666;">good leaver</span></td>
+        <td><span class="check">Mantém</span> — reservadas até liquidez</td>
+        <td><span class="cross">Perdidas</span></td>
+        <td style="color:#666; font-size:11px;">Ex-funcionário recebe no evento futuro.</td>
+      </tr>
+      <tr>
+        <td style="text-align:center;">🟠</td>
+        <td><strong>Demitido sem justa causa</strong></td>
+        <td><span class="check">Mantém</span> — mesmo que good leaver</td>
+        <td><span class="cross">Perdidas</span></td>
+        <td style="color:#666; font-size:11px;">Mesmo tratamento de pedido de demissão.</td>
+      </tr>
+      <tr>
+        <td style="text-align:center;">🔴</td>
+        <td><strong>Justa causa</strong><br><span style="font-size:10px; color:#666;">bad leaver</span></td>
+        <td><span class="cross">Perdidas — clawback total</span></td>
+        <td><span class="cross">Perdidas</span></td>
+        <td style="color:#666; font-size:11px;">Fraude, corrupção, violação grave.</td>
+      </tr>
+      <tr>
+        <td style="text-align:center;">🔴</td>
+        <td><strong>Violação non-compete</strong></td>
+        <td><span class="cross">Perdidas — clawback total</span></td>
+        <td><span class="cross">Perdidas</span></td>
+        <td style="color:#666; font-size:11px;">Foi para concorrente ou levou funcionários.</td>
+      </tr>
+      <tr>
+        <td style="text-align:center;">⚡</td>
+        <td><strong>Venda da empresa</strong></td>
+        <td><span class="check">Payout imediato</span></td>
+        <td><span class="check">Aceleração total</span></td>
+        <td style="color:#666; font-size:11px;">Todas as shares são liquidadas.</td>
+      </tr>
+      <tr>
+        <td style="text-align:center;">💀</td>
+        <td><strong>Falecimento / Invalidez</strong></td>
+        <td><span class="check">Transferidas a herdeiros</span></td>
+        <td><span class="check">Aceleração total</span></td>
+        <td style="color:#666; font-size:11px;">Herdeiros mantêm todos os direitos.</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="footer"><span>Confidencial — LionX Group</span><span>5</span></div>
+</div>
+
+<!-- ========== SLIDE 7: LIQUIDEZ ========== -->
+<div class="slide">
+  <span class="slide-num">06</span>
+  <span class="tag">Regras de Liquidez</span>
+  <h2>Quando as shares viram dinheiro</h2>
+  <p class="lead" style="margin-bottom:20px;">Dois mecanismos: um automático e um discricionário.</p>
+
+  <div class="grid-2">
+    <div class="card" style="border-color:#22c55e; border-width:2px;">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+        <span style="font-size:28px;">🎯</span>
+        <div>
+          <h3 style="margin-bottom:0; color:#22c55e;">Gatilho 1 — Evento de Liquidez</h3>
+        </div>
+      </div>
+      <p style="font-size:13px; color:#8888a0; margin-bottom:12px;">Payout <strong>automático</strong> quando ocorrer:</p>
+      <ul class="list">
+        <li><span class="ic check">✓</span> <strong>IPO</strong> — abertura de capital</li>
+        <li><span class="ic check">✓</span> <strong>Venda da empresa</strong> — M&A, aquisição</li>
+        <li><span class="ic check">✓</span> <strong>Venda secundária relevante</strong></li>
+      </ul>
+      <div class="co co-green" style="margin-top:12px; font-size:12px;">
+        <strong>Pagamento:</strong> A empresa pode pagar em dinheiro ou converter em ações reais, a seu critério.
+      </div>
+    </div>
+
+    <div class="card" style="border-color:#6366f1; border-width:2px;">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+        <span style="font-size:28px;">🔄</span>
+        <div>
+          <h3 style="margin-bottom:0; color:#818cf8;">Gatilho 2 — Recompra Discricionária</h3>
+        </div>
+      </div>
+      <p style="font-size:13px; color:#8888a0; margin-bottom:12px;">A empresa pode, <strong>a seu exclusivo critério</strong>, recomprar shares vestidas:</p>
+      <ul class="list">
+        <li><span class="ic check">✓</span> <strong>Sem obrigação</strong> — empresa decide se, quando e quanto</li>
+        <li><span class="ic check">✓</span> <strong>Valor justo</strong> — valuation mais recente do board</li>
+        <li><span class="ic check">✓</span> <strong>Limite por janela</strong> — empresa define teto por evento</li>
+      </ul>
+      <div class="co co-blue" style="margin-top:12px; font-size:12px;">
+        <strong>Propósito:</strong> Dar tangibilidade ao programa. Funcionário vê que as shares valem dinheiro real.
+      </div>
+    </div>
+  </div>
+
+  <div class="co co-orange" style="margin-top:16px; font-size:12px;">
+    <strong style="color:#f59e0b;">📌 Importante:</strong> A recompra é um direito da empresa, não do funcionário. O funcionário não pode exigir liquidez. Isso protege o caixa e dá controle total à empresa.
+  </div>
+  <div class="footer"><span>Confidencial — LionX Group</span><span>6</span></div>
+</div>
+
+<!-- ========== SLIDE 8: TRIBUTAÇÃO ========== -->
+<div class="slide">
+  <span class="slide-num">07</span>
+  <span class="tag">Tributação</span>
+  <h2>Impacto tributário</h2>
+  <p class="lead" style="margin-bottom:18px;">Imposto só é devido no payout. Concessão e vesting = zero imposto.</p>
+
+  <div class="grid-3" style="margin-bottom:20px;">
+    <div class="card" style="text-align:center; border-color:#22c55e;">
+      <div style="font-size:28px; margin-bottom:6px;">📝</div>
+      <h4>Na concessão</h4>
+      <div style="font-size:28px; font-weight:900; color:#22c55e;">Zero</div>
+      <p style="font-size:11px; color:#8888a0;">Sem fato gerador</p>
+    </div>
+    <div class="card" style="text-align:center; border-color:#22c55e;">
+      <div style="font-size:28px; margin-bottom:6px;">⏱️</div>
+      <h4>No vesting</h4>
+      <div style="font-size:28px; font-weight:900; color:#22c55e;">Zero</div>
+      <p style="font-size:11px; color:#8888a0;">Sem realização financeira</p>
+    </div>
+    <div class="card" style="text-align:center; border-color:#f59e0b;">
+      <div style="font-size:28px; margin-bottom:6px;">💰</div>
+      <h4>No payout</h4>
+      <div style="font-size:28px; font-weight:900; color:#f59e0b;">Tributa</div>
+      <p style="font-size:11px; color:#8888a0;">Conforme residência fiscal</p>
+    </div>
+  </div>
+
+  <table class="tbl">
+    <thead>
+      <tr><th>Residência Fiscal</th><th>Tributação no Payout</th><th>Responsabilidade</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>🇧🇷 Brasil</strong></td>
+        <td>IRPF progressivo até <strong>27,5%</strong></td>
+        <td style="color:#8888a0;">Funcionário declara. Empresa pode reter na fonte.</td>
+      </tr>
+      <tr>
+        <td><strong>🇨🇳 China</strong></td>
+        <td>Conforme legislação chinesa (IIT)</td>
+        <td style="color:#8888a0;">Funcionário declara conforme regras locais.</td>
+      </tr>
+      <tr>
+        <td><strong>🌍 Outros</strong></td>
+        <td>Conforme país de residência fiscal</td>
+        <td style="color:#8888a0;">Funcionário responsável pelas obrigações locais.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="co co-blue" style="margin-top:12px; font-size:12px;">
+    <strong style="color:#3b82f6;">📌 Contrato:</strong> Obrigações tributárias são de responsabilidade do beneficiário. Empresa paga valor bruto.
+  </div>
+  <div class="co co-orange" style="margin-top:8px; font-size:12px;">
+    <strong style="color:#f59e0b;">STF — Tema 1.226 (2024):</strong> Stock options com onerosidade = natureza mercantil (sem INSS/FGTS). Phantom shares são ligeiramente diferentes; recomenda-se validação com tributarista.
+  </div>
+  <div class="footer"><span>Confidencial — LionX Group</span><span>7</span></div>
+</div>
+
+<!-- ========== SLIDE 9: SIMULAÇÃO ========== -->
+<div class="slide">
+  <span class="slide-num">08</span>
+  <span class="tag">Simulação</span>
+  <h2>Na prática: como funciona</h2>
+  <p class="lead" style="margin-bottom:16px;">Exemplo com funcionário recebendo 5.000 Phantom Shares a R$ 200 cada.</p>
+
+  <div class="card" style="padding:16px 24px; margin-bottom:20px; display:flex; align-items:center; gap:16px;">
+    <span style="font-size:32px;">👩‍💻</span>
+    <div>
+      <h4 style="margin-bottom:2px;">Exemplo: Tech Lead</h4>
+      <p style="font-size:13px; color:#8888a0;"><strong>5.000 Phantom Shares</strong> × R$ 200 = valor base <strong style="color:#818cf8;">R$ 1.000.000</strong></p>
+    </div>
+  </div>
+
+  <h3 style="margin-bottom:12px;">Cenários após 4 anos (100% vestido)</h3>
+  <div class="grid-3" style="margin-bottom:24px;">
+    <div class="sc" style="border-color:#666;">
+      <div class="sl" style="color:#666;">Conservador</div>
+      <p style="font-size:11px; color:#666; margin-bottom:6px;">Valuation mantém</p>
+      <div class="sv" style="color:#8888a0;">R$ 1M</div>
+      <div class="ss">5.000 × R$ 200</div>
+      <div class="sm" style="background:rgba(255,255,255,0.05); color:#666;">1×</div>
+    </div>
+    <div class="sc" style="border-color:#3b82f6;">
+      <div class="sl" style="color:#3b82f6;">Moderado</div>
+      <p style="font-size:11px; color:#3b82f6; margin-bottom:6px;">Valuation 3×</p>
+      <div class="sv" style="color:#3b82f6;">R$ 3M</div>
+      <div class="ss">5.000 × R$ 600</div>
+      <div class="sm" style="background:rgba(59,130,246,0.15); color:#3b82f6;">3×</div>
+    </div>
+    <div class="sc" style="border-color:#22c55e;">
+      <div class="sl" style="color:#22c55e;">Otimista</div>
+      <p style="font-size:11px; color:#22c55e; margin-bottom:6px;">Valuation 10×</p>
+      <div class="sv" style="color:#22c55e;">R$ 10M</div>
+      <div class="ss">5.000 × R$ 2.000</div>
+      <div class="sm" style="background:rgba(34,197,94,0.15); color:#22c55e;">10×</div>
+    </div>
+  </div>
+
+  <div class="co co-green">
+    <strong style="color:#22c55e;">💬 Como comunicar:</strong>
+    <p style="font-size:13px; margin-top:6px; font-style:italic;">"Você recebeu 5.000 Phantom Shares. Cada share vale R$ 200 hoje. Em 4 anos, se você permanecer conosco, todas serão suas. Se a empresa triplicar de valor, cada share valerá R$ 600 — e você recebe isso quando houver um evento de liquidez."</p>
+  </div>
+  <div class="footer"><span>Confidencial — LionX Group</span><span>8</span></div>
+</div>
+
+<!-- ========== SLIDE 10: CASES ========== -->
+<div class="slide">
+  <span class="slide-num">09</span>
+  <span class="tag">Referências</span>
+  <h2>Quem faz algo parecido</h2>
+  <p class="lead" style="margin-bottom:16px;">Programas de ILP em empresas de tecnologia comparáveis.</p>
+
+  <div class="grid-3">
+    <div class="case">
+      <div class="cn">🟣 Nubank</div>
+      <h4 style="font-size:13px;">Stock Options → RSU</h4>
+      <p style="font-size:11px; color:#8888a0; margin:8px 0;">Options pré-IPO, vesting 4 anos. Migrou para RSU após listagem (2021).</p>
+      <span class="pill pill-p">Capital aberto</span>
+    </div>
+    <div class="case">
+      <div class="cn">🔴 iFood</div>
+      <h4 style="font-size:13px;">Phantom Shares + SAR</h4>
+      <p style="font-size:11px; color:#8888a0; margin:8px 0;">Phantom equity da Prosus. Payout em cash. Sem diluição pro controlador.</p>
+      <span class="pill pill-g">Capital fechado</span>
+    </div>
+    <div class="case">
+      <div class="cn">🟢 Stripe</div>
+      <h4 style="font-size:13px;">RSU + Tender Offers</h4>
+      <p style="font-size:11px; color:#8888a0; margin:8px 0;">Private ($50B+), concede RSUs reais. Liquidez via tender offers periódicos.</p>
+      <span class="pill pill-b">Capital fechado</span>
+    </div>
+    <div class="case">
+      <div class="cn">🔵 Cargill</div>
+      <h4 style="font-size:13px;">Phantom Stock puro</h4>
+      <p style="font-size:11px; color:#8888a0; margin:8px 0;">Maior empresa privada do mundo. Phantom stock desde anos 1980. Gold standard.</p>
+      <span class="pill pill-g">Capital fechado</span>
+    </div>
+    <div class="case">
+      <div class="cn">🟡 Koch Industries</div>
+      <h4 style="font-size:13px;">Phantom + Bônus LP</h4>
+      <p style="font-size:11px; color:#8888a0; margin:8px 0;">Empresa de $125B que nunca abriu capital. Retém talentos por décadas.</p>
+      <span class="pill pill-g">Capital fechado</span>
+    </div>
+    <div class="case">
+      <div class="cn">⚪ Wealthfront Model</div>
+      <h4 style="font-size:13px;">Evergreen Grants</h4>
+      <p style="font-size:11px; color:#8888a0; margin:8px 0;">Andy Rachleff (Benchmark). Grants de promoção + performance + evergreen anual.</p>
+      <span class="pill pill-k">Best practice</span>
+    </div>
+  </div>
+  <div class="footer"><span>Confidencial — LionX Group</span><span>9</span></div>
+</div>
+
+<!-- ========== SLIDE 11: CONTRATOS ========== -->
+<div class="slide">
+  <span class="slide-num">10</span>
+  <span class="tag">Contratos</span>
+  <h2>Estrutura Contratual</h2>
+  <p class="lead" style="margin-bottom:16px;">Cláusulas essenciais dos contratos individuais de cada beneficiário.</p>
+
+  <div class="grid-3">
+    <div class="card" style="padding:20px;">
+      <h4 style="color:#22c55e;">Good / Bad Leaver</h4>
+      <p style="font-size:12px; color:#8888a0; margin-top:6px;">Good leaver mantém vested; bad leaver perde tudo (vested + unvested).</p>
+    </div>
+    <div class="card" style="padding:20px;">
+      <h4 style="color:#f59e0b;">Clawback</h4>
+      <p style="font-size:12px; color:#8888a0; margin-top:6px;">Empresa pode recuperar payouts já feitos em caso de fraude ou violação grave (até 3 anos).</p>
+    </div>
+    <div class="card" style="padding:20px;">
+      <h4 style="color:#3b82f6;">Non-Compete / Non-Solicit</h4>
+      <p style="font-size:12px; color:#8888a0; margin-top:6px;">12-24 meses de restrição. Violação aciona bad leaver e forfeiture total.</p>
+    </div>
+    <div class="card" style="padding:20px;">
+      <h4 style="color:#a855f7;">Change of Control</h4>
+      <p style="font-size:12px; color:#8888a0; margin-top:6px;">Venda da empresa = aceleração total do vesting. Payout ao valor da transação.</p>
+    </div>
+    <div class="card" style="padding:20px;">
+      <h4 style="color:#06b6d4;">Responsabilidade Tributária</h4>
+      <p style="font-size:12px; color:#8888a0; margin-top:6px;">Obrigações fiscais são do beneficiário, conforme legislação de sua residência fiscal.</p>
+    </div>
+    <div class="card" style="padding:20px;">
+      <h4 style="color:#ec4899;">Confidencialidade</h4>
+      <p style="font-size:12px; color:#8888a0; margin-top:6px;">Grant e seus termos são confidenciais. Funcionário não pode divulgar valores.</p>
+    </div>
+  </div>
+  <div class="footer"><span>Confidencial — LionX Group</span><span>10</span></div>
+</div>
+
+<!-- ========== SLIDE 12: RESUMO ========== -->
+<div class="slide" style="background: linear-gradient(135deg, #0a0a1a 0%, #1a1040 40%, #0f0a2a 100%); text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+  <span class="slide-num">11</span>
+  <span class="tag tag-green">Resumo Executivo</span>
+  <h2 style="margin-bottom:24px;">Um programa simples,<br>poderoso e escalável</h2>
+
+  <div class="grid-3" style="width:900px; margin-bottom:28px;">
+    <div class="card" style="text-align:center;">
+      <div style="font-size:28px; margin-bottom:8px;">👻</div>
+      <h4>Phantom Shares</h4>
+      <p style="font-size:11px; color:#8888a0; margin-top:6px;">Full value, cash ou ações, zero diluição</p>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div style="font-size:28px; margin-bottom:8px;">⏱️</div>
+      <h4>4 anos, vesting anual</h4>
+      <p style="font-size:11px; color:#8888a0; margin-top:6px;">25% ao ano, no aniversário do grant</p>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div style="font-size:28px; margin-bottom:8px;">💰</div>
+      <h4>2 gatilhos de liquidez</h4>
+      <p style="font-size:11px; color:#8888a0; margin-top:6px;">Evento de liquidez + recompra discricionária</p>
+    </div>
+  </div>
+
+  <div style="width:700px; text-align:left;">
+    <ul class="list" style="font-size:13px;">
+      <li><span class="ic check">✓</span> <strong>Zero complexidade societária</strong> — sem cap table, sem diluição</li>
+      <li><span class="ic check">✓</span> <strong>Funcionário entende em 30s</strong> — "X shares × valor"</li>
+      <li><span class="ic check">✓</span> <strong>Qualquer jurisdição</strong> — empresa Cayman, funcionários no mundo</li>
+      <li><span class="ic check">✓</span> <strong>Regras claras</strong> — good leaver mantém, bad leaver perde</li>
+      <li><span class="ic check">✓</span> <strong>Empresa controla liquidez</strong> — recompra é direito da empresa</li>
+      <li><span class="ic check">✓</span> <strong>Migra fácil</strong> — converte para ações reais em IPO/venda</li>
+    </ul>
+  </div>
+
+  <p style="margin-top:36px; font-size:11px; color:#444;">
+    Documento confidencial — Preparado para Anderson Chamon — LionX Group — Março 2026
+  </p>
+</div>
+
+</body>
+</html>

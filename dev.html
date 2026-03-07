@@ -192,6 +192,47 @@ body{background:var(--bg);color:var(--text);font-family:ui-sans-serif,-apple-sys
 .cat-dropdown-item{padding:8px 12px;font-size:12px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:8px;color:var(--text)}
 .cat-dropdown-item:hover{background:rgba(255,255,255,0.06)}
 .cat-dropdown-item.selected{color:var(--accent);font-weight:600}
+/* Threads */
+.threads-container{max-width:800px;margin:0 auto}
+.threads-list{display:flex;flex-direction:column;gap:12px}
+.thread-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 20px;cursor:pointer;transition:all 0.15s}
+.thread-card:hover{border-color:var(--accent);transform:translateY(-1px)}
+.thread-card-title{font-size:16px;font-weight:600;margin-bottom:4px}
+.thread-card-summary{font-size:13px;color:var(--text-muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.thread-card-meta{font-size:11px;color:var(--text-muted);margin-top:8px;display:flex;gap:12px}
+.thread-new-btn{background:var(--accent);color:#fff;border:none;padding:12px 20px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:20px}
+.thread-new-btn:hover{opacity:0.85}
+.thread-back{background:none;border:none;color:var(--accent);cursor:pointer;font-size:14px;margin-bottom:16px;padding:0;display:flex;align-items:center;gap:6px}
+.thread-back:hover{text-decoration:underline}
+.thread-detail-title{font-size:24px;font-weight:700;margin-bottom:16px;border:none;background:transparent;color:var(--text);width:100%;font-family:inherit;outline:none;padding:4px 0;border-bottom:2px solid transparent}
+.thread-detail-title:focus{border-bottom-color:var(--accent)}
+.thread-section{margin-top:24px}
+.thread-section-header{font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.thread-section-header button{background:none;border:1px dashed var(--border);color:var(--text-muted);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px}
+.thread-section-header button:hover{border-color:var(--accent);color:var(--accent)}
+.thread-summary-area{width:100%;min-height:70vh;background:transparent;border:none;border-radius:0;color:var(--text);padding:0;font-size:16px;font-family:inherit;line-height:1.8;resize:none;overflow-y:auto}
+.thread-summary-area:focus{outline:none}
+.thread-summary-area::placeholder{color:var(--text-muted)}
+.thread-att-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;font-size:13px}
+.thread-att-item a{color:var(--accent);text-decoration:none;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.thread-att-item a:hover{text-decoration:underline}
+.thread-att-item .att-type{font-size:18px;flex-shrink:0}
+.thread-att-item .att-del{background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;opacity:0;transition:opacity 0.15s}
+.thread-att-item:hover .att-del{opacity:0.6}
+.thread-note-item{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:10px;position:relative}
+.thread-note-content{font-size:14px;line-height:1.6;white-space:pre-wrap}
+.thread-note-meta{font-size:11px;color:var(--text-muted);margin-top:8px;display:flex;align-items:center;gap:12px}
+.thread-note-meta button{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:11px;padding:0}
+.thread-note-meta button:hover{color:var(--accent)}
+.thread-note-edit{width:100%;min-height:80px;background:rgba(255,255,255,0.03);border:1px solid var(--accent);border-radius:6px;color:var(--text);padding:10px;font-size:14px;font-family:inherit;line-height:1.6;resize:vertical}
+.thread-delete-btn{background:none;border:1px solid var(--red);color:var(--red);padding:8px 16px;border-radius:6px;cursor:pointer;font-size:12px;margin-top:24px}
+.thread-delete-btn:hover{background:var(--red);color:#fff}
+.thread-empty{text-align:center;padding:60px 20px;color:var(--text-muted);font-size:14px}
+.thread-add-row{display:flex;gap:8px;margin-top:8px}
+.thread-add-row input{flex:1;padding:8px 12px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-family:inherit}
+.thread-add-row input:focus{outline:none;border-color:var(--accent)}
+.thread-add-row button{padding:8px 14px;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600}
+
 @media(max-width:768px){
   .sidebar{width:260px;left:-260px}
   .sidebar-toggle{font-size:28px!important;padding:6px 10px!important}
@@ -200,6 +241,7 @@ body{background:var(--bg);color:var(--text);font-family:ui-sans-serif,-apple-sys
   .todo-cat-select{font-size:16px!important}
   .todo-cat-row{display:flex;gap:8px;align-items:center;width:100%}
   .todo-cat-select{flex:1;font-size:13px}
+  .thread-detail-title{font-size:20px}
 }
 </style>
 </head><body>
@@ -212,6 +254,9 @@ body{background:var(--bg);color:var(--text);font-family:ui-sans-serif,-apple-sys
   <div class="sidebar-item active" data-module="todo" onclick="switchModule('todo')">
     <span class="si-icon">✅</span> To-Do / GTD
     <span class="si-badge" id="todoBadge" style="display:none">0</span>
+  </div>
+  <div class="sidebar-item" data-module="threads" onclick="switchModule('threads')">
+    <span class="si-icon">🧵</span> Threads
   </div>
   <div class="sidebar-item" data-module="orgchart" onclick="switchModule('orgchart')">
     <span class="si-icon">👥</span> Organograma
@@ -260,6 +305,46 @@ body{background:var(--bg);color:var(--text);font-family:ui-sans-serif,-apple-sys
       </div>
     </div>
     <div id="todoList"></div>
+  </div>
+</div>
+
+<!-- Threads View -->
+<div class="container" id="threadsView" style="display:none">
+  <div class="threads-container">
+    <!-- List view -->
+    <div id="threadsListView">
+      <button class="thread-new-btn" onclick="createThread()">+ Nova Thread</button>
+      <div class="threads-list" id="threadsList"></div>
+    </div>
+    <!-- Detail view -->
+    <div id="threadsDetailView" style="display:none">
+      <button class="thread-back" onclick="showThreadsList()">← Voltar</button>
+      <input type="text" class="thread-detail-title" id="threadTitle" onblur="saveThreadTitle()" onkeydown="if(event.key==='Enter')this.blur()">
+      <div style="margin-top:8px;">
+        <textarea class="thread-summary-area" id="threadSummary" onblur="saveThreadSummary()" placeholder="Comece a escrever..."></textarea>
+      </div>
+      <div class="thread-section">
+        <div class="thread-section-header">📎 Documentos <button onclick="showAddAttachment()">+ Adicionar</button></div>
+        <div id="threadAttachments"></div>
+        <div id="addAttachmentRow" style="display:none" class="thread-add-row">
+          <input type="text" id="attLabel" placeholder="Nome do documento">
+          <input type="text" id="attUrl" placeholder="URL">
+          <button onclick="addAttachment()">Add</button>
+        </div>
+      </div>
+      <div class="thread-section">
+        <div class="thread-section-header">💬 Notas <button onclick="showAddNote()">+ Adicionar</button></div>
+        <div id="threadNotes"></div>
+        <div id="addNoteRow" style="display:none">
+          <textarea class="thread-note-edit" id="newNoteContent" placeholder="Escreva uma nota..."></textarea>
+          <div style="display:flex;gap:8px;margin-top:6px">
+            <button style="padding:6px 14px;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px" onclick="addNote()">Salvar</button>
+            <button style="padding:6px 14px;background:var(--border);color:var(--text);border:none;border-radius:6px;cursor:pointer;font-size:13px" onclick="document.getElementById('addNoteRow').style.display='none'">Cancelar</button>
+          </div>
+        </div>
+      </div>
+      <button class="thread-delete-btn" onclick="deleteThread()">🗑️ Excluir Thread</button>
+    </div>
   </div>
 </div>
 
@@ -970,11 +1055,13 @@ function switchModule(mod){
   document.querySelectorAll('.sidebar-item').forEach(el => el.classList.toggle('active', el.dataset.module === mod));
   document.getElementById('container').style.display = mod === 'orgchart' ? '' : 'none';
   document.getElementById('todoView').style.display = mod === 'todo' ? '' : 'none';
+  document.getElementById('threadsView').style.display = mod === 'threads' ? '' : 'none';
   document.getElementById('orgLegend').style.display = mod === 'orgchart' ? '' : 'none';
   document.getElementById('orgButtons').style.display = mod === 'orgchart' ? '' : 'none';
-  const titles = {orgchart:'LionX — Organograma', todo:'LionX — To-Do / GTD', financeiro:'LionX — Financeiro', docs:'LionX — Documentos'};
+  const titles = {orgchart:'LionX — Organograma', todo:'LionX — To-Do / GTD', threads:'LionX — Threads', financeiro:'LionX — Financeiro', docs:'LionX — Documentos'};
   document.getElementById('toolbarTitle').textContent = titles[mod] || titles.orgchart;
   if(mod === 'todo') renderTodos();
+  if(mod === 'threads') loadThreads();
   if(mod === 'orgchart'){ requestAnimationFrame(()=>{ drawAllLines(); setTimeout(drawAllLines,100); }); }
 }
 
@@ -1445,6 +1532,214 @@ function handleItemDrop(sourceId, targetId, position){
 // Re-init drag after each render
 const origRenderTodos = renderTodos;
 renderTodos = function(){ origRenderTodos(); initDrag(); };
+
+// ===== THREADS =====
+let threadsData = [];
+let currentThread = null;
+
+async function loadThreads(){
+  try {
+    const r = await fetch('/api/threads');
+    threadsData = await r.json();
+    renderThreadsList();
+  } catch(e){ console.error('loadThreads',e); }
+}
+
+function renderThreadsList(){
+  document.getElementById('threadsListView').style.display = '';
+  document.getElementById('threadsDetailView').style.display = 'none';
+  const el = document.getElementById('threadsList');
+  if(!threadsData.length){
+    el.innerHTML = '<div class="thread-empty">Nenhuma thread ainda. Crie a primeira!</div>';
+    return;
+  }
+  el.innerHTML = threadsData.map(t => {
+    const date = new Date(t.updated_at+'Z');
+    const fmt = date.toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
+    const preview = (t.summary||'').replace(/[#*_\n]/g,' ').substring(0,120);
+    return `<div class="thread-card" onclick="openThread(${t.id})">
+      <div class="thread-card-title">${esc(t.title)}</div>
+      <div class="thread-card-summary">${esc(preview)}${preview.length>=120?'...':''}</div>
+      <div class="thread-card-meta">
+        <span>📎 ${t.attachment_count||0}</span>
+        <span>💬 ${t.note_count||0}</span>
+        <span>${fmt}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function esc(s){ if(!s) return ''; const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+async function openThread(id){
+  try {
+    const r = await fetch('/api/threads/'+id);
+    currentThread = await r.json();
+    renderThreadDetail();
+  } catch(e){ console.error('openThread',e); }
+}
+
+function renderThreadDetail(){
+  document.getElementById('threadsListView').style.display = 'none';
+  document.getElementById('threadsDetailView').style.display = '';
+  const t = currentThread;
+  document.getElementById('threadTitle').value = t.title;
+  document.getElementById('threadSummary').value = t.summary||'';
+  autoResizeSummary();
+  // Attachments
+  const attEl = document.getElementById('threadAttachments');
+  if(!t.attachments.length){
+    attEl.innerHTML = '<div style="font-size:13px;color:var(--text-muted);padding:8px 0">Nenhum documento anexado.</div>';
+  } else {
+    attEl.innerHTML = t.attachments.map(a => {
+      const icon = a.type==='pdf'?'📄':'🔗';
+      return `<div class="thread-att-item">
+        <span class="att-type">${icon}</span>
+        <a href="${esc(a.url)}" target="_blank">${esc(a.label)}</a>
+        <button class="att-del" onclick="event.stopPropagation();deleteAttachment(${a.id})">✕</button>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('addAttachmentRow').style.display = 'none';
+  // Notes
+  const notesEl = document.getElementById('threadNotes');
+  if(!t.notes.length){
+    notesEl.innerHTML = '<div style="font-size:13px;color:var(--text-muted);padding:8px 0">Nenhuma nota ainda.</div>';
+  } else {
+    notesEl.innerHTML = t.notes.map(n => {
+      const date = new Date(n.created_at+'Z');
+      const fmt = date.toLocaleDateString('pt-BR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+      return `<div class="thread-note-item" id="note-${n.id}">
+        <div class="thread-note-content" id="note-content-${n.id}">${esc(n.content)}</div>
+        <div class="thread-note-meta">
+          <span>${fmt}</span>
+          <button onclick="editNote(${n.id})">✏️ Editar</button>
+          <button onclick="deleteNote(${n.id})" style="color:var(--red)">🗑️</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('addNoteRow').style.display = 'none';
+}
+
+function autoResizeSummary(){
+  const el = document.getElementById('threadSummary');
+  if(!el) return;
+  // Only grow, never shrink while typing (prevents jump)
+  const needed = el.scrollHeight;
+  const min = window.innerHeight * 0.5;
+  const target = Math.max(needed, min);
+  if(target > el.offsetHeight){
+    el.style.height = target + 'px';
+  }
+}
+
+function showThreadsList(){
+  currentThread = null;
+  loadThreads();
+}
+
+async function createThread(){
+  const title = prompt('Nome da thread:');
+  if(!title) return;
+  try {
+    const r = await fetch('/api/threads',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title})});
+    const data = await r.json();
+    if(data.ok) openThread(data.id);
+  } catch(e){ console.error('createThread',e); }
+}
+
+async function saveThreadTitle(){
+  if(!currentThread) return;
+  const title = document.getElementById('threadTitle').value.trim();
+  if(!title || title === currentThread.title) return;
+  try {
+    await fetch('/api/threads/'+currentThread.id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({title})});
+    currentThread.title = title;
+  } catch(e){ console.error('saveThreadTitle',e); }
+}
+
+async function saveThreadSummary(){
+  if(!currentThread) return;
+  const summary = document.getElementById('threadSummary').value;
+  if(summary === currentThread.summary) return;
+  try {
+    await fetch('/api/threads/'+currentThread.id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({summary})});
+    currentThread.summary = summary;
+  } catch(e){ console.error('saveThreadSummary',e); }
+}
+
+async function deleteThread(){
+  if(!currentThread) return;
+  if(!confirm('Excluir thread "'+currentThread.title+'"?')) return;
+  try {
+    await fetch('/api/threads/'+currentThread.id,{method:'DELETE'});
+    showThreadsList();
+  } catch(e){ console.error('deleteThread',e); }
+}
+
+function showAddAttachment(){ document.getElementById('addAttachmentRow').style.display='flex'; document.getElementById('attLabel').focus(); }
+
+async function addAttachment(){
+  const label = document.getElementById('attLabel').value.trim();
+  const url = document.getElementById('attUrl').value.trim();
+  if(!label||!url) return;
+  const type = url.toLowerCase().endsWith('.pdf')?'pdf':'link';
+  try {
+    await fetch('/api/threads/'+currentThread.id+'/attachments',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({label,url,type})});
+    document.getElementById('attLabel').value='';
+    document.getElementById('attUrl').value='';
+    openThread(currentThread.id);
+  } catch(e){ console.error('addAttachment',e); }
+}
+
+async function deleteAttachment(id){
+  try {
+    await fetch('/api/threads/attachments/'+id,{method:'DELETE'});
+    openThread(currentThread.id);
+  } catch(e){ console.error('deleteAttachment',e); }
+}
+
+function showAddNote(){ document.getElementById('addNoteRow').style.display=''; document.getElementById('newNoteContent').focus(); }
+
+async function addNote(){
+  const content = document.getElementById('newNoteContent').value.trim();
+  if(!content) return;
+  try {
+    await fetch('/api/threads/'+currentThread.id+'/notes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content})});
+    document.getElementById('newNoteContent').value='';
+    openThread(currentThread.id);
+  } catch(e){ console.error('addNote',e); }
+}
+
+function editNote(id){
+  const el = document.getElementById('note-content-'+id);
+  const current = currentThread.notes.find(n=>n.id===id);
+  if(!current) return;
+  const noteItem = document.getElementById('note-'+id);
+  noteItem.innerHTML = `<textarea class="thread-note-edit" id="edit-note-${id}">${esc(current.content)}</textarea>
+    <div style="display:flex;gap:8px;margin-top:6px">
+      <button style="padding:6px 14px;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px" onclick="saveNote(${id})">Salvar</button>
+      <button style="padding:6px 14px;background:var(--border);color:var(--text);border:none;border-radius:6px;cursor:pointer;font-size:13px" onclick="openThread(${currentThread.id})">Cancelar</button>
+    </div>`;
+}
+
+async function saveNote(id){
+  const content = document.getElementById('edit-note-'+id).value.trim();
+  if(!content) return;
+  try {
+    await fetch('/api/threads/notes/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({content})});
+    openThread(currentThread.id);
+  } catch(e){ console.error('saveNote',e); }
+}
+
+async function deleteNote(id){
+  if(!confirm('Excluir esta nota?')) return;
+  try {
+    await fetch('/api/threads/notes/'+id,{method:'DELETE'});
+    openThread(currentThread.id);
+  } catch(e){ console.error('deleteNote',e); }
+}
 
 // PWA Service Worker
 if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js').catch(()=>{}); }
