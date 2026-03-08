@@ -129,6 +129,30 @@ body{background:var(--bg);color:var(--text);font-family:ui-sans-serif,-apple-sys
 .modal .add-resp-btn{background:transparent;border:1px dashed var(--border);color:var(--text-muted);padding:6px 12px;border-radius:4px;cursor:pointer;font-size:12px;margin-top:4px}
 .modal .add-resp-btn:hover{border-color:var(--accent);color:var(--accent)}
 
+/* Pessoal */
+.pessoal-container{max-width:800px;margin:0 auto;padding:20px}
+.pessoal-card{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px}
+.pessoal-card-title{font-size:18px;font-weight:700;color:#fff;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.pessoal-card-subtitle{font-size:13px;color:var(--text-muted);margin-bottom:12px}
+.pessoal-progress-bar{width:100%;height:8px;background:rgba(255,255,255,0.08);border-radius:4px;overflow:hidden;margin:12px 0}
+.pessoal-progress-fill{height:100%;border-radius:4px;transition:width 0.3s ease}
+.pessoal-week-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px;margin-top:12px}
+.pessoal-week-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);font-size:13px;color:var(--text)}
+.pessoal-week-item.done{opacity:0.5;text-decoration:line-through}
+.pessoal-week-item.current{border-color:var(--accent);background:rgba(99,102,241,0.08)}
+.pessoal-week-item input[type="checkbox"]{-webkit-appearance:none;appearance:none;width:20px;height:20px;border:2px solid rgba(255,255,255,0.35);border-radius:4px;cursor:pointer;flex-shrink:0;background:transparent;position:relative;transition:all 0.15s}
+.pessoal-week-item input[type="checkbox"]:checked{border-color:#22c55e;background:#22c55e}
+.pessoal-week-item input[type="checkbox"]:checked::after{content:'✓';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:12px;font-weight:700}
+.pessoal-timeline{display:flex;gap:0;margin:16px 0;overflow-x:auto}
+.pessoal-phase{flex:1;min-width:80px;text-align:center;padding:12px 8px;border:1px solid var(--border);font-size:11px;color:var(--text-muted);position:relative}
+.pessoal-phase:first-child{border-radius:8px 0 0 8px}
+.pessoal-phase:last-child{border-radius:0 8px 8px 0}
+.pessoal-phase.active{background:rgba(99,102,241,0.15);border-color:var(--accent);color:#fff;font-weight:600}
+.pessoal-phase.completed{background:rgba(34,197,94,0.1);border-color:#22c55e;color:#22c55e}
+.pessoal-phase-label{font-size:10px;margin-top:4px;color:var(--text-muted)}
+.pessoal-phase.active .pessoal-phase-label{color:rgba(255,255,255,0.7)}
+.pessoal-section-title{font-size:15px;font-weight:600;color:var(--text);margin:24px 0 12px;display:flex;align-items:center;gap:8px}
+
 /* Sidebar */
 .sidebar-toggle{background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:4px 8px;border-radius:6px;line-height:1}
 .sidebar-toggle:hover{background:var(--border)}
@@ -261,11 +285,8 @@ body{background:var(--bg);color:var(--text);font-family:ui-sans-serif,-apple-sys
   <div class="sidebar-item" data-module="orgchart" onclick="switchModule('orgchart')">
     <span class="si-icon">👥</span> Organograma
   </div>
-  <div class="sidebar-item" data-module="financeiro" onclick="switchModule('financeiro')" style="opacity:0.4;pointer-events:none">
-    <span class="si-icon">💰</span> Financeiro <span style="font-size:10px;color:var(--text-muted);margin-left:auto">em breve</span>
-  </div>
-  <div class="sidebar-item" data-module="docs" onclick="switchModule('docs')" style="opacity:0.4;pointer-events:none">
-    <span class="si-icon">📄</span> Documentos <span style="font-size:10px;color:var(--text-muted);margin-left:auto">em breve</span>
+  <div class="sidebar-item" data-module="pessoal" onclick="switchModule('pessoal')">
+    <span class="si-icon">🩺</span> Pessoal
   </div>
 </nav>
 
@@ -306,6 +327,11 @@ body{background:var(--bg);color:var(--text);font-family:ui-sans-serif,-apple-sys
     </div>
     <div id="todoList"></div>
   </div>
+</div>
+
+<!-- Pessoal View -->
+<div class="container" id="pessoalView" style="display:none">
+  <div class="pessoal-container" id="pessoalContent"></div>
 </div>
 
 <!-- Threads View -->
@@ -1048,19 +1074,49 @@ init();
 // ===== SIDEBAR =====
 let currentModule = 'todo';
 function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('active'); }
+function openSidebar(){ document.getElementById('sidebar').classList.add('open'); document.getElementById('sidebarOverlay').classList.add('active'); }
 function closeSidebar(){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('active'); }
+
+// Swipe to open/close sidebar
+(function(){
+  let touchStartX = 0, touchStartY = 0, swiping = false;
+  const EDGE_ZONE = 30; // px from left edge to trigger open
+  const SWIPE_MIN = 60; // min px to count as swipe
+  document.addEventListener('touchstart', function(e){
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    const sidebarOpen = document.getElementById('sidebar').classList.contains('open');
+    // Allow swipe-right from left edge (open) or swipe-left anywhere when open (close)
+    swiping = (!sidebarOpen && touchStartX < EDGE_ZONE) || sidebarOpen;
+  }, {passive:true});
+  document.addEventListener('touchend', function(e){
+    if(!swiping) return;
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const dy = Math.abs(e.changedTouches[0].clientY - touchStartY);
+    if(dy > Math.abs(dx)) { swiping = false; return; } // vertical scroll, ignore
+    const sidebarOpen = document.getElementById('sidebar').classList.contains('open');
+    if(!sidebarOpen && dx > SWIPE_MIN && touchStartX < EDGE_ZONE){
+      openSidebar();
+    } else if(sidebarOpen && dx < -SWIPE_MIN){
+      closeSidebar();
+    }
+    swiping = false;
+  }, {passive:true});
+})();
 function switchModule(mod){
   currentModule = mod;
   closeSidebar();
   document.querySelectorAll('.sidebar-item').forEach(el => el.classList.toggle('active', el.dataset.module === mod));
   document.getElementById('container').style.display = mod === 'orgchart' ? '' : 'none';
   document.getElementById('todoView').style.display = mod === 'todo' ? '' : 'none';
+  document.getElementById('pessoalView').style.display = mod === 'pessoal' ? '' : 'none';
   document.getElementById('threadsView').style.display = mod === 'threads' ? '' : 'none';
   document.getElementById('orgLegend').style.display = mod === 'orgchart' ? '' : 'none';
   document.getElementById('orgButtons').style.display = mod === 'orgchart' ? '' : 'none';
-  const titles = {orgchart:'LionX — Organograma', todo:'LionX — To-Do / GTD', threads:'LionX — Threads', financeiro:'LionX — Financeiro', docs:'LionX — Documentos'};
+  const titles = {orgchart:'LionX — Organograma', todo:'LionX — To-Do / GTD', pessoal:'Pessoal', threads:'LionX — Threads', financeiro:'LionX — Financeiro', docs:'LionX — Documentos'};
   document.getElementById('toolbarTitle').textContent = titles[mod] || titles.orgchart;
   if(mod === 'todo') renderTodos();
+  if(mod === 'pessoal') renderPessoal();
   if(mod === 'threads') loadThreads();
   if(mod === 'orgchart'){ requestAnimationFrame(()=>{ drawAllLines(); setTimeout(drawAllLines,100); }); }
 }
@@ -1532,6 +1588,244 @@ function handleItemDrop(sourceId, targetId, position){
 // Re-init drag after each render
 const origRenderTodos = renderTodos;
 renderTodos = function(){ origRenderTodos(); initDrag(); };
+
+// ===== PESSOAL =====
+
+const PESSOAL_CONFIG = {
+  vitD3: {
+    start: new Date('2026-03-08'),
+    weeks: 8,
+    label: 'Vitamina D3 50.000 UI',
+    instructions: '1x/semana no almoço com comida gordurosa',
+    color: '#f59e0b'
+  },
+  desmamePPI: {
+    start: new Date('2026-03-09'),
+    phases: [
+      { label: 'Fase 1', dose: '30mg', weeks: 4, desc: 'Dexilant 30mg/dia' },
+      { label: 'Fase 2', dose: '15mg', weeks: 4, desc: '15mg manipulado + Gaviscon' },
+      { label: 'Fase 3', dose: 'Alt.', weeks: 6, desc: '15mg dias alternados' },
+      { label: 'Fase 4', dose: 'Famot.', weeks: 4, desc: 'Parar PPI → famotidina 20mg 2x/dia' },
+      { label: 'Fase 5', dose: 'Reduz', weeks: 8, desc: 'Famotidina 20→10mg' },
+      { label: 'Fase 6', dose: 'Zero', weeks: 0, desc: 'Sem medicação' }
+    ],
+    color: '#818cf8'
+  }
+};
+
+function getPPICurrentPhase(){
+  const now = new Date();
+  const start = PESSOAL_CONFIG.desmamePPI.start;
+  const diffWeeks = Math.max(0, (now - start) / (7*24*60*60*1000));
+  let accum = 0;
+  for(let i = 0; i < PESSOAL_CONFIG.desmamePPI.phases.length; i++){
+    accum += PESSOAL_CONFIG.desmamePPI.phases[i].weeks;
+    if(diffWeeks < accum || i === PESSOAL_CONFIG.desmamePPI.phases.length - 1) return i;
+  }
+  return 0;
+}
+
+async function renderPessoal(){
+  // Fetch todos for vitamin D3 checklist
+  let vitTodos = [];
+  let otherPessoal = [];
+  try {
+    const r = await fetch(API_URL + '/api/todos', {credentials:'include'});
+    if(r.ok){
+      const all = await r.json();
+      const pessoal = all.filter(t => t.category === 'Pessoal');
+      vitTodos = pessoal.filter(t => t.text.includes('Vitamina D3'));
+      otherPessoal = pessoal.filter(t => !t.text.includes('Vitamina D3') && !t.done);
+    }
+  } catch(e){}
+
+  // Sort vitamin todos by week number
+  vitTodos.sort((a,b) => {
+    const wa = (a.text.match(/Semana (\d)/)||[0,0])[1];
+    const wb = (b.text.match(/Semana (\d)/)||[0,0])[1];
+    return wa - wb;
+  });
+
+  const cfg = PESSOAL_CONFIG.vitD3;
+  const now = new Date();
+  const weeksSinceStart = Math.max(0, Math.floor((now - cfg.start) / (7*24*60*60*1000)));
+  const currentWeek = Math.min(weeksSinceStart + 1, cfg.weeks);
+  const doneCount = vitTodos.filter(t => t.done).length;
+  const progressPct = Math.round((doneCount / cfg.weeks) * 100);
+
+  // PPI phase
+  const ppiPhaseIdx = getPPICurrentPhase();
+  const ppiCfg = PESSOAL_CONFIG.desmamePPI;
+  const ppiWeeks = Math.max(0, Math.floor((now - ppiCfg.start) / (7*24*60*60*1000)));
+  const ppiTotalWeeks = ppiCfg.phases.reduce((s,p) => s + p.weeks, 0);
+  const ppiPct = Math.min(100, Math.round((ppiWeeks / ppiTotalWeeks) * 100));
+
+  let html = '';
+
+  // === Desmame PPI Card ===
+  // Calculate start/end dates for each phase
+  const ppiPhaseDates = [];
+  let phaseStart = new Date(ppiCfg.start);
+  for(const p of ppiCfg.phases){
+    const end = p.weeks > 0 ? new Date(phaseStart.getTime() + p.weeks * 7 * 24*60*60*1000) : null;
+    ppiPhaseDates.push({ start: new Date(phaseStart), end });
+    if(end) phaseStart = end;
+  }
+  const fmtShort = d => d ? d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}) : '';
+  const totalEndDate = ppiPhaseDates[ppiPhaseDates.length - 2]?.end; // last phase with actual end
+
+  html += `<div class="pessoal-card">
+    <div class="pessoal-card-title">💊 Desmame PPI (Dexilant)</div>
+    <div class="pessoal-card-subtitle">Início: 09/03/2026 — Previsão término: ${totalEndDate ? fmtShort(totalEndDate) : '~set/2026'} — Semana ${ppiWeeks + 1} de ${ppiTotalWeeks}</div>
+    <div class="pessoal-progress-bar">
+      <div class="pessoal-progress-fill" style="width:${ppiPct}%;background:${ppiCfg.color}"></div>
+    </div>
+    <div class="pessoal-timeline">`;
+
+  for(let i = 0; i < ppiCfg.phases.length; i++){
+    const p = ppiCfg.phases[i];
+    const pd = ppiPhaseDates[i];
+    const cls = i < ppiPhaseIdx ? 'completed' : (i === ppiPhaseIdx ? 'active' : '');
+    const dateRange = pd.end ? `${fmtShort(pd.start)} → ${fmtShort(pd.end)}` : `${fmtShort(pd.start)} →`;
+    html += `<div class="pessoal-phase ${cls}" title="${p.desc}">
+      <div>${p.label}</div>
+      <div style="font-weight:700;font-size:13px;margin:4px 0">${p.dose}</div>
+      <div class="pessoal-phase-label">${p.weeks ? p.weeks+'sem' : '∞'}</div>
+      <div style="font-size:9px;margin-top:3px;color:${cls==='active'?'rgba(255,255,255,0.6)':'var(--text-muted)'}">${dateRange}</div>
+    </div>`;
+  }
+
+  html += `</div>
+    <div style="margin-top:12px;padding:10px 14px;background:rgba(99,102,241,0.08);border-radius:8px;font-size:13px;color:var(--text)">
+      <strong>Fase atual:</strong> ${ppiCfg.phases[ppiPhaseIdx].desc}<br>
+      <span style="font-size:12px;color:var(--text-muted)">Período: ${fmtShort(ppiPhaseDates[ppiPhaseIdx].start)} → ${ppiPhaseDates[ppiPhaseIdx].end ? fmtShort(ppiPhaseDates[ppiPhaseIdx].end) : '—'}</span>
+    </div>
+  </div>`;
+
+  // === Dieta Acid Watcher ===
+  html += `<div class="pessoal-card">
+    <div class="pessoal-card-title">🥗 Dieta Acid Watcher (durante o desmame)</div>
+    <div class="pessoal-card-subtitle">Baseada no protocolo do Dr. Jonathan Aviv — evitar alimentos ácidos e irritantes</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px">
+      <div style="background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:10px;padding:14px">
+        <div style="font-weight:700;color:#22c55e;margin-bottom:10px;font-size:14px">✅ Pode comer</div>
+
+        <div style="font-size:12px;font-weight:600;color:var(--text);margin:8px 0 4px">Proteínas</div>
+        <div style="font-size:12px;color:var(--text-muted);line-height:1.6">Frango, peru (s/ pele), peixe (salmão, tilápia), camarão, ovos, tofu</div>
+
+        <div style="font-size:12px;font-weight:600;color:var(--text);margin:8px 0 4px">Vegetais</div>
+        <div style="font-size:12px;color:var(--text-muted);line-height:1.6">Espinafre, couve, brócolis, couve-flor, abobrinha, pepino, beterraba, cenoura, batata doce, aspargos, gengibre</div>
+
+        <div style="font-size:12px;font-weight:600;color:var(--text);margin:8px 0 4px">Frutas (baixa acidez)</div>
+        <div style="font-size:12px;color:var(--text-muted);line-height:1.6">Banana, melão, melancia, mamão, pera, coco</div>
+
+        <div style="font-size:12px;font-weight:600;color:var(--text);margin:8px 0 4px">Grãos</div>
+        <div style="font-size:12px;color:var(--text-muted);line-height:1.6">Aveia, arroz integral, quinoa, pão integral</div>
+
+        <div style="font-size:12px;font-weight:600;color:var(--text);margin:8px 0 4px">Gorduras boas</div>
+        <div style="font-size:12px;color:var(--text-muted);line-height:1.6">Azeite extra virgem, abacate (moderação), nozes, castanhas, amêndoas</div>
+
+        <div style="font-size:12px;font-weight:600;color:var(--text);margin:8px 0 4px">Laticínios</div>
+        <div style="font-size:12px;color:var(--text-muted);line-height:1.6">Queijo feta, parmesão (pouco), leite de amêndoa/aveia (s/ açúcar)</div>
+
+        <div style="font-size:12px;font-weight:600;color:var(--text);margin:8px 0 4px">Temperos</div>
+        <div style="font-size:12px;color:var(--text-muted);line-height:1.6">Gengibre, manjericão, salsa, coentro, orégano, cúrcuma, sal</div>
+      </div>
+
+      <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:10px;padding:14px">
+        <div style="font-weight:700;color:#ef4444;margin-bottom:10px;font-size:14px">🚫 Evitar</div>
+
+        <div style="font-size:12px;color:var(--text-muted);line-height:2">
+          ☕ Café e chá preto/verde<br>
+          🍅 Tomate e molho de tomate<br>
+          🍋 Cítricos (limão, laranja, abacaxi)<br>
+          🧅 Cebola crua e alho cru<br>
+          🌶️ Pimenta e picantes<br>
+          🍫 Chocolate<br>
+          🍬 Menta / hortelã<br>
+          🥤 Refrigerante e gaseificados<br>
+          🍷 Álcool (todos)<br>
+          🫗 Vinagre (todos)<br>
+          🍟 Fritura<br>
+          🥫 Processados<br>
+          🧃 Sucos de fruta (mesmo natural)<br>
+          🫙 Ketchup, mostarda, molho de soja<br>
+          🥛 Leite de vaca (Fase 1)
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:12px;padding:10px 14px;background:rgba(255,255,255,0.03);border-radius:8px;font-size:12px;color:var(--text-muted)">
+      💡 <strong>Dica:</strong> Última refeição 3-4h antes de deitar · Cabeceira elevada 15-20cm · Gaviscon Advance após refeições
+    </div>
+  </div>`;
+
+  // === Other personal reminders ===
+  if(otherPessoal.length > 0){
+    html += `<div class="pessoal-section-title">📋 Outros Lembretes</div>`;
+    for(const t of otherPessoal){
+      html += `<div class="pessoal-week-item">
+        <input type="checkbox" onclick="togglePessoalTodo(${t.id})">
+        <span>${escHtml(t.text)}</span>
+      </div>`;
+    }
+  }
+
+  // === Vitamina D3 Card ===
+  html += `<div class="pessoal-card">
+    <div class="pessoal-card-title">☀️ ${cfg.label}</div>
+    <div class="pessoal-card-subtitle">${cfg.instructions} — Semana ${currentWeek} de ${cfg.weeks}</div>
+    <div class="pessoal-progress-bar">
+      <div class="pessoal-progress-fill" style="width:${progressPct}%;background:${cfg.color}"></div>
+    </div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">${doneCount}/${cfg.weeks} doses tomadas (${progressPct}%)</div>
+    <div class="pessoal-week-grid">`;
+
+  for(let i = 0; i < cfg.weeks; i++){
+    const weekNum = i + 1;
+    const todo = vitTodos.find(t => t.text.includes(`Semana ${weekNum}/`));
+    const isDone = todo && todo.done;
+    const isCurrent = weekNum === currentWeek && !isDone;
+    const dateStr = todo ? (todo.text.match(/\((\d{2}\/\d{2})\)/)||['',''])[1] : '';
+    const cls = isDone ? 'done' : (isCurrent ? 'current' : '');
+    html += `<div class="pessoal-week-item ${cls}">
+      <input type="checkbox" ${isDone?'checked':''} onclick="togglePessoalVitD(${todo?todo.id:0},${isDone?1:0})">
+      <span>Semana ${weekNum}${dateStr ? ' — '+dateStr : ''}</span>
+    </div>`;
+  }
+
+  html += `</div></div>`;
+
+  document.getElementById('pessoalContent').innerHTML = html;
+}
+
+async function togglePessoalVitD(id, wasDone){
+  if(!id) return;
+  const newDone = wasDone ? 0 : 1;
+  try {
+    await fetch(API_URL + '/api/todos/' + id, {
+      method:'PUT', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({done: newDone}), credentials:'include'
+    });
+  } catch(e){}
+  // Update local todos array too
+  const t = todos.find(x => x.id === id);
+  if(t){ t.done = newDone; t.completed_at = newDone ? new Date().toISOString() : null; saveTodosLocal(); }
+  renderPessoal();
+}
+
+async function togglePessoalTodo(id){
+  try {
+    await fetch(API_URL + '/api/todos/' + id, {
+      method:'PUT', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({done: 1}), credentials:'include'
+    });
+  } catch(e){}
+  const t = todos.find(x => x.id === id);
+  if(t){ t.done = 1; t.completed_at = new Date().toISOString(); saveTodosLocal(); }
+  renderPessoal();
+}
 
 // ===== THREADS =====
 let threadsData = [];
