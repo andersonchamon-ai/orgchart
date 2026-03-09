@@ -1703,17 +1703,17 @@ async function renderPessoal(){
     </div>
   </div>`;
 
-  // === Dieta Acid Watcher ===
+  // === Dieta Unificada ===
   html += `<div class="pessoal-card">
-    <div class="pessoal-card-title">🥗 Dieta Acid Watcher (durante o desmame)</div>
-    <div class="pessoal-card-subtitle">Baseada no protocolo do Dr. Jonathan Aviv — evitar alimentos ácidos e irritantes</div>
+    <div class="pessoal-card-title">🥗 Dieta Anti-Refluxo (durante o desmame)</div>
+    <div class="pessoal-card-subtitle">Cruzamento: Acid Watcher (Dr. Aviv) + Silent Reflux (Don Daniels) — regra mais conservadora prevalece</div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px">
       <div style="background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:10px;padding:14px">
         <div style="font-weight:700;color:#22c55e;margin-bottom:10px;font-size:14px">✅ Pode comer</div>
 
         <div style="font-size:12px;font-weight:600;color:var(--text);margin:8px 0 4px">Proteínas</div>
-        <div style="font-size:12px;color:var(--text-muted);line-height:1.6">Frango, peru (s/ pele), peixe (salmão, tilápia), camarão, ovos, tofu</div>
+        <div style="font-size:12px;color:var(--text-muted);line-height:1.6">Frango, peru (s/ pele, grelhado), peixe (salmão, tilápia), camarão, ovos, tofu</div>
 
         <div style="font-size:12px;font-weight:600;color:var(--text);margin:8px 0 4px">Vegetais</div>
         <div style="font-size:12px;color:var(--text-muted);line-height:1.6">Espinafre, couve, brócolis, couve-flor, abobrinha, pepino, beterraba, cenoura, batata doce, aspargos, gengibre</div>
@@ -1722,16 +1722,19 @@ async function renderPessoal(){
         <div style="font-size:12px;color:var(--text-muted);line-height:1.6">Banana, melão, melancia, mamão, pera, coco</div>
 
         <div style="font-size:12px;font-weight:600;color:var(--text);margin:8px 0 4px">Grãos</div>
-        <div style="font-size:12px;color:var(--text-muted);line-height:1.6">Aveia, arroz integral, quinoa, pão integral</div>
+        <div style="font-size:12px;color:var(--text-muted);line-height:1.6">Aveia, arroz integral, quinoa, pão integral (s/ conservantes ácidos)</div>
 
-        <div style="font-size:12px;font-weight:600;color:var(--text);margin:8px 0 4px">Gorduras boas</div>
-        <div style="font-size:12px;color:var(--text-muted);line-height:1.6">Azeite extra virgem, abacate (moderação), nozes, castanhas, amêndoas</div>
+        <div style="font-size:12px;font-weight:600;color:var(--text);margin:8px 0 4px">Gorduras boas ⚠️ moderação</div>
+        <div style="font-size:12px;color:var(--text-muted);line-height:1.6">Azeite extra virgem (pouco), abacate, nozes, castanhas, amêndoas, pasta de amendoim integral</div>
 
         <div style="font-size:12px;font-weight:600;color:var(--text);margin:8px 0 4px">Laticínios</div>
-        <div style="font-size:12px;color:var(--text-muted);line-height:1.6">Queijo feta, parmesão (pouco), leite de amêndoa/aveia (s/ açúcar)</div>
+        <div style="font-size:12px;color:var(--text-muted);line-height:1.6">Queijo feta, parmesão (pouco), queijo de castanha (s/ limão/vinagre), leite de amêndoa/aveia (s/ açúcar)</div>
+
+        <div style="font-size:12px;font-weight:600;color:var(--text);margin:8px 0 4px">Fibras (35-50g/dia)</div>
+        <div style="font-size:12px;color:var(--text-muted);line-height:1.6">Leguminosas (lentilha, grão-de-bico, feijão), vegetais e frutas da lista</div>
 
         <div style="font-size:12px;font-weight:600;color:var(--text);margin:8px 0 4px">Temperos</div>
-        <div style="font-size:12px;color:var(--text-muted);line-height:1.6">Gengibre, manjericão, salsa, coentro, orégano, cúrcuma, sal</div>
+        <div style="font-size:12px;color:var(--text-muted);line-height:1.6">Gengibre, manjericão, salsa, coentro, orégano, cúrcuma, sal, missô</div>
       </div>
 
       <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:10px;padding:14px">
@@ -1744,21 +1747,22 @@ async function renderPessoal(){
           🧅 Cebola crua e alho cru<br>
           🌶️ Pimenta e picantes<br>
           🍫 Chocolate<br>
-          🍬 Menta / hortelã<br>
+          🍬 Menta / hortelã / açúcar<br>
           🥤 Refrigerante e gaseificados<br>
           🍷 Álcool (todos)<br>
-          🫗 Vinagre (todos)<br>
-          🍟 Fritura<br>
+          🫗 Vinagre (todos os tipos)<br>
+          🍟 Fritura e gordura em excesso<br>
           🥫 Processados<br>
           🧃 Sucos de fruta (mesmo natural)<br>
           🫙 Ketchup, mostarda, molho de soja<br>
-          🥛 Leite de vaca (Fase 1)
+          🥛 Leite de vaca (Fase 1)<br>
+          🍞 Pão branco / pão francês
         </div>
       </div>
     </div>
 
     <div style="margin-top:12px;padding:10px 14px;background:rgba(255,255,255,0.03);border-radius:8px;font-size:12px;color:var(--text-muted)">
-      💡 <strong>Dica:</strong> Última refeição 3-4h antes de deitar · Cabeceira elevada 15-20cm · Gaviscon Advance após refeições
+      💡 <strong>Hábitos:</strong> Mastigar 32x · Última refeição 3-4h antes de deitar · Cabeceira elevada 15-20cm · Dormir do lado esquerdo · Água morna entre refeições · Gaviscon Advance após refeições
     </div>
   </div>`;
 
