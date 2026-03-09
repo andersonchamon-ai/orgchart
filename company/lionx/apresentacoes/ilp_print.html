@@ -768,5 +768,10 @@
   </p>
 </div>
 
+<script>
+if(new URLSearchParams(window.location.search).has('print')){
+  window.onload=function(){setTimeout(function(){window.print()},500)};
+}
+</script>
 </body>
 </html>

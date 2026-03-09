@@ -1888,9 +1888,10 @@ function renderThreadDetail(){
   } else {
     attEl.innerHTML = t.attachments.map(a => {
       const icon = a.type==='pdf'?'📄':'🔗';
+      const pdfUrl = a.type==='pdf'? esc(a.url)+(a.url.includes('?')?'&':'?')+'print=1' : esc(a.url);
       return `<div class="thread-att-item">
         <span class="att-type">${icon}</span>
-        <a href="${esc(a.url)}" target="_blank">${esc(a.label)}</a>
+        <a href="${pdfUrl}" target="_blank">${esc(a.label)}</a>
         <button class="att-del" onclick="event.stopPropagation();deleteAttachment(${a.id})">✕</button>
       </div>`;
     }).join('');
