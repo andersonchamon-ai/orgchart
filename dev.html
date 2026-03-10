@@ -2047,5 +2047,24 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js').cat
 // Load todos on startup
 rebuildCatDropdown();
 loadTodos();
+
+// --- Auto-refresh: sync todos silently across devices ---
+(function(){
+  const POLL_MS = 30000; // 30s
+  let pollTimer = null;
+  function startPoll(){ if(!pollTimer) pollTimer = setInterval(()=>{ if(currentModule==='todo') loadTodos(); }, POLL_MS); }
+  function stopPoll(){ clearInterval(pollTimer); pollTimer = null; }
+  startPoll();
+  // Reload immediately when tab regains focus
+  document.addEventListener('visibilitychange', ()=>{
+    if(document.hidden){ stopPoll(); } else { loadTodos(); startPoll(); }
+  });
+  // Also reload when switching TO the todo module
+  const origShowMod = window.showModule;
+  window.showModule = function(m){
+    origShowMod(m);
+    if(m === 'todo') loadTodos();
+  };
+})();
 </script>
 </body></html>
