@@ -1,0 +1,169 @@
+Name,Region,Position,Dept1,Dept2,Dept3,DirectManager
+Davi Pozzi,Brazil,CBO,Business and Support,,,Raphael Rodrigues
+Rafael Ermeto,Brazil,Backoffice and Fraud Prev Coordinator,Business and Support,,,Davi Pozzi
+Adolf,China,Penetration Tester,Engineering,Info Security,,Anson
+Star,China,Info Security Operations,Engineering,Info Security,,Anson
+Kyrie,China,Java Developer,Engineering,Content Service,Contern Backend,Elvis
+Neo,China,Java Developer,Engineering,Content Service,Contern Backend,Elvis
+peng,China,Java Developer,Engineering,Content Service,Contern Backend,Elvis
+sefree,China,Java Developer,Engineering,Content Service,Contern Backend,Elvis
+Sergio,China,Java Developer,Engineering,Content Service,Contern Backend,Elvis
+Shane,China,Java Developer,Engineering,Content Service,Contern Backend,Elvis
+Alan,China,Java Developer,Engineering,Content Service,Pay Backend,Elvis
+Hunter,China,Java Developer,Engineering,Content Service,Pay Backend,Elvis
+Rain,China,Java Developer,Engineering,Content Service,Pay Backend,Elvis
+Cooper,China,QA,Engineering,QA,,Jerry
+Jack,China,QA,Engineering,QA,,Jerry
+Lily,China,QA,Engineering,QA,,Jerry
+Lyon,China,QA,Engineering,QA,,Jerry
+Mina,China,QA,Engineering,QA,,Jerry
+Ranni,China,QA,Engineering,QA,,Jerry
+Rafael Araújo,Brazil,Principal Software Engineer,Engineering,Foundation & Cross Teams,Cloud & Infrastructure,Jonathan
+Fabiano Lemos,Brazil,SRE,Engineering,Foundation & Cross Teams,Cloud & Infrastructure,Jonathan
+Diego Cunha,Brazil,Software Engineer,Engineering,Foundation & Cross Teams,Cloud & Infrastructure,Jonathan
+André Bedran,Brazil,Staff Software Engineer,Engineering,Foundation & Cross Teams,Mobile Platform & DX,Jonathan
+Ewerton Pontini,Brazil,Software Engineer,Engineering,Foundation & Cross Teams,Mobile Platform & DX,Jonathan
+Cristiana Santos,Brazil,DBA,Engineering,Foundation & Cross Teams,Database Reliability,Jonathan
+Felipe Roque,Brazil,QA,Engineering,Foundation & Cross Teams,QA,Jonathan
+Murilo Marazzi,Brazil,Principal Software Engineer,Engineering,Product Teams,DM & Integration,Kenji Soares
+Bruno Corazza,Brazil,Software Engineer,Engineering,Product Teams,DM & Integration,Kenji Soares
+Nicolas Pedroso,Brazil,Software Engineer,Engineering,Product Teams,DM & Integration,Kenji Soares
+João Paulo Ávila,Brazil,Software Engineer,Engineering,Product Teams,DM & Integration,Kenji Soares
+Thiago Oliveira,Brazil,Software Engineer,Engineering,Product Teams,DM & Integration,Kenji Soares
+Daniel Matos,Brazil,Software Engineer,Engineering,Product Teams,DM & Integration,Kenji Soares
+Duda Sanches,Brazil,Software Engineer,Engineering,Product Teams,DM & Integration,Kenji Soares
+Gabriel Oliveira,Brazil,Software Engineer,Engineering,Product Teams,Privacy,Kenji Soares
+Vanessa Soares,Brazil,Software Engineer,Engineering,Product Teams,Privacy,Kenji Soares
+Leonardo Maffei,Brazil,Software Engineer,Engineering,Product Teams,Privacy,Kenji Soares
+Vitor Carvalho,Brazil,Software Engineer,Engineering,Product Teams,Privacy,Kenji Soares
+Caio Bulha,Brazil,Software Engineer,Engineering,Product Teams,Privacy,Kenji Soares
+Anna César,Brazil,Software Engineer,Engineering,Product Teams,Privacy,Kenji Soares
+Friday,China,Backend Developer,Engineering,IM Core Sevice,,Leo Gong
+Bryan,China,Backend Developer,Engineering,IM Core Sevice,IM Service,Leo Gong
+Crush,China,Backend Developer,Engineering,IM Core Sevice,IM Service,Leo Gong
+humorchen,China,Backend Developer,Engineering,IM Core Sevice,IM Service,Leo Gong
+Jake,China,Java Developer,Engineering,IM Core Sevice,IM Service,Leo Gong
+Jarven,China,Java Developer,Engineering,IM Core Sevice,IM Service,Leo Gong
+Job,China,Backend Developer,Engineering,IM Core Sevice,IM Service,Leo Gong
+Kevin,China,Backend Developer,Engineering,IM Core Sevice,IM Service,Leo Gong
+Mountain,China,Backend Developer,Engineering,IM Core Sevice,IM Service,Leo Gong
+Panda,China,Backend Developer,Engineering,IM Core Sevice,IM Service,Leo Gong
+sunline,China,Backend Developer,Engineering,IM Core Sevice,IM Service,Leo Gong
+Ted,China,Backend Developer,Engineering,IM Core Sevice,IM Service,Leo Gong
+yonggen,China,Backend Developer,Engineering,IM Core Sevice,IM Service,Leo Gong
+Rancho,China,Team Leader,Engineering,IM Core Sevice,IM Infra,Leo Gong
+Elvis,China,Team Leader,Engineering,Content Service,Pay Backend,Leo Gong
+Kenji Soares,Brazil,Software Engineering Manager,Engineering,Product Teams,DM & Integration,Louis Wong
+Robson Alves,Brazil,Software Engineering Manager,Engineering,Product Teams,Payments,Louis Wong
+Jonathan Araujo,Brazil,Software Engineering Manager,Engineering,Foundation & Cross Teams,Cloud & Infrastructure,Louis Wong
+Vitor Rezende,Brazil,IT Specialist,Engineering,Foundation & Cross Teams,CyberSec & Governance,Louis Wong
+Ning,China,Director,Engineering,Data Platform,,Louis Wong
+Zed,China,Director,Engineering,APP Dev.,,Louis Wong
+Leo Gong,China,Director,Engineering,IM Core Sevice,,Louis Wong
+Anson,China,Director,Engineering,Info Security,,Louis Wong
+Jerry,China,Team Leader,Engineering,QA,,Louis Wong
+Bing,China,Flutter Developer,Engineering,APP Dev.,Flutter Dev.,Mxthing
+Daniel,China,Flutter Developer,Engineering,APP Dev.,Flutter Dev.,Mxthing
+Fahad Ahmad,China,Flutter Developer (Part Time),Engineering,APP Dev.,Flutter Dev.,Mxthing
+Flappy,China,Flutter Developer,Engineering,APP Dev.,Flutter Dev.,Mxthing
+Jayce,China,Flutter Developer,Engineering,APP Dev.,Flutter Dev.,Mxthing
+Lancer,China,Flutter Developer,Engineering,APP Dev.,Flutter Dev.,Mxthing
+luson,China,Flutter Developer,Engineering,APP Dev.,Flutter Dev.,Mxthing
+Sunny,China,Flutter Developer,Engineering,APP Dev.,Flutter Dev.,Mxthing
+Wasim Ahmad,China,Flutter Developer (Part Time),Engineering,APP Dev.,Flutter Dev.,Mxthing
+Garfield,China,Erlang Developer,Engineering,IM Core Sevice,IM Infra,Rancho
+Harry,China,Backend Developer,Engineering,IM Core Sevice,IM Infra,Rancho
+Jim,China,Backend Developer,Engineering,IM Core Sevice,IM Infra,Rancho
+Kpin,China,Backend Developer,Engineering,IM Core Sevice,IM Infra,Rancho
+Shen,China,Erlang Developer,Engineering,IM Core Sevice,IM Infra,Rancho
+wuzg,China,Backend Developer,Engineering,IM Core Sevice,IM Infra,Rancho
+zhenxing,China,Java Developer,Engineering,IM Core Sevice,IM Infra,Rancho
+Louis Wong,China,CTO,Engineering,,,Raphael Rodrigues
+Fabio Silva,Brazil,Principal Software Engineer,Engineering,Product Teams,Payments,Robson Alves
+Cadu Borges,Brazil,Software Engineer,Engineering,Product Teams,Payments,Robson Alves
+Felipe Martins,Brazil,Software Engineer,Engineering,Product Teams,Payments,Robson Alves
+Juliano Zorzolli,Brazil,Software Engineer,Engineering,Product Teams,Payments,Robson Alves
+Miguel Soares,Brazil,Software Engineer,Engineering,Product Teams,Payments,Robson Alves
+Laura Domingues,Brazil,Software Engineer,Engineering,Product Teams,Payments,Robson Alves
+João Eduardo,Brazil,Software Engineer,Engineering,Product Teams,Trust & Safety,Robson Alves
+Artur Sousa,Brazil,Software Engineer,Engineering,Product Teams,Trust & Safety,Robson Alves
+Alcides,Brazil,Software Engineer,Engineering,Product Teams,Trust & Safety,Robson Alves
+Alex Soares,Brazil,Software Engineer,Engineering,Product Teams,Trust & Safety,Robson Alves
+Rafael Ferraz,Brazil,Software Engineer,Engineering,Product Teams,Trust & Safety,Robson Alves
+Hayna Pinto,Brazil,Software Engineer,Engineering,Product Teams,Trust & Safety,Robson Alves
+Kenny,China,Web. Developer,Engineering,APP Dev.,Web Dev.,Wonder
+Rio,China,Backend Developer,Engineering,APP Dev.,Web Dev.,Wonder
+Shawn,China,Backend Developer,Engineering,APP Dev.,Web Dev.,Wonder
+Simpson,China,Backend Developer,Engineering,APP Dev.,Web Dev.,Wonder
+Summer,China,PM,Engineering,APP Dev.,,Zed
+Mxthing,China,Team Leader,Engineering,APP Dev.,Flutter Dev.,Zed
+Jimmie,China,APP Developer,Engineering,APP Dev.,Flutter Dev.,Zed
+Wonder,China,Team Leader,Engineering,APP Dev.,Web Dev.,Zed
+Clint,China,DevOps. Engineer,Engineering,DevOps.,,Zed
+kerven,China,DevOps. Engineer,Engineering,DevOps.,,Zed
+Mark,China,DevOps. Engineer,Engineering,DevOps.,,Zed
+Michel Gomes,China,Senior Manager,Finance,,,Mays
+Annie,China,Finance,Finance,,,Linda
+Grace,China,Finance,Finance,,,Linda
+Sylvia,China,Finance,Finance,,,Linda
+Linda,China,CFO,Finance,,,Mays
+Mays,China,General Manager,General Management Office,,,Raphael Rodrigues
+Raphael Rodrigues,China,CEO,General Management Office,,,
+Eduardo Mauro,Brazil,Business Development Manager,Growth,Business Development,,Armando Areias
+Vagner Lessa,Brazil,PMO,Growth,Business Development,,
+Lucas Lisboa,Brazil,Coordenador de Projetos,Growth,Business Development,,
+Luiz Gustavo Rodrigues,Brazil,Supervisor de TI,Growth,Business Development,,
+Rennan Felipe,Brazil,Auxiliar de TI,Growth,Business Development,,
+Amanda Porto,Brazil,Programadora,Growth,Business Development,,
+Gabriel De Satis,Brazil,Estagiário,Growth,Business Development,,
+Diogo Archanjo,Brazil,Sales Manager,Growth,Sales,,Armando Areias
+Amanda Salles,Brazil,Onboarding,Growth,Sales,,Diogo Archanjo
+Alexandre Rodrigues,Brazil,Sales Consultant,Growth,Sales,,Diogo Archanjo
+Armando Areias,Brazil,Executive Growth,Growth,Growth,,Raphael Rodrigues
+Eduany Vidal,Brazil,Analista Pleno de RH,HR & Admin,HR,,Bruna Carvalho
+Ella,China,HR Manager,HR&Admin,,,Alex
+James,China,Administrator,HR&Admin,Admin,,Alex
+Nini,China,Administrator,HR&Admin,Admin,,Alex
+Michelle,China,Recruiter,HR&Admin,HR,,Alex
+Judy,China,Recruiter,HR&Admin,HR,,Alex
+Alex,China,HR Director,HR&Admin,,,Mays
+Gabrielle,China,Legal,Legal,,,Mays
+Kaio Sant'anna,Brazil,Product Designer,Product & Operations,Product Design,,Fillip Bayer
+Anne Mendes,Brazil,Product Designer,Product & Operations,Product Design,,Fillip Bayer
+Isabella Luiz,Brazil,Associate Product Designer,Product & Operations,Product Design,,Fillip Bayer
+Will,China,Product Designer,Product & Operations,Product Design,,Fillip Bayer
+Rock (Jon),China,Product Designer,Product & Operations,Product Design,,Fillip Bayer
+Munize Moita,Brazil,Associate Designer,Product & Operations,Product Design,,Fillip Bayer
+Gustavo Frederico,Brazil,Designer,Product & Operations,Product Design,,Fillip Bayer
+Aron,China,Operations,Product & Operations,Operations,,Henry
+Cissy,China,Operations,Product & Operations,Operations,,Henry
+Ester,China,Translator,Product & Operations,Operations,,Henry
+Iris,China,Translator,Product & Operations,Operations,,Henry
+Karena,China,Operations,Product & Operations,Operations,,Henry
+Melina,China,Operations,Product & Operations,Operations,,Henry
+Raven,China,Operations,Product & Operations,Operations,,Henry
+Viona,China,Operations,Product & Operations,Operations,,Henry
+John,China,Product Manager,Product & Operations,Product Managament,,Henry
+Betty,China,Product Manager,Product & Operations,Product Managament,,Henry
+Cole,China,Product Manager,Product & Operations,Product Managament,,Henry
+echo,China,Product Manager,Product & Operations,Product Managament,,Henry
+liocky,China,Product Manager,Product & Operations,Product Managament,,Henry
+Mso,China,Product Manager,Product & Operations,Product Managament,,Henry
+Simon,China,Product Manager,Product & Operations,Product Managament,,Henry
+Victoria,China,Product Manager,Product & Operations,Product Managament,,Henry
+Daniel Nagahata,Brazil,Product Manager,Product & Operations,Product Teams,DM & Integration,Luiz Parussolo
+Tiago Matheus,Brazil,Product Manager,Product & Operations,Product Teams,Privacy,Luiz Parussolo
+Pedro Freire,Brazil,Product Manager,Product & Operations,Product Teams,Payments,Luiz Parussolo
+Vitor Mozer,Brazil,Product Manager,Product & Operations,Product Teams,Trust & Safety,Luiz Parussolo
+Giovanna Bregantin,Brazil,Associate Product Manager,Product & Operations,Foundation & Cross Teams,Cloud & Infrastructure,Luiz Parussolo
+Fillip Bayer,Brazil,Design Manager,Product & Operations,Product Teams,,Luiz Parussolo
+Tiago Pedrosa,Brazil,Data Manager,Product & Operations,Data Team,,Luiz Parussolo
+Henry,China,Director,Product & Operations,,,Luiz Parussolo
+Luiz Parussolo,Brazil,CPO,Product & Operations,,,Raphael Rodrigues
+Fernanda Durbano,Brazil,Data Analyst,Product & Operations,Data Team,Data Analytics,Tiago Pedrosa
+Marcus Thomazetti,Brazil,Data Analyst,Product & Operations,Data Team,Data Analytics,Tiago Pedrosa
+Gabriella Gomes,Brazil,Data Analyst,Product & Operations,Data Team,Data Analytics,Tiago Pedrosa
+Olivia Domingues,Brazil,Data Analyst,Product & Operations,Data Team,Data Analytics,Tiago Pedrosa
+Paulo Paniago,Brazil,Data Analyst,Product & Operations,Data Team,Data Analytics,Tiago Pedrosa
+Gabriel Caeran,Brazil,Data Engineer,Product & Operations,Data Team,Data Engineering,Tiago Pedrosa
+Ronai Ribeiro,Brazil,Data Engineer,Product & Operations,Data Team,Data Engineering,Tiago Pedrosa

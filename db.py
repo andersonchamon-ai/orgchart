@@ -149,6 +149,7 @@ def export_all(conn=None):
             'hcFilled': row['hc_filled'] if 'hc_filled' in row.keys() else 0,
             'hcOpen': row['hc_open'] if 'hc_open' in row.keys() else 0,
             'sortOrder': row['sort_order'] if 'sort_order' in row.keys() else 0,
+            'region': row['region'] if 'region' in row.keys() else '',
         })
     
     unassigned = {}
@@ -217,11 +218,11 @@ def upsert_person(person_data):
         if old:
             log_audit(conn, 'update', 'person', pid, dict(old), person_data)
             conn.execute("""
-                UPDATE people SET name=?, role=?, company_id=?, level=?, reports_to=?, hc_filled=?, hc_open=?, updated_at=datetime('now')
+                UPDATE people SET name=?, role=?, company_id=?, level=?, reports_to=?, hc_filled=?, hc_open=?, region=?, updated_at=datetime('now')
                 WHERE id=?
             """, (person_data.get('name',''), person_data['role'], person_data['company'],
                   person_data['level'], person_data.get('reportsTo'),
-                  person_data.get('hcFilled', 0), person_data.get('hcOpen', 0), pid))
+                  person_data.get('hcFilled', 0), person_data.get('hcOpen', 0), person_data.get('region', ''), pid))
             # Replace responsibilities
             conn.execute("DELETE FROM responsibilities WHERE person_id=?", (pid,))
             for r in person_data.get('responsibilities', []):
@@ -233,10 +234,10 @@ def upsert_person(person_data):
     # Insert new
     log_audit(conn, 'create', 'person', None, None, person_data)
     cursor = conn.execute(
-        "INSERT INTO people (name, role, company_id, level, reports_to, hc_filled, hc_open) VALUES (?,?,?,?,?,?,?)",
+        "INSERT INTO people (name, role, company_id, level, reports_to, hc_filled, hc_open, region) VALUES (?,?,?,?,?,?,?,?)",
         (person_data.get('name',''), person_data['role'], person_data['company'],
          person_data['level'], person_data.get('reportsTo'),
-         person_data.get('hcFilled', 0), person_data.get('hcOpen', 0))
+         person_data.get('hcFilled', 0), person_data.get('hcOpen', 0), person_data.get('region', ''))
     )
     pid = cursor.lastrowid
     for r in person_data.get('responsibilities', []):

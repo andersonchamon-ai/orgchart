@@ -53,6 +53,9 @@ body{background:var(--bg);color:var(--text);font-family:ui-sans-serif,-apple-sys
 .hc-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;line-height:1.3}
 .hc-badge-filled{background:#22c55e;color:#000}
 .hc-badge-open{background:#f59e0b;color:#000}
+.team-size-badge{font-size:11px;color:var(--text-muted);font-weight:500}
+.card-badges{display:flex;align-items:center;gap:6px;margin-top:2px}
+.region-tag{font-size:12px;margin-left:4px;vertical-align:middle}
 .tag-hc{background:rgba(255,255,255,0.06);color:var(--text);font-weight:600}
 .node-card .remove-btn{position:absolute;top:4px;right:6px;background:none;border:none;color:var(--red);cursor:pointer;font-size:13px;opacity:0;transition:opacity 0.2s}
 .node-card:hover .remove-btn{opacity:0.5}
@@ -405,6 +408,12 @@ body{background:var(--bg);color:var(--text);font-family:ui-sans-serif,-apple-sys
       <div style="flex:1"><label>HC Preenchido (abaixo, fora do org)</label><input id="mHcFilled" type="number" min="0" value="0"></div>
       <div style="flex:1"><label>Vagas Abertas (abaixo, fora do org)</label><input id="mHcOpen" type="number" min="0" value="0"></div>
     </div>
+    <label>Região</label>
+    <select id="mRegion">
+      <option value="">— Nenhuma —</option>
+      <option value="Brazil">🇧🇷 Brazil</option>
+      <option value="China">🇨🇳 China</option>
+    </select>
     <label>Responsabilidades</label>
     <div class="resp-list" id="mRespList"></div>
     <button class="add-resp-btn" type="button" onclick="addRespField()">+ Adicionar responsabilidade</button>
@@ -508,6 +517,13 @@ function hcBadgesHTML(personId) {
   return html;
 }
 
+function countTeamSize(personId) {
+  let count = 0;
+  const ch = getChildren(personId);
+  for (const c of ch) { count += 1 + countTeamSize(c.id); }
+  return count;
+}
+
 function renderCardHTML(item) {
   const vacant = !item.name;
   const isCeo = item.level <= 1;
@@ -515,10 +531,14 @@ function renderCardHTML(item) {
   const hasChildren = children.length > 0 && !collapsedSet.has(item.id);
   const isCollapsed = collapsedSet.has(item.id);
   const showToggle = getChildren(item.id).length > 0;
+  const teamSize = countTeamSize(item.id);
+  const teamBadge = teamSize > 0 ? `<span class="team-size-badge" title="${teamSize} pessoa${teamSize>1?'s':''} no time">👥 ${teamSize}</span>` : '';
+  const regionTag = (item.region === 'Brazil') ? '<span class="region-tag region-br">🇧🇷</span>'
+                  : (item.region === 'China') ? '<span class="region-tag region-cn">🇨🇳</span>' : '';
   return `<div class="node-card ${vacant?'vacant':''} ${isCeo?'ceo':''}" data-id="${item.id}" onclick="editCard(${item.id})">
-    <div class="node-name">${vacant ? '⚠️ VAGA' : item.name}</div>
+    <div class="node-name">${vacant ? '⚠️ VAGA' : item.name}${regionTag}</div>
     <div class="node-role">${item.role}</div>
-    ${hcBadgesHTML(item.id)}
+    <div class="card-badges">${teamBadge}${hcBadgesHTML(item.id)}</div>
     <button class="remove-btn" onclick="event.stopPropagation();removeCard(${item.id})">✕</button>
   </div>${showToggle ? `<button class="toggle-btn ${isCollapsed?'active':''}" data-toggle="${item.id}" onclick="event.stopPropagation();toggleCollapse(${item.id})">${isCollapsed?'+':'−'}</button>` : ''}`;
 }
@@ -719,9 +739,56 @@ function toggleUnassigned(compId) {
   render();
 }
 
+function getOffsetInTree(el) {
+  // Get element's left offset relative to its .tree-inner ancestor (the scrollable content)
+  let left = 0, top = 0, cur = el;
+  const inner = el.closest('.tree-inner');
+  while (cur && cur !== inner) {
+    left += cur.offsetLeft;
+    top += cur.offsetTop;
+    cur = cur.offsetParent;
+  }
+  return { left, top };
+}
+
 function toggleCollapse(id) {
+  const nodeEl = document.querySelector(`.tree-level-group[data-node="${id}"]`);
+  if (!nodeEl) { if (collapsedSet.has(id)) collapsedSet.delete(id); else collapsedSet.add(id); render(); return; }
+
+  const card = nodeEl.querySelector('.node-card') || nodeEl;
+  const treeWrap = nodeEl.closest('.tree-wrap');
+  const treeWrapId = treeWrap ? treeWrap.id : null;
+
+  // Measure node position INSIDE the scrollable content (not viewport)
+  const oldOffset = getOffsetInTree(card);
+  const oldScrollLeft = treeWrap ? treeWrap.scrollLeft : 0;
+  const oldScrollY = window.scrollY;
+  const oldViewportTop = card.getBoundingClientRect().top;
+
   if (collapsedSet.has(id)) collapsedSet.delete(id); else collapsedSet.add(id);
   render();
+
+  const newWrap = treeWrapId ? document.getElementById(treeWrapId) : null;
+  const newNodeEl = document.querySelector(`.tree-level-group[data-node="${id}"]`);
+  if (!newNodeEl) return;
+  const newCard = newNodeEl.querySelector('.node-card') || newNodeEl;
+
+  // Measure new position inside the (possibly narrower) scrollable content
+  const newOffset = getOffsetInTree(newCard);
+
+  // Adjust scrollLeft: the node moved within the content, so compensate
+  // oldViewportX = wrapLeft + oldOffset.left - oldScrollLeft
+  // newViewportX = wrapLeft + newOffset.left - newScrollLeft
+  // We want newViewportX = oldViewportX, so:
+  // newScrollLeft = oldScrollLeft + (newOffset.left - oldOffset.left)
+  if (newWrap) {
+    newWrap.scrollLeft = oldScrollLeft + (newOffset.left - oldOffset.left);
+  }
+
+  // Vertical: keep card at same viewport Y
+  void document.documentElement.offsetHeight;
+  const newViewportTop = newCard.getBoundingClientRect().top;
+  window.scrollBy(0, newViewportTop - oldViewportTop);
 }
 
 // --- Person Modal ---
@@ -742,6 +809,7 @@ function openModal(item) {
   document.getElementById('mLevel').value = item ? item.level : 2;
   document.getElementById('mHcFilled').value = item ? (item.hcFilled || 0) : 0;
   document.getElementById('mHcOpen').value = item ? (item.hcOpen || 0) : 0;
+  document.getElementById('mRegion').value = item ? (item.region || '') : '';
   updateReportsTo(item);
   document.getElementById('mCompany').onchange = () => updateReportsTo(item);
   const rl = document.getElementById('mRespList'); rl.innerHTML = '';
@@ -765,6 +833,7 @@ function saveModal() {
   const responsibilities = Array.from(document.querySelectorAll('#mRespList .resp-input')).map(i=>i.value.trim()).filter(v=>v);
   const hcFilled = parseInt(document.getElementById('mHcFilled').value) || 0;
   const hcOpen = parseInt(document.getElementById('mHcOpen').value) || 0;
+  const region = document.getElementById('mRegion').value;
   /* role can be empty */
 
   // Validate: warn if this edit would make the person invisible in the orgchart
@@ -793,8 +862,8 @@ function saveModal() {
   })();
   if (!wouldBeVisible && !confirm('⚠️ Atenção: com essas configurações, esta pessoa não vai aparecer no organograma. O "Reporta a" precisa ser alguém da mesma empresa, ou o nível precisa ser 1 (CEO da empresa).\n\nDeseja salvar mesmo assim?')) return;
 
-  if (editingId !== null) { const item = data.find(d=>d.id===editingId); Object.assign(item, {name,role,company,level,reportsTo,responsibilities,hcFilled,hcOpen}); }
-  else { data.push({id:nextId++,name,role,company,level,reportsTo,responsibilities,hcFilled,hcOpen}); }
+  if (editingId !== null) { const item = data.find(d=>d.id===editingId); Object.assign(item, {name,role,company,level,reportsTo,responsibilities,hcFilled,hcOpen,region}); }
+  else { data.push({id:nextId++,name,role,company,level,reportsTo,responsibilities,hcFilled,hcOpen,region}); }
   closeModal(); render(); saveLocal();
 }
 function editCard(id) { openModal(data.find(d=>d.id===id)); }
