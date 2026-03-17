@@ -150,6 +150,17 @@ class Handler(SimpleHTTPRequestHandler):
                 with DB_LOCK:
                     nid = db.add_thread_note(tid, body.get('content',''))
                 self.send_json({'ok': True, 'id': nid})
+            elif path.endswith('/todos') and '/api/threads/' in path:
+                parts = path.split('/')
+                tid = int(parts[3])
+                body = self.read_body()
+                text = body.get('text','').strip()
+                if not text:
+                    self.send_json({'error': 'text required'}, 400)
+                    return
+                with DB_LOCK:
+                    todo_id = db.add_thread_todo(tid, text)
+                self.send_json({'ok': True, 'id': todo_id})
             else:
                 self.send_json({'error': 'Not found'}, 404)
         except Exception as e:
@@ -174,6 +185,12 @@ class Handler(SimpleHTTPRequestHandler):
                 body = self.read_body()
                 with DB_LOCK:
                     db.update_thread_note(nid, body.get('content',''))
+                self.send_json({'ok': True})
+            elif path.startswith('/api/threads/todos/'):
+                todo_id = int(path.split('/')[-1])
+                body = self.read_body()
+                with DB_LOCK:
+                    db.update_thread_todo(todo_id, body)
                 self.send_json({'ok': True})
             elif path.startswith('/api/threads/') and path.count('/') == 3:
                 tid = int(path.split('/')[-1])
@@ -208,6 +225,11 @@ class Handler(SimpleHTTPRequestHandler):
                 nid = int(path.split('/')[-1])
                 with DB_LOCK:
                     db.delete_thread_note(nid)
+                self.send_json({'ok': True})
+            elif path.startswith('/api/threads/todos/'):
+                todo_id = int(path.split('/')[-1])
+                with DB_LOCK:
+                    db.delete_thread_todo(todo_id)
                 self.send_json({'ok': True})
             elif path.startswith('/api/threads/') and path.count('/') == 3:
                 tid = int(path.split('/')[-1])

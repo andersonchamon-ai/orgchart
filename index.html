@@ -238,9 +238,7 @@ body{background:var(--bg);color:var(--text);font-family:ui-sans-serif,-apple-sys
 .thread-section-header{font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
 .thread-section-header button{background:none;border:1px dashed var(--border);color:var(--text-muted);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px}
 .thread-section-header button:hover{border-color:var(--accent);color:var(--accent)}
-.thread-summary-area{width:100%;min-height:70vh;background:transparent;border:none;border-radius:0;color:var(--text);padding:0;font-size:16px;font-family:inherit;line-height:1.8;resize:none;overflow-y:auto}
-.thread-summary-area:focus{outline:none}
-.thread-summary-area::placeholder{color:var(--text-muted)}
+/* thread-summary-area replaced by thread-editor (contenteditable) */
 .thread-att-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;font-size:13px}
 .thread-att-item a{color:var(--accent);text-decoration:none;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .thread-att-item a:hover{text-decoration:underline}
@@ -260,6 +258,22 @@ body{background:var(--bg);color:var(--text);font-family:ui-sans-serif,-apple-sys
 .thread-add-row input{flex:1;padding:8px 12px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-family:inherit}
 .thread-add-row input:focus{outline:none;border-color:var(--accent)}
 .thread-add-row button{padding:8px 14px;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600}
+/* Slash Command Menu */
+.slash-menu{position:absolute;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:6px 0;min-width:220px;box-shadow:0 8px 30px rgba(0,0,0,0.4);z-index:1000;display:none}
+.slash-menu-item{display:flex;align-items:center;gap:12px;padding:10px 16px;cursor:pointer;font-size:14px;color:var(--text);transition:background 0.1s}
+.slash-menu-item:hover,.slash-menu-item.active{background:rgba(255,255,255,0.06)}
+.slash-menu-item .smi-icon{font-size:18px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.05);border-radius:6px;flex-shrink:0}
+.slash-menu-item .smi-label{font-weight:500}
+.slash-menu-hint{font-size:11px;color:var(--text-muted);padding:6px 16px;border-top:1px solid var(--border);margin-top:4px}
+/* Thread Editor (contenteditable) */
+.thread-editor{width:100%;min-height:70vh;background:transparent;border:none;color:var(--text);padding:0;font-size:16px;font-family:inherit;line-height:1.8;outline:none;white-space:pre-wrap;word-wrap:break-word}
+.thread-editor:empty::before{content:attr(data-placeholder);color:var(--text-muted)}
+.thread-editor .todo-line{display:flex;align-items:flex-start;gap:8px;padding:2px 0;line-height:1.8}
+.thread-editor .todo-cb{width:24px;height:24px;min-width:24px;border-radius:4px;border:2px solid rgba(255,255,255,0.35);background:transparent;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:transparent;transition:all 0.15s;margin-top:3px;flex-shrink:0;touch-action:manipulation}
+.thread-editor .todo-cb:hover{border-color:var(--accent)}
+.thread-editor .todo-cb.checked{background:var(--accent);border-color:var(--accent);color:#fff}
+.thread-editor .todo-text{flex:1;outline:none;min-width:0}
+.thread-editor .todo-text.done{text-decoration:line-through;color:var(--text-muted)}
 
 @media(max-width:768px){
   .sidebar{width:260px;left:-260px}
@@ -350,8 +364,15 @@ body{background:var(--bg);color:var(--text);font-family:ui-sans-serif,-apple-sys
     <div id="threadsDetailView" style="display:none">
       <button class="thread-back" onclick="showThreadsList()">← Voltar</button>
       <input type="text" class="thread-detail-title" id="threadTitle" onblur="saveThreadTitle()" onkeydown="if(event.key==='Enter')this.blur()">
-      <div style="margin-top:8px;">
-        <textarea class="thread-summary-area" id="threadSummary" onblur="saveThreadSummary()" placeholder="Comece a escrever..."></textarea>
+      <div style="margin-top:8px;position:relative;">
+        <div class="thread-editor" id="threadEditor" contenteditable="true" data-placeholder="Comece a escrever... (digite / para comandos)"></div>
+        <div class="slash-menu" id="slashMenu">
+          <div class="slash-menu-item active" data-cmd="todo" onclick="insertSlashCmd('todo')">
+            <span class="smi-icon">☑️</span>
+            <span class="smi-label">To-do list</span>
+          </div>
+          <div class="slash-menu-hint">Enter para selecionar · Esc para fechar</div>
+        </div>
       </div>
       <div class="thread-section">
         <div class="thread-section-header">📎 Documentos <button onclick="showAddAttachment()">+ Adicionar</button></div>
@@ -1952,8 +1973,7 @@ function renderThreadDetail(){
   document.getElementById('threadsDetailView').style.display = '';
   const t = currentThread;
   document.getElementById('threadTitle').value = t.title;
-  document.getElementById('threadSummary').value = t.summary||'';
-  autoResizeSummary();
+  loadEditorContent(t.summary||'');
   // Attachments
   const attEl = document.getElementById('threadAttachments');
   if(!t.attachments.length){
@@ -1991,17 +2011,302 @@ function renderThreadDetail(){
   document.getElementById('addNoteRow').style.display = 'none';
 }
 
-function autoResizeSummary(){
-  const el = document.getElementById('threadSummary');
-  if(!el) return;
-  // Only grow, never shrink while typing (prevents jump)
-  const needed = el.scrollHeight;
-  const min = window.innerHeight * 0.5;
-  const target = Math.max(needed, min);
-  if(target > el.offsetHeight){
-    el.style.height = target + 'px';
+// --- Thread Editor (contenteditable + slash commands) ---
+let slashActive = false;
+let slashRange = null; // range where the "/" was typed
+
+function loadEditorContent(summary){
+  const editor = document.getElementById('threadEditor');
+  if(!summary){
+    editor.innerHTML = '';
+    return;
   }
+  // Parse summary: lines starting with [ ] or [x] become todo items, rest is plain text
+  const lines = summary.split('\n');
+  editor.innerHTML = lines.map(line => {
+    const todoMatch = line.match(/^\[([ x])\] (.*)$/);
+    if(todoMatch){
+      const checked = todoMatch[1] === 'x';
+      const text = todoMatch[2];
+      return `<div class="todo-line"><button class="todo-cb${checked?' checked':''}" contenteditable="false" onclick="toggleEditorTodo(this)">${checked?'✓':''}</button><span class="todo-text${checked?' done':''}">${esc(text)}</span></div>`;
+    }
+    return `<div>${line || '<br>'}</div>`;
+  }).join('');
 }
+
+function getEditorContent(){
+  var editor = document.getElementById('threadEditor');
+  var lines = [];
+  for(var i=0; i<editor.childNodes.length; i++){
+    var node = editor.childNodes[i];
+    if(node.nodeType === Node.TEXT_NODE){
+      lines.push(node.textContent.replace(/\u200B/g,''));
+      continue;
+    }
+    if(node.classList && node.classList.contains('todo-line')){
+      var cb = node.querySelector('.todo-cb');
+      var textEl = node.querySelector('.todo-text');
+      var checked = cb && cb.classList.contains('checked');
+      var text = textEl ? textEl.textContent.replace(/\u200B/g,'') : '';
+      lines.push('[' + (checked?'x':' ') + '] ' + text);
+    } else {
+      lines.push((node.textContent || '').replace(/\u200B/g,''));
+    }
+  }
+  return lines.join('\n');
+}
+
+function toggleEditorTodo(btn){
+  const isChecked = btn.classList.contains('checked');
+  if(isChecked){
+    btn.classList.remove('checked');
+    btn.textContent = '';
+    btn.nextElementSibling.classList.remove('done');
+  } else {
+    btn.classList.add('checked');
+    btn.textContent = '✓';
+    btn.nextElementSibling.classList.add('done');
+  }
+  debounceSaveEditor();
+}
+
+let editorSaveTimer = null;
+function debounceSaveEditor(){
+  clearTimeout(editorSaveTimer);
+  editorSaveTimer = setTimeout(saveEditorContent, 800);
+}
+
+async function saveEditorContent(){
+  if(!currentThread) return;
+  const summary = getEditorContent();
+  if(summary === currentThread.summary) return;
+  try {
+    await fetch('/api/threads/'+currentThread.id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({summary})});
+    currentThread.summary = summary;
+  } catch(e){ console.error('saveEditorContent',e); }
+}
+
+function showSlashMenu(){
+  const menu = document.getElementById('slashMenu');
+  const sel = window.getSelection();
+  if(!sel.rangeCount) return;
+  const range = sel.getRangeAt(0);
+  const rect = range.getBoundingClientRect();
+  const editorRect = document.getElementById('threadEditor').parentElement.getBoundingClientRect();
+  menu.style.left = Math.max(0, rect.left - editorRect.left) + 'px';
+  menu.style.top = (rect.bottom - editorRect.top + 4) + 'px';
+  menu.style.display = 'block';
+  slashActive = true;
+}
+
+function hideSlashMenu(){
+  document.getElementById('slashMenu').style.display = 'none';
+  slashActive = false;
+  slashRange = null;
+}
+
+function insertSlashCmd(cmd){
+  if(cmd === 'todo'){
+    var editor = document.getElementById('threadEditor');
+    var sel = window.getSelection();
+    
+    // Find the line div containing the "/"
+    var focusNode = sel.focusNode || (slashRange && slashRange.startContainer);
+    if(!focusNode){ hideSlashMenu(); return; }
+    
+    var lineDiv = focusNode;
+    while(lineDiv && lineDiv !== editor && lineDiv.parentElement !== editor){
+      lineDiv = lineDiv.parentElement;
+    }
+    if(lineDiv === editor) lineDiv = null;
+    
+    // Remove "/" from text content  
+    if(lineDiv){
+      // Get all text, remove the "/" 
+      var walker = document.createTreeWalker(lineDiv, NodeFilter.SHOW_TEXT);
+      var textNode;
+      while(textNode = walker.nextNode()){
+        var idx = textNode.textContent.lastIndexOf('/');
+        if(idx !== -1){
+          textNode.textContent = textNode.textContent.substring(0, idx) + textNode.textContent.substring(idx + 1);
+          break;
+        }
+      }
+    }
+    
+    // Create todo element
+    var todoDiv = document.createElement('div');
+    todoDiv.className = 'todo-line';
+    todoDiv.innerHTML = '<button class="todo-cb" contenteditable="false" onclick="toggleEditorTodo(this)"></button><span class="todo-text"></span>';
+    
+    if(lineDiv && lineDiv.textContent.trim() === ''){
+      // Line is empty after removing "/", replace it with todo
+      lineDiv.replaceWith(todoDiv);
+    } else if(lineDiv){
+      // Line has other content, insert todo after it
+      lineDiv.after(todoDiv);
+    } else {
+      editor.appendChild(todoDiv);
+    }
+    
+    // Focus the todo text span
+    var textSpan = todoDiv.querySelector('.todo-text');
+    // Add zero-width space so cursor has something to latch onto
+    textSpan.textContent = '\u200B';
+    var newRange = document.createRange();
+    newRange.setStart(textSpan.firstChild, 1);
+    newRange.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(newRange);
+    editor.focus();
+  }
+  hideSlashMenu();
+  debounceSaveEditor();
+}
+
+// Editor event listeners
+document.addEventListener('DOMContentLoaded', ()=>{
+  const editor = document.getElementById('threadEditor');
+  if(!editor) return;
+  
+  editor.addEventListener('input', (e)=>{
+    debounceSaveEditor();
+    // Check for slash command
+    const sel = window.getSelection();
+    if(!sel.rangeCount) return;
+    const node = sel.focusNode;
+    const offset = sel.focusOffset;
+    if(node && node.nodeType === Node.TEXT_NODE){
+      const text = node.textContent;
+      const charBefore = text[offset-1];
+      // Show menu if "/" is typed at start of line or after whitespace
+      if(charBefore === '/' && (offset === 1 || text[offset-2] === ' ' || text[offset-2] === '\n')){
+        slashRange = sel.getRangeAt(0).cloneRange();
+        showSlashMenu();
+        return;
+      }
+    }
+    if(slashActive) hideSlashMenu();
+  });
+
+  editor.addEventListener('keydown', (e)=>{
+    if(slashActive){
+      if(e.key === 'Enter'){
+        e.preventDefault();
+        insertSlashCmd('todo');
+        return;
+      }
+      if(e.key === 'Escape'){
+        e.preventDefault();
+        hideSlashMenu();
+        return;
+      }
+    }
+    // Handle Enter in todo line: create new todo below
+    if(e.key === 'Enter'){
+      var sel = window.getSelection();
+      if(!sel.rangeCount) return;
+      var rng = sel.getRangeAt(0);
+      var node2 = sel.focusNode;
+      var lineEl = node2;
+      while(lineEl && lineEl !== editor && !(lineEl.classList && lineEl.classList.contains('todo-line'))){
+        lineEl = lineEl.parentElement;
+      }
+      if(lineEl && lineEl.classList && lineEl.classList.contains('todo-line')){
+        e.preventDefault();
+        e.stopPropagation();
+        var textSpan = lineEl.querySelector('.todo-text');
+        var fullText = (textSpan.textContent || '').replace(/\u200B/g,'');
+        
+        // If empty todo, convert to regular line
+        if(!fullText.trim()){
+          var newDiv = document.createElement('div');
+          newDiv.innerHTML = '<br>';
+          lineEl.replaceWith(newDiv);
+          var r3 = document.createRange();
+          r3.selectNodeContents(newDiv);
+          r3.collapse(true);
+          sel.removeAllRanges();
+          sel.addRange(r3);
+          debounceSaveEditor();
+          return;
+        }
+        
+        // Figure out cursor offset within textSpan
+        var cursorOffset = fullText.length;
+        if(rng.startContainer === textSpan){
+          cursorOffset = 0;
+        } else if(rng.startContainer.parentElement === textSpan || rng.startContainer === textSpan.firstChild){
+          cursorOffset = rng.startOffset;
+        }
+        
+        // Split text at cursor
+        var beforeText = fullText.substring(0, cursorOffset);
+        var afterText = fullText.substring(cursorOffset);
+        
+        // Update current line text
+        textSpan.textContent = beforeText || '\u200B';
+        
+        // Create new todo line with the remainder
+        var newTodo = document.createElement('div');
+        newTodo.className = 'todo-line';
+        var afterContent = afterText ? esc(afterText) : '\u200B';
+        newTodo.innerHTML = '<button class="todo-cb" contenteditable="false" onclick="toggleEditorTodo(this)"></button><span class="todo-text">' + afterContent + '</span>';
+        lineEl.after(newTodo);
+        
+        // Place cursor at start of new todo text
+        var newTextSpan = newTodo.querySelector('.todo-text');
+        var r3 = document.createRange();
+        r3.setStart(newTextSpan.firstChild, afterText ? 0 : 1);
+        r3.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(r3);
+        editor.focus();
+        debounceSaveEditor();
+      }
+    }
+    // Backspace at start of todo line: convert to normal line
+    if(e.key === 'Backspace'){
+      var bsel = window.getSelection();
+      if(!bsel.rangeCount) return;
+      var bnode = bsel.focusNode;
+      var blineEl = bnode;
+      while(blineEl && blineEl !== editor && !(blineEl.classList && blineEl.classList.contains('todo-line'))){
+        blineEl = blineEl.parentElement;
+      }
+      if(blineEl && blineEl.classList && blineEl.classList.contains('todo-line')){
+        var btextSpan = blineEl.querySelector('.todo-text');
+        var brange = bsel.getRangeAt(0);
+        var boffset = brange.startOffset;
+        var batStart = (bsel.focusNode === btextSpan && boffset === 0) ||
+                       (bsel.focusNode === btextSpan.firstChild && boffset <= 1 && (btextSpan.textContent === '\u200B' || boffset === 0));
+        if(batStart){
+          e.preventDefault();
+          var btext = (btextSpan.textContent || '').replace(/\u200B/g,'');
+          var bnewDiv = document.createElement('div');
+          if(btext){ bnewDiv.textContent = btext; } else { bnewDiv.innerHTML = '<br>'; }
+          blineEl.replaceWith(bnewDiv);
+          var bnewRange = document.createRange();
+          if(btext){ bnewRange.setStart(bnewDiv.firstChild, 0); } else { bnewRange.selectNodeContents(bnewDiv); }
+          bnewRange.collapse(true);
+          bsel.removeAllRanges();
+          bsel.addRange(bnewRange);
+          debounceSaveEditor();
+        }
+      }
+    }
+  });
+
+  // Save on blur
+  editor.addEventListener('blur', ()=>{ saveEditorContent(); });
+
+  // Hide slash menu on click outside
+  document.addEventListener('click', (e)=>{
+    if(slashActive && !e.target.closest('.slash-menu') && !e.target.closest('#threadEditor')){
+      hideSlashMenu();
+    }
+  });
+});
 
 function showThreadsList(){
   currentThread = null;
@@ -2028,15 +2333,7 @@ async function saveThreadTitle(){
   } catch(e){ console.error('saveThreadTitle',e); }
 }
 
-async function saveThreadSummary(){
-  if(!currentThread) return;
-  const summary = document.getElementById('threadSummary').value;
-  if(summary === currentThread.summary) return;
-  try {
-    await fetch('/api/threads/'+currentThread.id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({summary})});
-    currentThread.summary = summary;
-  } catch(e){ console.error('saveThreadSummary',e); }
-}
+// saveThreadSummary replaced by saveEditorContent
 
 async function deleteThread(){
   if(!currentThread) return;
@@ -2109,6 +2406,8 @@ async function deleteNote(id){
     openThread(currentThread.id);
   } catch(e){ console.error('deleteNote',e); }
 }
+
+// Thread todo functions moved to inline editor (slash commands)
 
 // PWA Service Worker
 if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js').catch(()=>{}); }

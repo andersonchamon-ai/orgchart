@@ -407,6 +407,14 @@ def init_threads():
             created_at TEXT DEFAULT (datetime('now')),
             updated_at TEXT DEFAULT (datetime('now'))
         );
+        CREATE TABLE IF NOT EXISTS thread_todos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            thread_id INTEGER NOT NULL REFERENCES threads(id) ON DELETE CASCADE,
+            text TEXT NOT NULL,
+            done INTEGER DEFAULT 0,
+            position INTEGER DEFAULT 0,
+            created_at TEXT DEFAULT (datetime('now'))
+        );
     """)
     conn.commit()
     conn.close()
@@ -418,7 +426,8 @@ def get_threads():
     for r in rows:
         note_count = conn.execute("SELECT COUNT(*) FROM thread_notes WHERE thread_id=?", (r['id'],)).fetchone()[0]
         att_count = conn.execute("SELECT COUNT(*) FROM thread_attachments WHERE thread_id=?", (r['id'],)).fetchone()[0]
-        result.append({**dict(r), 'note_count': note_count, 'attachment_count': att_count})
+        todo_count = conn.execute("SELECT COUNT(*) FROM thread_todos WHERE thread_id=?", (r['id'],)).fetchone()[0]
+        result.append({**dict(r), 'note_count': note_count, 'attachment_count': att_count, 'todo_count': todo_count})
     conn.close()
     return result
 
@@ -434,6 +443,9 @@ def get_thread(thread_id):
     )]
     t['notes'] = [dict(n) for n in conn.execute(
         "SELECT * FROM thread_notes WHERE thread_id=? ORDER BY created_at", (thread_id,)
+    )]
+    t['todos'] = [dict(td) for td in conn.execute(
+        "SELECT * FROM thread_todos WHERE thread_id=? ORDER BY position, created_at", (thread_id,)
     )]
     conn.close()
     return t
@@ -511,6 +523,43 @@ def delete_thread_note(note_id):
     conn = get_db()
     row = conn.execute("SELECT thread_id FROM thread_notes WHERE id=?", (note_id,)).fetchone()
     conn.execute("DELETE FROM thread_notes WHERE id=?", (note_id,))
+    if row:
+        conn.execute("UPDATE threads SET updated_at=datetime('now') WHERE id=?", (row['thread_id'],))
+    conn.commit()
+    conn.close()
+
+def add_thread_todo(thread_id, text):
+    conn = get_db()
+    max_pos = conn.execute("SELECT COALESCE(MAX(position),0) FROM thread_todos WHERE thread_id=?", (thread_id,)).fetchone()[0]
+    cursor = conn.execute(
+        "INSERT INTO thread_todos (thread_id, text, position) VALUES (?,?,?)", (thread_id, text, max_pos+1)
+    )
+    tid = cursor.lastrowid
+    conn.execute("UPDATE threads SET updated_at=datetime('now') WHERE id=?", (thread_id,))
+    conn.commit()
+    conn.close()
+    return tid
+
+def update_thread_todo(todo_id, updates):
+    conn = get_db()
+    row = conn.execute("SELECT thread_id FROM thread_todos WHERE id=?", (todo_id,)).fetchone()
+    fields, vals = [], []
+    for k in ('text', 'done', 'position'):
+        if k in updates:
+            fields.append(f"{k}=?")
+            vals.append(updates[k])
+    if fields:
+        vals.append(todo_id)
+        conn.execute(f"UPDATE thread_todos SET {','.join(fields)} WHERE id=?", vals)
+        if row:
+            conn.execute("UPDATE threads SET updated_at=datetime('now') WHERE id=?", (row['thread_id'],))
+        conn.commit()
+    conn.close()
+
+def delete_thread_todo(todo_id):
+    conn = get_db()
+    row = conn.execute("SELECT thread_id FROM thread_todos WHERE id=?", (todo_id,)).fetchone()
+    conn.execute("DELETE FROM thread_todos WHERE id=?", (todo_id,))
     if row:
         conn.execute("UPDATE threads SET updated_at=datetime('now') WHERE id=?", (row['thread_id'],))
     conn.commit()
