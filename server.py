@@ -1,12 +1,116 @@
 #!/usr/bin/env python3
 """Orgchart API server with SQLite backend."""
-import json, os, threading, time
+import json, os, threading, time, secrets, hashlib, subprocess, smtplib
 from http.server import HTTPServer, SimpleHTTPRequestHandler
-from urllib.parse import urlparse
+from urllib.parse import urlparse, parse_qs
+from email.mime.text import MIMEText
+from http import cookies
 import db
 
 PORT = 8790
 STATIC_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# === AUTH CONFIG ===
+ALLOWED_EMAIL = "andersonchamon@gmail.com"
+AUTH_PASSWORD_HASH = hashlib.sha256("lionx2026!AC".encode()).hexdigest()  # password: lionx2026!AC
+SESSION_EXPIRY = 86400 * 30  # 30 days
+OTP_EXPIRY = 300  # 5 minutes
+
+# In-memory stores (persist across requests, reset on server restart)
+_sessions = {}   # token -> {"email": ..., "created": timestamp}
+_otps = {}       # email -> {"code": "123456", "created": timestamp}
+
+# Also persist sessions to disk so they survive restarts
+_SESSION_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.sessions.json')
+def _load_sessions():
+    global _sessions
+    try:
+        if os.path.exists(_SESSION_FILE):
+            with open(_SESSION_FILE) as f:
+                _sessions = json.load(f)
+            # Clean expired
+            now = time.time()
+            _sessions = {k:v for k,v in _sessions.items() if now - v['created'] < SESSION_EXPIRY}
+    except: pass
+
+def _save_sessions():
+    try:
+        with open(_SESSION_FILE, 'w') as f:
+            json.dump(_sessions, f)
+    except: pass
+
+_load_sessions()
+
+# Pages that don't require auth
+PUBLIC_PATHS = {
+    '/album-copa.html', '/album-copa-styles.html', '/album-copa-capivara.html',
+    '/api/auth/login', '/api/auth/request-otp', '/api/auth/verify-otp', '/api/auth/check',
+    '/api/health', '/login.html',
+}
+PUBLIC_PREFIXES = ('/capybara_',)  # capybara images
+
+def _is_public(path):
+    if path in PUBLIC_PATHS:
+        return True
+    for pfx in PUBLIC_PREFIXES:
+        if path.startswith(pfx):
+            return True
+    # Allow static assets needed by login page
+    if path.endswith(('.ico', '.png', '.webmanifest', '.json')) and '/api/' not in path:
+        return True
+    return False
+
+def _get_session_token(handler):
+    cookie_header = handler.headers.get('Cookie', '')
+    c = cookies.SimpleCookie()
+    try:
+        c.load(cookie_header)
+    except Exception:
+        return None
+    if 'session' in c:
+        return c['session'].value
+    # Also check Authorization header
+    auth = handler.headers.get('Authorization', '')
+    if auth.startswith('Bearer '):
+        return auth[7:]
+    return None
+
+def _is_authenticated(handler):
+    token = _get_session_token(handler)
+    if not token:
+        return False
+    sess = _sessions.get(token)
+    if not sess:
+        return False
+    if time.time() - sess['created'] > SESSION_EXPIRY:
+        del _sessions[token]
+        return False
+    return True
+
+def _send_otp(email, code):
+    """Send OTP via Telegram using openclaw CLI."""
+    try:
+        msg = f"🔐 Código de acesso LionX: {code}\n\nVálido por 5 minutos."
+        result = subprocess.run(
+            ['openclaw', 'send', '--channel', 'telegram', '--to', '951774483', '--message', msg],
+            capture_output=True, text=True, timeout=30
+        )
+        if result.returncode != 0:
+            # Fallback: write to file for Bob to pick up during heartbeat
+            otp_file = os.path.join(STATIC_DIR, '.pending_otp')
+            with open(otp_file, 'w') as f:
+                json.dump({'email': email, 'code': code, 'ts': time.time()}, f)
+        return True
+    except Exception as e:
+        print(f"OTP send error: {e}")
+        # Fallback to file
+        try:
+            otp_file = os.path.join(STATIC_DIR, '.pending_otp')
+            with open(otp_file, 'w') as f:
+                json.dump({'email': email, 'code': code, 'ts': time.time()}, f)
+            return True
+        except:
+            return False
 
 # Lock to serialize all DB writes
 DB_LOCK = threading.Lock()
@@ -34,8 +138,37 @@ class Handler(SimpleHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
         self.end_headers()
 
+    def _check_auth(self):
+        """Returns True if request is allowed, False if blocked (already sent 401)."""
+        path = urlparse(self.path).path
+        if _is_public(path):
+            return True
+        if _is_authenticated(self):
+            return True
+        # Redirect HTML requests to login, return 401 for API
+        if path.startswith('/api/'):
+            self.send_json({'error': 'Unauthorized', 'login_required': True}, 401)
+        else:
+            self.send_response(302)
+            self.send_header('Location', '/login.html')
+            self.end_headers()
+        return False
+
+    def _set_session_cookie(self, token):
+        self.send_header('Set-Cookie', f'session={token}; Path=/; HttpOnly; SameSite=Lax; Max-Age={SESSION_EXPIRY}')
+
     def do_GET(self):
         path = urlparse(self.path).path
+
+        # Auth endpoints (public)
+        if path == '/api/auth/check':
+            self.send_json({'authenticated': _is_authenticated(self)})
+            return
+
+        # Block unauthorized access
+        if not self._check_auth():
+            return
+
         if path == '/api/data':
             self.send_json(db.export_all())
         elif path == '/api/todos':
@@ -81,6 +214,76 @@ class Handler(SimpleHTTPRequestHandler):
     def do_POST(self):
         path = urlparse(self.path).path
         try:
+            # === AUTH ENDPOINTS (public) ===
+            if path == '/api/auth/login':
+                body = self.read_body()
+                email = body.get('email', '').strip().lower()
+                password = body.get('password', '')
+                pw_hash = hashlib.sha256(password.encode()).hexdigest()
+                if email != ALLOWED_EMAIL:
+                    self.send_json({'error': 'Email não autorizado'}, 403)
+                    return
+                if pw_hash != AUTH_PASSWORD_HASH:
+                    self.send_json({'error': 'Senha incorreta'}, 401)
+                    return
+                # Valid! Create session
+                token = secrets.token_urlsafe(32)
+                _sessions[token] = {'email': email, 'created': time.time()}
+                _save_sessions()
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json; charset=utf-8')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self._set_session_cookie(token)
+                self.end_headers()
+                self.wfile.write(json.dumps({'ok': True, 'token': token}).encode())
+                return
+
+            elif path == '/api/auth/request-otp':
+                body = self.read_body()
+                email = body.get('email', '').strip().lower()
+                if email != ALLOWED_EMAIL:
+                    self.send_json({'error': 'Email não autorizado'}, 403)
+                    return
+                code = f"{secrets.randbelow(1000000):06d}"
+                _otps[email] = {'code': code, 'created': time.time()}
+                sent = _send_otp(email, code)
+                if sent:
+                    self.send_json({'ok': True, 'message': 'Código enviado'})
+                else:
+                    self.send_json({'error': 'Falha ao enviar código'}, 500)
+                return
+
+            elif path == '/api/auth/verify-otp':
+                body = self.read_body()
+                email = body.get('email', '').strip().lower()
+                code = body.get('code', '').strip()
+                otp_data = _otps.get(email)
+                if not otp_data:
+                    self.send_json({'error': 'Nenhum código solicitado'}, 400)
+                    return
+                if time.time() - otp_data['created'] > OTP_EXPIRY:
+                    del _otps[email]
+                    self.send_json({'error': 'Código expirado'}, 400)
+                    return
+                if otp_data['code'] != code:
+                    self.send_json({'error': 'Código inválido'}, 400)
+                    return
+                del _otps[email]
+                token = secrets.token_urlsafe(32)
+                _sessions[token] = {'email': email, 'created': time.time()}
+                _save_sessions()
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json; charset=utf-8')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self._set_session_cookie(token)
+                self.end_headers()
+                self.wfile.write(json.dumps({'ok': True, 'token': token}).encode())
+                return
+
+            # === AUTH CHECK for all other POST routes ===
+            if not self._check_auth():
+                return
+
             if path == '/api/save':
                 body = self.read_body()
                 with DB_LOCK:
@@ -167,6 +370,8 @@ class Handler(SimpleHTTPRequestHandler):
             self.send_json({'error': str(e)}, 500)
 
     def do_PUT(self):
+        if not self._check_auth():
+            return
         path = urlparse(self.path).path
         try:
             if path == '/api/settings/todo-cat-order':
@@ -204,6 +409,8 @@ class Handler(SimpleHTTPRequestHandler):
             self.send_json({'error': str(e)}, 500)
 
     def do_DELETE(self):
+        if not self._check_auth():
+            return
         path = urlparse(self.path).path
         try:
             if path.startswith('/api/person/'):
