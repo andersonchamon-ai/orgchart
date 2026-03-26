@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>⚽ Álbum da Copa 2026</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    background: #0d1117; color: #fff; min-height: 100dvh; overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  html { scroll-behavior: smooth; }
+
+  /* Safe area */
+  .safe-top { height: env(safe-area-inset-top, 0px); background: #0d1117; }
+
+  /* Screens */
+  .screen { display: none; min-height: 100dvh; padding-bottom: 90px; }
+  .screen.active { display: block; }
+
+  /* Nav bar */
+  .nav-bar {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(13,17,23,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex; padding: 6px 0 calc(6px + env(safe-area-inset-bottom, 8px));
+  }
+  .nav-item {
+    flex: 1; text-align: center; padding: 6px 0; cursor: pointer;
+    color: #555; font-size: 10px; font-weight: 600; transition: color 0.2s;
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+  }
+  .nav-item.active { color: #FFD700; }
+  .nav-item .ni { font-size: 24px; line-height: 1; }
+  .nav-item .badge {
+    position: absolute; top: -2px; right: 50%; transform: translateX(18px);
+    background: #ef4444; color: #fff; font-size: 9px; font-weight: 800;
+    padding: 1px 5px; border-radius: 8px; min-width: 16px;
+  }
+  .nav-item { position: relative; }
+
+  /* HOME */
+  .home-bg {
+    background: linear-gradient(160deg, #1a0a3e 0%, #0d1117 50%);
+    padding: 20px 20px 0; text-align: center;
+  }
+  .logo { font-size: 28px; font-weight: 900; color: #FFD700; letter-spacing: 0.5px; }
+  .logo-sub { color: #888; font-size: 13px; margin-top: 2px; }
+
+  .progress-container { margin: 24px auto 20px; width: 180px; height: 180px; position: relative; }
+  .progress-container svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .progress-container .track { fill: none; stroke: #1c2333; stroke-width: 10; }
+  .progress-container .fill { fill: none; stroke: url(#goldGrad); stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset 1.5s ease; }
+  .progress-center {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center;
+  }
+  .progress-center .big { font-size: 42px; font-weight: 900; color: #FFD700; line-height: 1; }
+  .progress-center .sub { font-size: 12px; color: #888; margin-top: 2px; }
+  .progress-center .pct { font-size: 14px; color: #aaa; font-weight: 600; }
+
+  .packs-section { padding: 0 20px 20px; }
+  .packs-title { font-size: 16px; font-weight: 800; margin-bottom: 2px; }
+  .packs-timer { font-size: 12px; color: #F87171; margin-bottom: 14px; font-weight: 600; }
+  .packs-row { display: flex; gap: 12px; justify-content: center; }
+  .pack-card {
+    width: 100px; height: 140px; border-radius: 16px; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    transition: transform 0.2s, box-shadow 0.2s; position: relative;
+  }
+  .pack-card.available {
+    background: linear-gradient(145deg, #FFD700 0%, #FF8C00 100%);
+    box-shadow: 0 6px 24px rgba(255,215,0,0.35);
+  }
+  .pack-card.available:active { transform: scale(0.95); }
+  .pack-card.opened {
+    background: #161b22; border: 1px solid #21262d; cursor: default;
+  }
+  .pack-card .pe { font-size: 40px; }
+  .pack-card .pl { font-size: 11px; font-weight: 700; margin-top: 4px; }
+  .pack-card.available .pl { color: #1a0a3e; }
+  .pack-card.opened .pl { color: #555; }
+
+  .stats-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; padding: 20px; }
+  .stat-box {
+    background: #161b22; border: 1px solid #21262d; border-radius: 14px;
+    padding: 14px 8px; text-align: center;
+  }
+  .stat-box .sv { font-size: 26px; font-weight: 900; color: #FFD700; }
+  .stat-box .sl { font-size: 10px; color: #888; margin-top: 2px; }
+
+  /* OPEN PACK */
+  .open-bg {
+    min-height: 100dvh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; padding: 20px;
+    background: radial-gradient(ellipse at 50% 40%, #1a0a3e 0%, #0d1117 70%);
+  }
+  .open-title { font-size: 20px; font-weight: 800; }
+  .open-sub { font-size: 13px; color: #888; margin: 4px 0 24px; }
+  .cards-container { position: relative; width: 320px; height: 240px; margin: 0 auto; }
+  .rcard {
+    width: 90px; height: 126px; border-radius: 12px; position: absolute;
+    top: 50%; left: 50%; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; padding: 8px;
+    background: linear-gradient(145deg, #1e3a5f 0%, #162447 100%);
+    border: 2px solid #2d5a8e; box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    transition: transform 0.6s cubic-bezier(.34,1.56,.64,1);
+  }
+  .rcard .re { font-size: 36px; }
+  .rcard .rn { font-size: 9px; font-weight: 800; color: #FFD700; margin-top: 4px; text-align: center; }
+  .rcard .rc { font-size: 8px; color: #888; }
+  .rcard.is-new::after {
+    content: "NOVA!"; position: absolute; top: -8px; right: -8px;
+    background: #22c55e; color: #fff; font-size: 8px; font-weight: 900;
+    padding: 2px 7px; border-radius: 10px;
+  }
+  .rcard.is-dup::after {
+    content: "REPETIDA"; position: absolute; top: -8px; right: -12px;
+    background: #f59e0b; color: #1a0a3e; font-size: 7px; font-weight: 900;
+    padding: 2px 6px; border-radius: 10px;
+  }
+  .rcard:nth-child(1) { transform: translate(-155px,-50%) rotate(-14deg); z-index: 1; }
+  .rcard:nth-child(2) { transform: translate(-85px,-55%) rotate(-7deg); z-index: 2; }
+  .rcard:nth-child(3) { transform: translate(-45px,-58%) rotate(0deg); z-index: 3; }
+  .rcard:nth-child(4) { transform: translate(0px,-55%) rotate(7deg); z-index: 2; }
+  .rcard:nth-child(5) { transform: translate(60px,-50%) rotate(14deg); z-index: 1; }
+
+  .open-result { font-size: 15px; color: #aaa; margin-top: 20px; }
+  .open-result b { color: #22c55e; }
+  .btn-gold {
+    margin-top: 24px; background: linear-gradient(135deg, #FFD700, #FF8C00);
+    color: #1a0a3e; border: none; padding: 16px 48px; border-radius: 30px;
+    font-size: 16px; font-weight: 900; cursor: pointer; text-transform: uppercase;
+    letter-spacing: 1px; box-shadow: 0 4px 20px rgba(255,215,0,0.3);
+  }
+  .btn-gold:active { transform: scale(0.96); }
+
+  /* ALBUM */
+  .album-top {
+    position: sticky; top: 0; z-index: 10; padding: 16px 20px;
+    background: rgba(13,17,23,0.92); backdrop-filter: blur(20px);
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .album-top h2 { font-size: 20px; font-weight: 900; }
+  .album-top .filter-btn {
+    font-size: 12px; color: #FFD700; font-weight: 700; cursor: pointer;
+    background: rgba(255,215,0,0.1); padding: 6px 14px; border-radius: 20px;
+  }
+  .team-section { padding: 16px 16px 8px; }
+  .team-header {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+  }
+  .team-flag { font-size: 24px; }
+  .team-name { font-size: 15px; font-weight: 800; }
+  .team-count { font-size: 12px; color: #888; font-weight: 400; }
+  .team-bar { flex: 1; height: 4px; background: #1c2333; border-radius: 2px; margin-left: 8px; }
+  .team-bar-fill { height: 100%; background: #FFD700; border-radius: 2px; transition: width 0.5s; }
+
+  .sticker-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 6px; }
+  .sticker {
+    aspect-ratio: 0.72; border-radius: 10px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; padding: 4px;
+  }
+  .sticker.has {
+    background: linear-gradient(145deg, #1e3a5f 0%, #162447 100%);
+    border: 1px solid #2d5a8e;
+  }
+  .sticker.empty {
+    background: rgba(255,255,255,0.02); border: 1px dashed #2a2a3a;
+  }
+  .sticker .se { font-size: 24px; }
+  .sticker .sn { font-size: 7px; color: #aaa; margin-top: 1px; text-align: center; line-height: 1.1; }
+  .sticker.empty .se { font-size: 18px; opacity: 0.3; }
+  .sticker.empty .sn { color: #333; }
+
+  /* INVENTORY */
+  .inv-top { padding: 16px 20px; }
+  .inv-top h2 { font-size: 20px; font-weight: 900; }
+  .inv-top .inv-sub { font-size: 13px; color: #888; margin-top: 2px; }
+  .inv-items { padding: 0 16px; }
+  .inv-card {
+    display: flex; align-items: center; gap: 14px; padding: 14px 16px;
+    background: #161b22; border: 1px solid #21262d; border-radius: 14px; margin-bottom: 8px;
+  }
+  .inv-card .ie { font-size: 36px; }
+  .inv-card .ii { flex: 1; }
+  .inv-card .iname { font-size: 14px; font-weight: 700; }
+  .inv-card .icountry { font-size: 11px; color: #888; margin-top: 1px; }
+  .inv-card .iqty {
+    background: rgba(255,215,0,0.15); color: #FFD700; font-size: 13px;
+    font-weight: 800; padding: 4px 12px; border-radius: 12px;
+  }
+  .btn-blue {
+    background: #2563EB; color: #fff; border: none; padding: 10px 16px;
+    border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer;
+    margin-left: 8px;
+  }
+  .btn-blue:active { opacity: 0.8; }
+
+  /* SHARE */
+  .share-content { padding: 20px; }
+  .share-back { font-size: 16px; color: #888; cursor: pointer; margin-bottom: 12px; display: inline-block; }
+  .share-content h2 { font-size: 20px; font-weight: 900; margin-bottom: 16px; }
+  .share-card {
+    background: #161b22; border: 1px solid #21262d; border-radius: 16px;
+    padding: 24px; text-align: center; margin-bottom: 20px;
+  }
+  .share-card .sce { font-size: 64px; }
+  .share-card .scn { font-size: 18px; font-weight: 800; margin-top: 8px; }
+  .share-card .scc { font-size: 13px; color: #888; }
+  .contacts-label { font-size: 13px; color: #888; margin-bottom: 10px; }
+  .contact {
+    display: flex; align-items: center; gap: 12px; padding: 14px;
+    background: #161b22; border: 1px solid #21262d; border-radius: 14px;
+    margin-bottom: 8px; cursor: pointer; transition: border-color 0.2s;
+  }
+  .contact:active { border-color: #FFD700; background: #1a1a2e; }
+  .contact .cavatar {
+    width: 44px; height: 44px; border-radius: 50%; display: flex;
+    align-items: center; justify-content: center; font-size: 18px; font-weight: 800; color: #fff;
+  }
+  .contact .cname { font-size: 14px; font-weight: 700; }
+  .contact .cstatus { font-size: 11px; color: #888; margin-top: 1px; }
+  .btn-send-full {
+    width: 100%; margin-top: 16px; background: linear-gradient(135deg, #FFD700, #FF8C00);
+    color: #1a0a3e; border: none; padding: 16px; border-radius: 14px;
+    font-size: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* COMPLETE */
+  .complete-bg {
+    min-height: 100dvh; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; padding: 32px 24px 100px; text-align: center;
+    background: radial-gradient(ellipse at 50% 30%, #3a1a0e 0%, #0d1117 70%);
+  }
+  .complete-bg .trophy { font-size: 80px; }
+  .complete-bg h2 { font-size: 28px; font-weight: 900; color: #FFD700; margin-top: 12px; }
+  .complete-bg .cmsg { color: #ccc; font-size: 15px; margin-top: 8px; line-height: 1.5; }
+  .complete-bg .csub { color: #FFD700; font-size: 13px; margin-top: 20px; font-weight: 700; }
+  .cfield {
+    width: 100%; margin-top: 10px; padding: 14px 16px; border-radius: 12px;
+    border: 1px solid #333; background: #161b22; color: #fff; font-size: 15px;
+    outline: none; transition: border-color 0.2s;
+  }
+  .cfield:focus { border-color: #FFD700; }
+  .cfield::placeholder { color: #555; }
+
+  /* Divider */
+  .divider { height: 1px; background: #21262d; margin: 0 20px; }
+
+  /* Pulse animation for packs */
+  @keyframes pulse { 0%,100% { box-shadow: 0 6px 24px rgba(255,215,0,0.35); } 50% { box-shadow: 0 6px 32px rgba(255,215,0,0.55); } }
+  .pack-card.available { animation: pulse 2s infinite; }
+
+  /* Shimmer for new badge */
+  @keyframes shimmer { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+  .rcard.is-new::after { animation: shimmer 1.5s infinite; }
+</style>
+</head>
+<body>
+
+<div class="safe-top"></div>
+
+<!-- SVG gradient def -->
+<svg style="position:absolute;width:0;height:0">
+  <defs>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#FFD700"/>
+      <stop offset="100%" style="stop-color:#FF8C00"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<!-- ===== HOME ===== -->
+<div id="s-home" class="screen active">
+  <div class="home-bg">
+    <div class="logo">⚽ Álbum da Copa</div>
+    <div class="logo-sub">Copa do Mundo 2026</div>
+    <div class="progress-container">
+      <svg viewBox="0 0 180 180">
+        <circle class="track" cx="90" cy="90" r="78"/>
+        <circle class="fill" cx="90" cy="90" r="78" stroke-dasharray="490" stroke-dashoffset="300"/>
+      </svg>
+      <div class="progress-center">
+        <div class="big">387</div>
+        <div class="sub">de 1.000</div>
+        <div class="pct">38,7%</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="packs-section">
+    <div class="packs-title">📦 Pacotinhos de Hoje</div>
+    <div class="packs-timer">⏰ Expiram em 6h 23min</div>
+    <div class="packs-row">
+      <div class="pack-card opened">
+        <div class="pe">📦</div>
+        <div class="pl">Aberto ✓</div>
+      </div>
+      <div class="pack-card available" onclick="go('open')">
+        <div class="pe">🎁</div>
+        <div class="pl">Pacote 2</div>
+      </div>
+      <div class="pack-card available" onclick="go('open')">
+        <div class="pe">🎁</div>
+        <div class="pl">Pacote 3</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-box"><div class="sv">387</div><div class="sl">Colecionadas</div></div>
+    <div class="stat-box"><div class="sv">43</div><div class="sl">Repetidas</div></div>
+    <div class="stat-box"><div class="sv">12</div><div class="sl">Enviadas</div></div>
+  </div>
+</div>
+
+<!-- ===== OPEN PACK ===== -->
+<div id="s-open" class="screen">
+  <div class="open-bg">
+    <div class="open-title">🎴 Pacote #2</div>
+    <div class="open-sub">5 figurinhas</div>
+    <div class="cards-container">
+      <div class="rcard is-new">
+        <div class="re">🐴</div>
+        <div class="rn">Vinícius</div>
+        <div class="rc">🇧🇷 Brasil</div>
+      </div>
+      <div class="rcard is-new">
+        <div class="re">🐴</div>
+        <div class="rn">Mbappé</div>
+        <div class="rc">🇫🇷 França</div>
+      </div>
+      <div class="rcard is-dup">
+        <div class="re">🐴</div>
+        <div class="rn">Messi</div>
+        <div class="rc">🇦🇷 Argentina</div>
+      </div>
+      <div class="rcard is-new">
+        <div class="re">🐴</div>
+        <div class="rn">Salah</div>
+        <div class="rc">🇪🇬 Egito</div>
+      </div>
+      <div class="rcard is-dup">
+        <div class="re">🐴</div>
+        <div class="rn">Cristiano</div>
+        <div class="rc">🇵🇹 Portugal</div>
+      </div>
+    </div>
+    <div class="open-result"><b>3 novas</b> · 2 repetidas</div>
+    <button class="btn-gold" onclick="go('home')">Coletar! ✨</button>
+  </div>
+</div>
+
+<!-- ===== ALBUM ===== -->
+<div id="s-album" class="screen">
+  <div class="album-top">
+    <h2>📖 Álbum</h2>
+    <div class="filter-btn">Filtrar ▾</div>
+  </div>
+
+  <!-- Brasil -->
+  <div class="team-section">
+    <div class="team-header">
+      <span class="team-flag">🇧🇷</span>
+      <span class="team-name">Brasil</span>
+      <span class="team-count">14/20</span>
+      <div class="team-bar"><div class="team-bar-fill" style="width:70%"></div></div>
+    </div>
+    <div class="sticker-grid">
+      <div class="sticker has"><div class="se">🛡️</div><div class="sn">Escudo</div></div>
+      <div class="sticker has"><div class="se">📸</div><div class="sn">Time</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Alisson</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Marquinhos</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Militão</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Danilo</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Casemiro</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Paquetá</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Bruno G.</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Raphinha</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Vinícius</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Rodrygo</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Endrick</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Neymar</div></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Argentina -->
+  <div class="team-section">
+    <div class="team-header">
+      <span class="team-flag">🇦🇷</span>
+      <span class="team-name">Argentina</span>
+      <span class="team-count">9/20</span>
+      <div class="team-bar"><div class="team-bar-fill" style="width:45%"></div></div>
+    </div>
+    <div class="sticker-grid">
+      <div class="sticker has"><div class="se">🛡️</div><div class="sn">Escudo</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">E. Martínez</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Otamendi</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">De Paul</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Mac Allister</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Messi</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Álvarez</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Di María</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Lautaro</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- França -->
+  <div class="team-section">
+    <div class="team-header">
+      <span class="team-flag">🇫🇷</span>
+      <span class="team-name">França</span>
+      <span class="team-count">11/20</span>
+      <div class="team-bar"><div class="team-bar-fill" style="width:55%"></div></div>
+    </div>
+    <div class="sticker-grid">
+      <div class="sticker has"><div class="se">🛡️</div><div class="sn">Escudo</div></div>
+      <div class="sticker has"><div class="se">📸</div><div class="sn">Time</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Mbappé</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Griezmann</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Dembélé</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Tchouaméni</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Camavinga</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Maignan</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Upamecano</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Hernández</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Saliba</div></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Alemanha -->
+  <div class="team-section">
+    <div class="team-header">
+      <span class="team-flag">🇩🇪</span>
+      <span class="team-name">Alemanha</span>
+      <span class="team-count">6/20</span>
+      <div class="team-bar"><div class="team-bar-fill" style="width:30%"></div></div>
+    </div>
+    <div class="sticker-grid">
+      <div class="sticker has"><div class="se">🛡️</div><div class="sn">Escudo</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Neuer</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Kimmich</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Musiala</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Sané</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Havertz</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== INVENTORY ===== -->
+<div id="s-inv" class="screen">
+  <div class="inv-top">
+    <h2>🔄 Repetidas</h2>
+    <div class="inv-sub">43 figurinhas pra enviar</div>
+  </div>
+  <div class="inv-items">
+    <div class="inv-card">
+      <div class="ie">🐴</div>
+      <div class="ii"><div class="iname">Messi</div><div class="icountry">🇦🇷 Argentina</div></div>
+      <div class="iqty">×4</div>
+      <button class="btn-blue" onclick="go('share')">Enviar</button>
+    </div>
+    <div class="inv-card">
+      <div class="ie">🐴</div>
+      <div class="ii"><div class="iname">Cristiano</div><div class="icountry">🇵🇹 Portugal</div></div>
+      <div class="iqty">×3</div>
+      <button class="btn-blue" onclick="go('share')">Enviar</button>
+    </div>
+    <div class="inv-card">
+      <div class="ie">🐴</div>
+      <div class="ii"><div class="iname">Vinícius</div><div class="icountry">🇧🇷 Brasil</div></div>
+      <div class="iqty">×2</div>
+      <button class="btn-blue" onclick="go('share')">Enviar</button>
+    </div>
+    <div class="inv-card">
+      <div class="ie">🐴</div>
+      <div class="ii"><div class="iname">Mbappé</div><div class="icountry">🇫🇷 França</div></div>
+      <div class="iqty">×2</div>
+      <button class="btn-blue" onclick="go('share')">Enviar</button>
+    </div>
+    <div class="inv-card">
+      <div class="ie">🐴</div>
+      <div class="ii"><div class="iname">Bellingham</div><div class="icountry">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Inglaterra</div></div>
+      <div class="iqty">×5</div>
+      <button class="btn-blue" onclick="go('share')">Enviar</button>
+    </div>
+    <div class="inv-card">
+      <div class="ie">🐴</div>
+      <div class="ii"><div class="iname">Pedri</div><div class="icountry">🇪🇸 Espanha</div></div>
+      <div class="iqty">×3</div>
+      <button class="btn-blue" onclick="go('share')">Enviar</button>
+    </div>
+    <div class="inv-card">
+      <div class="ie">🐴</div>
+      <div class="ii"><div class="iname">Haaland</div><div class="icountry">🇳🇴 Noruega</div></div>
+      <div class="iqty">×2</div>
+      <button class="btn-blue" onclick="go('share')">Enviar</button>
+    </div>
+    <div class="inv-card">
+      <div class="ie">🐴</div>
+      <div class="ii"><div class="iname">Neuer</div><div class="icountry">🇩🇪 Alemanha</div></div>
+      <div class="iqty">×4</div>
+      <button class="btn-blue" onclick="go('share')">Enviar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SHARE ===== -->
+<div id="s-share" class="screen">
+  <div class="share-content">
+    <div class="share-back" onclick="go('inv')">← Voltar</div>
+    <h2>Enviar Figurinha</h2>
+    <div class="share-card">
+      <div class="sce">🐴</div>
+      <div class="scn">Messi</div>
+      <div class="scc">🇦🇷 Argentina</div>
+    </div>
+    <div class="contacts-label">Escolha um contato no Phiz:</div>
+    <div class="contact">
+      <div class="cavatar" style="background:#2563EB">M</div>
+      <div><div class="cname">Maria Silva</div><div class="cstatus">Precisa: Messi 🇦🇷</div></div>
+    </div>
+    <div class="contact">
+      <div class="cavatar" style="background:#22c55e">J</div>
+      <div><div class="cname">João Pedro</div><div class="cstatus">Online agora</div></div>
+    </div>
+    <div class="contact">
+      <div class="cavatar" style="background:#f59e0b">R</div>
+      <div><div class="cname">Rafael Costa</div><div class="cstatus">Álbum: 62%</div></div>
+    </div>
+    <div class="contact">
+      <div class="cavatar" style="background:#8b5cf6">A</div>
+      <div><div class="cname">Ana Beatriz</div><div class="cstatus">Álbum: 28%</div></div>
+    </div>
+    <button class="btn-send-full">Enviar via Phiz Chat 📤</button>
+  </div>
+</div>
+
+<!-- ===== COMPLETE ===== -->
+<div id="s-complete" class="screen">
+  <div class="complete-bg">
+    <div class="trophy">🏆</div>
+    <h2>PARABÉNS! 🎉</h2>
+    <p class="cmsg">Você completou o<br>Álbum da Copa 2026!<br><br>Seu <b>iPhone 17</b> está a caminho!</p>
+    <div class="csub">Preencha seus dados:</div>
+    <input class="cfield" placeholder="Nome completo">
+    <input class="cfield" placeholder="CPF">
+    <input class="cfield" placeholder="Endereço completo">
+    <input class="cfield" placeholder="CEP">
+    <input class="cfield" placeholder="Telefone">
+    <button class="btn-gold" style="width:100%; margin-top:20px;">Confirmar Dados ✅</button>
+  </div>
+</div>
+
+<!-- NAV BAR -->
+<div class="nav-bar">
+  <div class="nav-item active" id="n-home" onclick="go('home')"><div class="ni">🏠</div>Início</div>
+  <div class="nav-item" id="n-album" onclick="go('album')"><div class="ni">📖</div>Álbum</div>
+  <div class="nav-item" id="n-open" onclick="go('open')">
+    <div class="ni">🎴</div>Abrir
+    <div class="badge">2</div>
+  </div>
+  <div class="nav-item" id="n-inv" onclick="go('inv')"><div class="ni">🔄</div>Repetidas</div>
+  <div class="nav-item" id="n-share" onclick="go('share')"><div class="ni">📤</div>Enviar</div>
+</div>
+
+<script>
+function go(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('s-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const nav = document.getElementById('n-' + id);
+  if (nav) nav.classList.add('active');
+  window.scrollTo(0, 0);
+}
+</script>
+
+</body>
+</html>
