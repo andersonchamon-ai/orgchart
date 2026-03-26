@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>⚽ Estilos de Figurinha — Álbum da Copa 2026</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    background: #0d1117; color: #fff; min-height: 100dvh;
+    padding: env(safe-area-inset-top, 20px) 16px calc(env(safe-area-inset-bottom, 20px) + 20px);
+  }
+
+  .page-title { text-align: center; padding: 20px 0 8px; }
+  .page-title h1 { font-size: 22px; font-weight: 900; color: #FFD700; }
+  .page-title p { font-size: 13px; color: #888; margin-top: 4px; }
+
+  .style-card {
+    background: #161b22; border: 1px solid #21262d; border-radius: 20px;
+    margin: 16px 0; overflow: hidden;
+  }
+  .style-header {
+    padding: 16px 20px 12px; display: flex; align-items: center; gap: 10px;
+  }
+  .style-num {
+    width: 32px; height: 32px; border-radius: 50%; background: #FFD700;
+    color: #1a0a3e; display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 14px;
+  }
+  .style-name { font-size: 18px; font-weight: 800; }
+  .style-tag {
+    font-size: 10px; background: rgba(255,215,0,0.15); color: #FFD700;
+    padding: 3px 10px; border-radius: 12px; font-weight: 700; margin-left: auto;
+  }
+
+  .sticker-showcase {
+    display: flex; gap: 10px; padding: 0 16px 16px; overflow-x: auto;
+    -webkit-overflow-scrolling: touch; scroll-snap-type: x mandatory;
+  }
+  .sticker-showcase::-webkit-scrollbar { display: none; }
+
+  .sticker-demo {
+    min-width: 140px; height: 190px; border-radius: 14px; flex-shrink: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 12px; position: relative; scroll-snap-align: start;
+    text-align: center;
+  }
+
+  /* Character illustration area */
+  .char-circle {
+    width: 80px; height: 80px; border-radius: 50%; display: flex;
+    align-items: center; justify-content: center; font-size: 48px;
+    margin-bottom: 8px; position: relative;
+  }
+
+  /* Hair overlay for Neymar look */
+  .hair-neymar {
+    position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
+    font-size: 14px; filter: none;
+  }
+  .hair-messi {
+    position: absolute; top: -6px; left: 50%; transform: translateX(-50%);
+    font-size: 12px;
+  }
+
+  .char-name { font-size: 12px; font-weight: 800; color: #FFD700; }
+  .char-team { font-size: 10px; color: #888; }
+  .char-pos { font-size: 8px; color: #555; margin-top: 2px; }
+
+  /* Style 1: Robots */
+  .robot-bg { background: linear-gradient(145deg, #0f2847, #0a1628); border: 2px solid #1e4d8c; }
+  .robot-circle { background: radial-gradient(circle, #1a3a6b, #0d1f3d); }
+
+  /* Style 2: Cats */
+  .cat-bg { background: linear-gradient(145deg, #2d1b4e, #1a0e30); border: 2px solid #5c3d8f; }
+  .cat-circle { background: radial-gradient(circle, #3d2366, #231440); }
+
+  /* Style 3: Horses */
+  .horse-bg { background: linear-gradient(145deg, #3d2b0f, #241a08); border: 2px solid #8b6914; }
+  .horse-circle { background: radial-gradient(circle, #4a3510, #2a1e08); }
+
+  /* Style 4: Aliens */
+  .alien-bg { background: linear-gradient(145deg, #0f3d2b, #081a14); border: 2px solid #14b87a; }
+  .alien-circle { background: radial-gradient(circle, #0d4d32, #06261a); }
+
+  /* Style 5: Bears */
+  .bear-bg { background: linear-gradient(145deg, #3d1f0f, #241208); border: 2px solid #b8651e; }
+  .bear-circle { background: radial-gradient(circle, #4a2810, #2a1608); }
+
+  /* Style 6: Penguins */
+  .penguin-bg { background: linear-gradient(145deg, #1a2a3d, #0d1824); border: 2px solid #4a7fb8; }
+  .penguin-circle { background: radial-gradient(circle, #1e3550, #0f1f30); }
+
+  .style-desc {
+    padding: 0 20px 16px; font-size: 12px; color: #999; line-height: 1.5;
+  }
+
+  .pros-cons { padding: 0 20px 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .pro, .con {
+    font-size: 10px; padding: 6px 10px; border-radius: 8px; line-height: 1.4;
+  }
+  .pro { background: rgba(34,197,94,0.1); color: #22c55e; }
+  .con { background: rgba(239,68,68,0.1); color: #ef4444; }
+
+  .vote-section {
+    text-align: center; padding: 24px 16px;
+    background: linear-gradient(180deg, transparent, rgba(255,215,0,0.05));
+    border-radius: 20px; margin: 20px 0;
+  }
+  .vote-section h3 { font-size: 16px; font-weight: 800; color: #FFD700; margin-bottom: 4px; }
+  .vote-section p { font-size: 12px; color: #888; }
+
+  /* New badge */
+  .rec-badge {
+    position: absolute; top: 8px; right: 8px; background: #22c55e; color: #fff;
+    font-size: 7px; font-weight: 900; padding: 2px 6px; border-radius: 8px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+
+  /* Comparison grid */
+  .comparison {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+    padding: 0 16px 16px;
+  }
+  .comp-card {
+    border-radius: 12px; padding: 12px 8px; text-align: center;
+    font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  }
+  .comp-card .ce { font-size: 32px; }
+  .comp-card .cn { font-weight: 700; font-size: 9px; color: #aaa; }
+</style>
+</head>
+<body>
+
+<div class="page-title">
+  <h1>⚽ Estilos de Figurinha</h1>
+  <p>Álbum da Copa 2026 · PhizChat</p>
+</div>
+
+<!-- ===== STYLE 1: ROBOTS ===== -->
+<div class="style-card">
+  <div class="style-header">
+    <div class="style-num">1</div>
+    <div class="style-name">🤖 Robôs</div>
+    <div class="style-tag">TECH VIBE</div>
+  </div>
+
+  <div class="sticker-showcase">
+    <div class="sticker-demo robot-bg">
+      <div class="rec-badge">⭐ TOP PICK</div>
+      <div class="char-circle robot-circle">🤖</div>
+      <div class="char-name">Neymar</div>
+      <div class="char-team">🇧🇷 Brasil</div>
+      <div class="char-pos">Atacante · #10</div>
+    </div>
+    <div class="sticker-demo robot-bg">
+      <div class="char-circle robot-circle">🤖</div>
+      <div class="char-name">Messi</div>
+      <div class="char-team">🇦🇷 Argentina</div>
+      <div class="char-pos">Atacante · #10</div>
+    </div>
+    <div class="sticker-demo robot-bg">
+      <div class="char-circle robot-circle">🤖</div>
+      <div class="char-name">Mbappé</div>
+      <div class="char-team">🇫🇷 França</div>
+      <div class="char-pos">Atacante · #7</div>
+    </div>
+    <div class="sticker-demo robot-bg">
+      <div class="char-circle robot-circle">🤖</div>
+      <div class="char-name">Cristiano</div>
+      <div class="char-team">🇵🇹 Portugal</div>
+      <div class="char-pos">Atacante · #7</div>
+    </div>
+  </div>
+
+  <div class="style-desc">
+    Cada jogador é um robô com design único. Corpo metálico com detalhes na cor da seleção. Rosto LED expressivo que remete ao jogador real — "olhos" e "cabelo" customizados. Neymar teria um topete de metal dourado, Messi um visor azul sereno.
+  </div>
+  <div class="pros-cons">
+    <div class="pro">✅ Super alinhado com tech/app</div>
+    <div class="pro">✅ Infinitas variações visuais</div>
+    <div class="con">❌ Menos "fofinho", mais frio</div>
+    <div class="con">❌ Pode parecer genérico</div>
+  </div>
+</div>
+
+<!-- ===== STYLE 2: CATS ===== -->
+<div class="style-card">
+  <div class="style-header">
+    <div class="style-num">2</div>
+    <div class="style-name">🐱 Gatos</div>
+    <div class="style-tag">INTERNET CULTURE</div>
+  </div>
+
+  <div class="sticker-showcase">
+    <div class="sticker-demo cat-bg">
+      <div class="char-circle cat-circle">🐱</div>
+      <div class="char-name">Neymar</div>
+      <div class="char-team">🇧🇷 Brasil</div>
+      <div class="char-pos">Atacante · #10</div>
+    </div>
+    <div class="sticker-demo cat-bg">
+      <div class="char-circle cat-circle">😺</div>
+      <div class="char-name">Messi</div>
+      <div class="char-team">🇦🇷 Argentina</div>
+      <div class="char-pos">Atacante · #10</div>
+    </div>
+    <div class="sticker-demo cat-bg">
+      <div class="char-circle cat-circle">😼</div>
+      <div class="char-name">Mbappé</div>
+      <div class="char-team">🇫🇷 França</div>
+      <div class="char-pos">Atacante · #7</div>
+    </div>
+    <div class="sticker-demo cat-bg">
+      <div class="char-circle cat-circle">🐱</div>
+      <div class="char-name">Cristiano</div>
+      <div class="char-team">🇵🇹 Portugal</div>
+      <div class="char-pos">Atacante · #7</div>
+    </div>
+  </div>
+
+  <div class="style-desc">
+    Gatos antropomórficos com uniforme da seleção. Cada gato tem pelagem, olhos e expressão que remetem ao jogador. Neymar: gato amarelo com topete, olhar malandro. Messi: gato calmo, pelagem clara, barba sutil. Mbappé: gato preto ágil, olhar focado.
+  </div>
+  <div class="pros-cons">
+    <div class="pro">✅ Viral — gatos dominam a internet</div>
+    <div class="pro">✅ Muito expressivo e fofinho</div>
+    <div class="con">❌ Pode ser visto como infantil</div>
+    <div class="con">❌ Difícil diferenciar 1.000 gatos</div>
+  </div>
+</div>
+
+<!-- ===== STYLE 3: HORSES ===== -->
+<div class="style-card">
+  <div class="style-header">
+    <div class="style-num">3</div>
+    <div class="style-name">🐴 Cavalos</div>
+    <div class="style-tag">NOBRE & FORTE</div>
+  </div>
+
+  <div class="sticker-showcase">
+    <div class="sticker-demo horse-bg">
+      <div class="char-circle horse-circle">🐴</div>
+      <div class="char-name">Neymar</div>
+      <div class="char-team">🇧🇷 Brasil</div>
+      <div class="char-pos">Atacante · #10</div>
+    </div>
+    <div class="sticker-demo horse-bg">
+      <div class="char-circle horse-circle">🐴</div>
+      <div class="char-name">Messi</div>
+      <div class="char-team">🇦🇷 Argentina</div>
+      <div class="char-pos">Atacante · #10</div>
+    </div>
+    <div class="sticker-demo horse-bg">
+      <div class="char-circle horse-circle">🐴</div>
+      <div class="char-name">Mbappé</div>
+      <div class="char-team">🇫🇷 França</div>
+      <div class="char-pos">Atacante · #7</div>
+    </div>
+    <div class="sticker-demo horse-bg">
+      <div class="char-circle horse-circle">🐴</div>
+      <div class="char-name">Cristiano</div>
+      <div class="char-team">🇵🇹 Portugal</div>
+      <div class="char-pos">Atacante · #7</div>
+    </div>
+  </div>
+
+  <div class="style-desc">
+    Cavalos estilizados com uniforme. Crina customizada (topete do Neymar = crina pintada, Messi = crina lisa). Rosto expressivo com traços do jogador. Remete a força, competição e nobreza — muito alinhado com esporte.
+  </div>
+  <div class="pros-cons">
+    <div class="pro">✅ Forte conexão com esporte</div>
+    <div class="pro">✅ Visual nobre e diferenciado</div>
+    <div class="con">❌ Menos apelo "fofo"</div>
+    <div class="con">❌ Rosto de cavalo é difícil de estilizar</div>
+  </div>
+</div>
+
+<!-- ===== STYLE 4: ALIENS ===== -->
+<div class="style-card">
+  <div class="style-header">
+    <div class="style-num">4</div>
+    <div class="style-name">👽 Aliens</div>
+    <div class="style-tag">CRIATIVO</div>
+  </div>
+
+  <div class="sticker-showcase">
+    <div class="sticker-demo alien-bg">
+      <div class="char-circle alien-circle">👽</div>
+      <div class="char-name">Neymar</div>
+      <div class="char-team">🇧🇷 Brasil</div>
+      <div class="char-pos">Atacante · #10</div>
+    </div>
+    <div class="sticker-demo alien-bg">
+      <div class="char-circle alien-circle">👽</div>
+      <div class="char-name">Messi</div>
+      <div class="char-team">🇦🇷 Argentina</div>
+      <div class="char-pos">Atacante · #10</div>
+    </div>
+    <div class="sticker-demo alien-bg">
+      <div class="char-circle alien-circle">👾</div>
+      <div class="char-name">Mbappé</div>
+      <div class="char-team">🇫🇷 França</div>
+      <div class="char-pos">Atacante · #7</div>
+    </div>
+    <div class="sticker-demo alien-bg">
+      <div class="char-circle alien-circle">👽</div>
+      <div class="char-name">Cristiano</div>
+      <div class="char-team">🇵🇹 Portugal</div>
+      <div class="char-pos">Atacante · #7</div>
+    </div>
+  </div>
+
+  <div class="style-desc">
+    Alienígenas humanóides com pele na cor da seleção. Cabeça grande, olhos expressivos. Cada alien tem acessórios que remetem ao jogador (cabelo, barba, tatuagens como marcas na pele). Zero chance de confundir com imagem real — proteção jurídica máxima.
+  </div>
+  <div class="pros-cons">
+    <div class="pro">✅ Máxima proteção jurídica</div>
+    <div class="pro">✅ Liberdade criativa total</div>
+    <div class="con">❌ Pode não ter apelo emocional</div>
+    <div class="con">❌ Mais difícil conectar com o jogador</div>
+  </div>
+</div>
+
+<!-- ===== STYLE 5: BEARS ===== -->
+<div class="style-card">
+  <div class="style-header">
+    <div class="style-num">5</div>
+    <div class="style-name">🐻 Ursinhos</div>
+    <div class="style-tag">FOFINHO</div>
+  </div>
+
+  <div class="sticker-showcase">
+    <div class="sticker-demo bear-bg">
+      <div class="rec-badge">⭐ TOP PICK</div>
+      <div class="char-circle bear-circle">🧸</div>
+      <div class="char-name">Neymar</div>
+      <div class="char-team">🇧🇷 Brasil</div>
+      <div class="char-pos">Atacante · #10</div>
+    </div>
+    <div class="sticker-demo bear-bg">
+      <div class="char-circle bear-circle">🧸</div>
+      <div class="char-name">Messi</div>
+      <div class="char-team">🇦🇷 Argentina</div>
+      <div class="char-pos">Atacante · #10</div>
+    </div>
+    <div class="sticker-demo bear-bg">
+      <div class="char-circle bear-circle">🐻</div>
+      <div class="char-name">Mbappé</div>
+      <div class="char-team">🇫🇷 França</div>
+      <div class="char-pos">Atacante · #7</div>
+    </div>
+    <div class="sticker-demo bear-bg">
+      <div class="char-circle bear-circle">🧸</div>
+      <div class="char-name">Cristiano</div>
+      <div class="char-team">🇵🇹 Portugal</div>
+      <div class="char-pos">Atacante · #7</div>
+    </div>
+  </div>
+
+  <div class="style-desc">
+    Ursinhos de pelúcia vestindo uniforme da seleção. Visual fofo e colecionável — instinto de "quero todos". Neymar: ursinho dourado com topete estilizado. Messi: ursinho branco sereno com barba desenhada. Muito shareável nas redes sociais.
+  </div>
+  <div class="pros-cons">
+    <div class="pro">✅ Altamente colecionável</div>
+    <div class="pro">✅ Apelo emocional forte</div>
+    <div class="pro">✅ Super shareável / UGC friendly</div>
+    <div class="con">❌ Pode parecer infantil demais</div>
+  </div>
+</div>
+
+<!-- ===== STYLE 6: PENGUINS ===== -->
+<div class="style-card">
+  <div class="style-header">
+    <div class="style-num">6</div>
+    <div class="style-name">🐧 Pinguins</div>
+    <div class="style-tag">SIMPÁTICO</div>
+  </div>
+
+  <div class="sticker-showcase">
+    <div class="sticker-demo penguin-bg">
+      <div class="char-circle penguin-circle">🐧</div>
+      <div class="char-name">Neymar</div>
+      <div class="char-team">🇧🇷 Brasil</div>
+      <div class="char-pos">Atacante · #10</div>
+    </div>
+    <div class="sticker-demo penguin-bg">
+      <div class="char-circle penguin-circle">🐧</div>
+      <div class="char-name">Messi</div>
+      <div class="char-team">🇦🇷 Argentina</div>
+      <div class="char-pos">Atacante · #7</div>
+    </div>
+    <div class="sticker-demo penguin-bg">
+      <div class="char-circle penguin-circle">🐧</div>
+      <div class="char-name">Mbappé</div>
+      <div class="char-team">🇫🇷 França</div>
+      <div class="char-pos">Atacante · #7</div>
+    </div>
+    <div class="sticker-demo penguin-bg">
+      <div class="char-circle penguin-circle">🐧</div>
+      <div class="char-name">Cristiano</div>
+      <div class="char-team">🇵🇹 Portugal</div>
+      <div class="char-pos">Atacante · #7</div>
+    </div>
+  </div>
+
+  <div class="style-desc">
+    Pinguins com cachecol/uniforme da seleção. Corpo redondo, simpático, expressões faciais marcantes. Fácil de diferenciar com acessórios (óculos, cabelo, barba). Referência: Club Penguin + futebol. Pinguins são universalmente amados.
+  </div>
+  <div class="pros-cons">
+    <div class="pro">✅ Universalmente simpático</div>
+    <div class="pro">✅ Fácil de diferenciar</div>
+    <div class="con">❌ Menos "sério" pra público adulto</div>
+    <div class="con">❌ Associação com frio vs Copa</div>
+  </div>
+</div>
+
+<!-- ===== COMPARISON ===== -->
+<div class="style-card">
+  <div class="style-header">
+    <div class="style-num">⚡</div>
+    <div class="style-name">Comparativo</div>
+  </div>
+
+  <div style="padding: 0 16px 8px; font-size: 11px; color: #888;">
+    O mesmo jogador (Neymar 🇧🇷) nos 6 estilos:
+  </div>
+  <div class="comparison">
+    <div class="comp-card robot-bg"><div class="ce">🤖</div><div class="cn">Robô</div></div>
+    <div class="comp-card cat-bg"><div class="ce">🐱</div><div class="cn">Gato</div></div>
+    <div class="comp-card horse-bg"><div class="ce">🐴</div><div class="cn">Cavalo</div></div>
+    <div class="comp-card alien-bg"><div class="ce">👽</div><div class="cn">Alien</div></div>
+    <div class="comp-card bear-bg"><div class="ce">🧸</div><div class="cn">Ursinho</div></div>
+    <div class="comp-card penguin-bg"><div class="ce">🐧</div><div class="cn">Pinguim</div></div>
+  </div>
+
+  <div style="padding: 8px 20px 16px; font-size: 12px; color: #aaa; line-height: 1.6;">
+    <b style="color: #FFD700;">💡 Recomendação:</b> <b>Ursinhos</b> ou <b>Robôs</b>.<br><br>
+    <b>Ursinhos</b> — máximo apelo emocional e colecionável. As pessoas vão querer compartilhar screenshots dos seus ursinhos favoritos (UGC natural). Funciona pra todas as idades.<br><br>
+    <b>Robôs</b> — alinhado com o DNA tech do Phiz. Mais moderno e diferenciado no mercado. Visual que pode ser mais sofisticado sem parecer infantil.
+  </div>
+</div>
+
+<div class="vote-section">
+  <h3>Qual estilo prefere? 🤔</h3>
+  <p>Deslize as figurinhas horizontalmente pra ver os exemplos</p>
+</div>
+
+</body>
+</html>
