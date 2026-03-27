@@ -14,11 +14,8 @@
     -webkit-font-smoothing: antialiased;
   }
   html { scroll-behavior: smooth; }
-
-  /* Safe area */
   .safe-top { height: env(safe-area-inset-top, 0px); background: #0d1117; }
 
-  /* Screens */
   .screen { display: none; min-height: 100dvh; padding-bottom: 90px; }
   .screen.active { display: block; }
 
@@ -33,6 +30,7 @@
     flex: 1; text-align: center; padding: 6px 0; cursor: pointer;
     color: #555; font-size: 10px; font-weight: 600; transition: color 0.2s;
     display: flex; flex-direction: column; align-items: center; gap: 2px;
+    position: relative;
   }
   .nav-item.active { color: #FFD700; }
   .nav-item .ni { font-size: 24px; line-height: 1; }
@@ -41,28 +39,48 @@
     background: #ef4444; color: #fff; font-size: 9px; font-weight: 800;
     padding: 1px 5px; border-radius: 8px; min-width: 16px;
   }
-  .nav-item { position: relative; }
 
-  /* HOME */
+  /* HOME — new design without global progress */
   .home-bg {
     background: linear-gradient(160deg, #1a0a3e 0%, #0d1117 50%);
-    padding: 20px 20px 0; text-align: center;
+    padding: 24px 20px 16px; text-align: center;
   }
   .logo { font-size: 28px; font-weight: 900; color: #FFD700; letter-spacing: 0.5px; }
   .logo-sub { color: #888; font-size: 13px; margin-top: 2px; }
 
-  .progress-container { margin: 24px auto 20px; width: 180px; height: 180px; position: relative; }
-  .progress-container svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-  .progress-container .track { fill: none; stroke: #1c2333; stroke-width: 10; }
-  .progress-container .fill { fill: none; stroke: url(#goldGrad); stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset 1.5s ease; }
-  .progress-center {
-    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center;
+  /* Completed teams showcase */
+  .completed-section { padding: 16px 20px 0; }
+  .completed-title { font-size: 14px; font-weight: 700; color: #aaa; margin-bottom: 10px; }
+  .completed-teams {
+    display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px;
+    -webkit-overflow-scrolling: touch; scroll-snap-type: x mandatory;
   }
-  .progress-center .big { font-size: 42px; font-weight: 900; color: #FFD700; line-height: 1; }
-  .progress-center .sub { font-size: 12px; color: #888; margin-top: 2px; }
-  .progress-center .pct { font-size: 14px; color: #aaa; font-weight: 600; }
+  .completed-teams::-webkit-scrollbar { display: none; }
+  .ct-card {
+    min-width: 72px; text-align: center; scroll-snap-align: start;
+  }
+  .ct-flag { font-size: 36px; }
+  .ct-name { font-size: 9px; color: #888; margin-top: 2px; }
+  .ct-star { font-size: 10px; }
 
-  .packs-section { padding: 0 20px 20px; }
+  /* Almost there section */
+  .almost-section { padding: 16px 20px 0; }
+  .almost-title { font-size: 14px; font-weight: 700; color: #aaa; margin-bottom: 10px; }
+  .almost-card {
+    display: flex; align-items: center; gap: 12px; padding: 12px 14px;
+    background: #161b22; border: 1px solid #21262d; border-radius: 14px;
+    margin-bottom: 8px;
+  }
+  .almost-flag { font-size: 28px; }
+  .almost-info { flex: 1; }
+  .almost-name { font-size: 14px; font-weight: 700; }
+  .almost-progress { font-size: 11px; color: #888; margin-top: 2px; }
+  .almost-bar { height: 4px; background: #1c2333; border-radius: 2px; margin-top: 4px; }
+  .almost-bar-fill { height: 100%; background: linear-gradient(90deg, #FFD700, #FF8C00); border-radius: 2px; }
+  .almost-missing { font-size: 11px; color: #FFD700; font-weight: 700; }
+
+  /* Packs */
+  .packs-section { padding: 20px 20px; }
   .packs-title { font-size: 16px; font-weight: 800; margin-bottom: 2px; }
   .packs-timer { font-size: 12px; color: #F87171; margin-bottom: 14px; font-weight: 600; }
   .packs-row { display: flex; gap: 12px; justify-content: center; }
@@ -76,21 +94,23 @@
     box-shadow: 0 6px 24px rgba(255,215,0,0.35);
   }
   .pack-card.available:active { transform: scale(0.95); }
-  .pack-card.opened {
-    background: #161b22; border: 1px solid #21262d; cursor: default;
-  }
+  .pack-card.opened { background: #161b22; border: 1px solid #21262d; cursor: default; }
   .pack-card .pe { font-size: 40px; }
   .pack-card .pl { font-size: 11px; font-weight: 700; margin-top: 4px; }
   .pack-card.available .pl { color: #1a0a3e; }
   .pack-card.opened .pl { color: #555; }
 
-  .stats-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; padding: 20px; }
-  .stat-box {
-    background: #161b22; border: 1px solid #21262d; border-radius: 14px;
-    padding: 14px 8px; text-align: center;
+  @keyframes pulse { 0%,100% { box-shadow: 0 6px 24px rgba(255,215,0,0.35); } 50% { box-shadow: 0 6px 32px rgba(255,215,0,0.55); } }
+  .pack-card.available { animation: pulse 2s infinite; }
+
+  /* Stats - simpler */
+  .stats-row { display: flex; gap: 10px; padding: 0 20px 16px; }
+  .stat-pill {
+    flex: 1; background: #161b22; border: 1px solid #21262d; border-radius: 12px;
+    padding: 10px; text-align: center;
   }
-  .stat-box .sv { font-size: 26px; font-weight: 900; color: #FFD700; }
-  .stat-box .sl { font-size: 10px; color: #888; margin-top: 2px; }
+  .stat-pill .sv { font-size: 18px; font-weight: 800; color: #FFD700; }
+  .stat-pill .sl { font-size: 9px; color: #666; margin-top: 1px; }
 
   /* OPEN PACK */
   .open-bg {
@@ -127,6 +147,8 @@
   .rcard:nth-child(3) { transform: translate(-45px,-58%) rotate(0deg); z-index: 3; }
   .rcard:nth-child(4) { transform: translate(0px,-55%) rotate(7deg); z-index: 2; }
   .rcard:nth-child(5) { transform: translate(60px,-50%) rotate(14deg); z-index: 1; }
+  @keyframes shimmer { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+  .rcard.is-new::after { animation: shimmer 1.5s infinite; }
 
   .open-result { font-size: 15px; color: #aaa; margin-top: 20px; }
   .open-result b { color: #22c55e; }
@@ -151,14 +173,16 @@
     background: rgba(255,215,0,0.1); padding: 6px 14px; border-radius: 20px;
   }
   .team-section { padding: 16px 16px 8px; }
-  .team-header {
-    display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
-  }
+  .team-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
   .team-flag { font-size: 24px; }
   .team-name { font-size: 15px; font-weight: 800; }
   .team-count { font-size: 12px; color: #888; font-weight: 400; }
   .team-bar { flex: 1; height: 4px; background: #1c2333; border-radius: 2px; margin-left: 8px; }
   .team-bar-fill { height: 100%; background: #FFD700; border-radius: 2px; transition: width 0.5s; }
+  .team-complete-badge {
+    font-size: 10px; background: #22c55e; color: #fff; font-weight: 800;
+    padding: 2px 8px; border-radius: 8px; margin-left: 8px;
+  }
 
   .sticker-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 6px; }
   .sticker {
@@ -169,13 +193,12 @@
     background: linear-gradient(145deg, #1e3a5f 0%, #162447 100%);
     border: 1px solid #2d5a8e;
   }
-  .sticker.empty {
-    background: rgba(255,255,255,0.02); border: 1px dashed #2a2a3a;
-  }
+  .sticker.empty { background: rgba(255,255,255,0.02); border: 1px dashed #2a2a3a; }
   .sticker .se { font-size: 24px; }
   .sticker .sn { font-size: 7px; color: #aaa; margin-top: 1px; text-align: center; line-height: 1.1; }
   .sticker.empty .se { font-size: 18px; opacity: 0.3; }
   .sticker.empty .sn { color: #333; }
+  .divider { height: 1px; background: #21262d; margin: 0 20px; }
 
   /* INVENTORY */
   .inv-top { padding: 16px 20px; }
@@ -196,8 +219,7 @@
   }
   .btn-blue {
     background: #2563EB; color: #fff; border: none; padding: 10px 16px;
-    border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer;
-    margin-left: 8px;
+    border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; margin-left: 8px;
   }
   .btn-blue:active { opacity: 0.8; }
 
@@ -228,8 +250,7 @@
   .btn-send-full {
     width: 100%; margin-top: 16px; background: linear-gradient(135deg, #FFD700, #FF8C00);
     color: #1a0a3e; border: none; padding: 16px; border-radius: 14px;
-    font-size: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase;
-    letter-spacing: 0.5px;
+    font-size: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px;
   }
 
   /* COMPLETE */
@@ -249,24 +270,11 @@
   }
   .cfield:focus { border-color: #FFD700; }
   .cfield::placeholder { color: #555; }
-
-  /* Divider */
-  .divider { height: 1px; background: #21262d; margin: 0 20px; }
-
-  /* Pulse animation for packs */
-  @keyframes pulse { 0%,100% { box-shadow: 0 6px 24px rgba(255,215,0,0.35); } 50% { box-shadow: 0 6px 32px rgba(255,215,0,0.55); } }
-  .pack-card.available { animation: pulse 2s infinite; }
-
-  /* Shimmer for new badge */
-  @keyframes shimmer { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
-  .rcard.is-new::after { animation: shimmer 1.5s infinite; }
 </style>
 </head>
 <body>
 
 <div class="safe-top"></div>
-
-<!-- SVG gradient def -->
 <svg style="position:absolute;width:0;height:0">
   <defs>
     <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -281,17 +289,6 @@
   <div class="home-bg">
     <div class="logo">⚽ Álbum da Copa</div>
     <div class="logo-sub">Copa do Mundo 2026</div>
-    <div class="progress-container">
-      <svg viewBox="0 0 180 180">
-        <circle class="track" cx="90" cy="90" r="78"/>
-        <circle class="fill" cx="90" cy="90" r="78" stroke-dasharray="490" stroke-dashoffset="300"/>
-      </svg>
-      <div class="progress-center">
-        <div class="big">387</div>
-        <div class="sub">de 1.000</div>
-        <div class="pct">38,7%</div>
-      </div>
-    </div>
   </div>
 
   <div class="packs-section">
@@ -313,10 +310,56 @@
     </div>
   </div>
 
-  <div class="stats-grid">
-    <div class="stat-box"><div class="sv">387</div><div class="sl">Colecionadas</div></div>
-    <div class="stat-box"><div class="sv">43</div><div class="sl">Repetidas</div></div>
-    <div class="stat-box"><div class="sv">12</div><div class="sl">Enviadas</div></div>
+  <!-- Completed teams -->
+  <div class="completed-section">
+    <div class="completed-title">⭐ Seleções completas</div>
+    <div class="completed-teams">
+      <div class="ct-card"><div class="ct-flag">🇲🇽</div><div class="ct-name">México</div><div class="ct-star">⭐</div></div>
+      <div class="ct-card"><div class="ct-flag">🇨🇷</div><div class="ct-name">Costa Rica</div><div class="ct-star">⭐</div></div>
+      <div class="ct-card"><div class="ct-flag">🇸🇦</div><div class="ct-name">Arábia Saud.</div><div class="ct-star">⭐</div></div>
+      <div class="ct-card" style="opacity:0.3"><div class="ct-flag">❓</div><div class="ct-name">Próxima?</div><div class="ct-star" style="opacity:0.3">⭐</div></div>
+    </div>
+  </div>
+
+  <!-- Almost complete -->
+  <div class="almost-section">
+    <div class="almost-title">🔥 Quase lá!</div>
+
+    <div class="almost-card">
+      <div class="almost-flag">🇧🇷</div>
+      <div class="almost-info">
+        <div class="almost-name">Brasil</div>
+        <div class="almost-progress">17 de 20</div>
+        <div class="almost-bar"><div class="almost-bar-fill" style="width:85%"></div></div>
+      </div>
+      <div class="almost-missing">Faltam 3!</div>
+    </div>
+
+    <div class="almost-card">
+      <div class="almost-flag">🇫🇷</div>
+      <div class="almost-info">
+        <div class="almost-name">França</div>
+        <div class="almost-progress">16 de 20</div>
+        <div class="almost-bar"><div class="almost-bar-fill" style="width:80%"></div></div>
+      </div>
+      <div class="almost-missing">Faltam 4!</div>
+    </div>
+
+    <div class="almost-card">
+      <div class="almost-flag">🇩🇪</div>
+      <div class="almost-info">
+        <div class="almost-name">Alemanha</div>
+        <div class="almost-progress">15 de 20</div>
+        <div class="almost-bar"><div class="almost-bar-fill" style="width:75%"></div></div>
+      </div>
+      <div class="almost-missing">Faltam 5!</div>
+    </div>
+  </div>
+
+  <div class="stats-row" style="margin-top: 16px;">
+    <div class="stat-pill"><div class="sv">3 ⭐</div><div class="sl">Completas</div></div>
+    <div class="stat-pill"><div class="sv">43</div><div class="sl">Repetidas</div></div>
+    <div class="stat-pill"><div class="sv">12</div><div class="sl">Enviadas</div></div>
   </div>
 </div>
 
@@ -326,31 +369,11 @@
     <div class="open-title">🎴 Pacote #2</div>
     <div class="open-sub">5 figurinhas</div>
     <div class="cards-container">
-      <div class="rcard is-new">
-        <div class="re">🐴</div>
-        <div class="rn">Vinícius</div>
-        <div class="rc">🇧🇷 Brasil</div>
-      </div>
-      <div class="rcard is-new">
-        <div class="re">🐴</div>
-        <div class="rn">Mbappé</div>
-        <div class="rc">🇫🇷 França</div>
-      </div>
-      <div class="rcard is-dup">
-        <div class="re">🐴</div>
-        <div class="rn">Messi</div>
-        <div class="rc">🇦🇷 Argentina</div>
-      </div>
-      <div class="rcard is-new">
-        <div class="re">🐴</div>
-        <div class="rn">Salah</div>
-        <div class="rc">🇪🇬 Egito</div>
-      </div>
-      <div class="rcard is-dup">
-        <div class="re">🐴</div>
-        <div class="rn">Cristiano</div>
-        <div class="rc">🇵🇹 Portugal</div>
-      </div>
+      <div class="rcard is-new"><div class="re">🐴</div><div class="rn">Vinícius</div><div class="rc">🇧🇷 Brasil</div></div>
+      <div class="rcard is-new"><div class="re">🐴</div><div class="rn">Mbappé</div><div class="rc">🇫🇷 França</div></div>
+      <div class="rcard is-dup"><div class="re">🐴</div><div class="rn">Messi</div><div class="rc">🇦🇷 Argentina</div></div>
+      <div class="rcard is-new"><div class="re">🐴</div><div class="rn">Salah</div><div class="rc">🇪🇬 Egito</div></div>
+      <div class="rcard is-dup"><div class="re">🐴</div><div class="rn">Cristiano</div><div class="rc">🇵🇹 Portugal</div></div>
     </div>
     <div class="open-result"><b>3 novas</b> · 2 repetidas</div>
     <button class="btn-gold" onclick="go('home')">Coletar! ✨</button>
@@ -364,13 +387,46 @@
     <div class="filter-btn">Filtrar ▾</div>
   </div>
 
+  <!-- México - COMPLETA -->
+  <div class="team-section">
+    <div class="team-header">
+      <span class="team-flag">🇲🇽</span>
+      <span class="team-name">México</span>
+      <span class="team-count">20/20</span>
+      <span class="team-complete-badge">COMPLETA ⭐</span>
+    </div>
+    <div class="sticker-grid">
+      <div class="sticker has"><div class="se">🛡️</div><div class="sn">Escudo</div></div>
+      <div class="sticker has"><div class="se">📸</div><div class="sn">Time</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Ochoa</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Álvarez</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Araujo</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Montes</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Gallardo</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Herrera</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Guardado</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Gutiérrez</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Lozano</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Corona</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Jiménez</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Vega</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Romo</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Chávez</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Rodríguez</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Sánchez</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Antuna</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Martín</div></div>
+    </div>
+  </div>
+  <div class="divider"></div>
+
   <!-- Brasil -->
   <div class="team-section">
     <div class="team-header">
       <span class="team-flag">🇧🇷</span>
       <span class="team-name">Brasil</span>
-      <span class="team-count">14/20</span>
-      <div class="team-bar"><div class="team-bar-fill" style="width:70%"></div></div>
+      <span class="team-count">17/20</span>
+      <div class="team-bar"><div class="team-bar-fill" style="width:85%"></div></div>
     </div>
     <div class="sticker-grid">
       <div class="sticker has"><div class="se">🛡️</div><div class="sn">Escudo</div></div>
@@ -380,7 +436,7 @@
       <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
       <div class="sticker has"><div class="se">🐴</div><div class="sn">Militão</div></div>
       <div class="sticker has"><div class="se">🐴</div><div class="sn">Danilo</div></div>
-      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Arana</div></div>
       <div class="sticker has"><div class="se">🐴</div><div class="sn">Casemiro</div></div>
       <div class="sticker has"><div class="se">🐴</div><div class="sn">Paquetá</div></div>
       <div class="sticker has"><div class="se">🐴</div><div class="sn">Bruno G.</div></div>
@@ -388,14 +444,13 @@
       <div class="sticker has"><div class="se">🐴</div><div class="sn">Raphinha</div></div>
       <div class="sticker has"><div class="se">🐴</div><div class="sn">Vinícius</div></div>
       <div class="sticker has"><div class="se">🐴</div><div class="sn">Rodrygo</div></div>
-      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
       <div class="sticker has"><div class="se">🐴</div><div class="sn">Endrick</div></div>
-      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
-      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
       <div class="sticker has"><div class="se">🐴</div><div class="sn">Neymar</div></div>
+      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Martinelli</div></div>
+      <div class="sticker has"><div class="se">🐴</div><div class="sn">Éderson</div></div>
     </div>
   </div>
-
   <div class="divider"></div>
 
   <!-- Argentina -->
@@ -429,41 +484,6 @@
       <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
     </div>
   </div>
-
-  <div class="divider"></div>
-
-  <!-- França -->
-  <div class="team-section">
-    <div class="team-header">
-      <span class="team-flag">🇫🇷</span>
-      <span class="team-name">França</span>
-      <span class="team-count">11/20</span>
-      <div class="team-bar"><div class="team-bar-fill" style="width:55%"></div></div>
-    </div>
-    <div class="sticker-grid">
-      <div class="sticker has"><div class="se">🛡️</div><div class="sn">Escudo</div></div>
-      <div class="sticker has"><div class="se">📸</div><div class="sn">Time</div></div>
-      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
-      <div class="sticker has"><div class="se">🐴</div><div class="sn">Mbappé</div></div>
-      <div class="sticker has"><div class="se">🐴</div><div class="sn">Griezmann</div></div>
-      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
-      <div class="sticker has"><div class="se">🐴</div><div class="sn">Dembélé</div></div>
-      <div class="sticker has"><div class="se">🐴</div><div class="sn">Tchouaméni</div></div>
-      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
-      <div class="sticker has"><div class="se">🐴</div><div class="sn">Camavinga</div></div>
-      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
-      <div class="sticker has"><div class="se">🐴</div><div class="sn">Maignan</div></div>
-      <div class="sticker has"><div class="se">🐴</div><div class="sn">Upamecano</div></div>
-      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
-      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
-      <div class="sticker has"><div class="se">🐴</div><div class="sn">Hernández</div></div>
-      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
-      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
-      <div class="sticker empty"><div class="se">❓</div><div class="sn">???</div></div>
-      <div class="sticker has"><div class="se">🐴</div><div class="sn">Saliba</div></div>
-    </div>
-  </div>
-
   <div class="divider"></div>
 
   <!-- Alemanha -->
@@ -506,54 +526,14 @@
     <div class="inv-sub">43 figurinhas pra enviar</div>
   </div>
   <div class="inv-items">
-    <div class="inv-card">
-      <div class="ie">🐴</div>
-      <div class="ii"><div class="iname">Messi</div><div class="icountry">🇦🇷 Argentina</div></div>
-      <div class="iqty">×4</div>
-      <button class="btn-blue" onclick="go('share')">Enviar</button>
-    </div>
-    <div class="inv-card">
-      <div class="ie">🐴</div>
-      <div class="ii"><div class="iname">Cristiano</div><div class="icountry">🇵🇹 Portugal</div></div>
-      <div class="iqty">×3</div>
-      <button class="btn-blue" onclick="go('share')">Enviar</button>
-    </div>
-    <div class="inv-card">
-      <div class="ie">🐴</div>
-      <div class="ii"><div class="iname">Vinícius</div><div class="icountry">🇧🇷 Brasil</div></div>
-      <div class="iqty">×2</div>
-      <button class="btn-blue" onclick="go('share')">Enviar</button>
-    </div>
-    <div class="inv-card">
-      <div class="ie">🐴</div>
-      <div class="ii"><div class="iname">Mbappé</div><div class="icountry">🇫🇷 França</div></div>
-      <div class="iqty">×2</div>
-      <button class="btn-blue" onclick="go('share')">Enviar</button>
-    </div>
-    <div class="inv-card">
-      <div class="ie">🐴</div>
-      <div class="ii"><div class="iname">Bellingham</div><div class="icountry">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Inglaterra</div></div>
-      <div class="iqty">×5</div>
-      <button class="btn-blue" onclick="go('share')">Enviar</button>
-    </div>
-    <div class="inv-card">
-      <div class="ie">🐴</div>
-      <div class="ii"><div class="iname">Pedri</div><div class="icountry">🇪🇸 Espanha</div></div>
-      <div class="iqty">×3</div>
-      <button class="btn-blue" onclick="go('share')">Enviar</button>
-    </div>
-    <div class="inv-card">
-      <div class="ie">🐴</div>
-      <div class="ii"><div class="iname">Haaland</div><div class="icountry">🇳🇴 Noruega</div></div>
-      <div class="iqty">×2</div>
-      <button class="btn-blue" onclick="go('share')">Enviar</button>
-    </div>
-    <div class="inv-card">
-      <div class="ie">🐴</div>
-      <div class="ii"><div class="iname">Neuer</div><div class="icountry">🇩🇪 Alemanha</div></div>
-      <div class="iqty">×4</div>
-      <button class="btn-blue" onclick="go('share')">Enviar</button>
-    </div>
+    <div class="inv-card"><div class="ie">🐴</div><div class="ii"><div class="iname">Messi</div><div class="icountry">🇦🇷 Argentina</div></div><div class="iqty">×4</div><button class="btn-blue" onclick="go('share')">Enviar</button></div>
+    <div class="inv-card"><div class="ie">🐴</div><div class="ii"><div class="iname">Cristiano</div><div class="icountry">🇵🇹 Portugal</div></div><div class="iqty">×3</div><button class="btn-blue" onclick="go('share')">Enviar</button></div>
+    <div class="inv-card"><div class="ie">🐴</div><div class="ii"><div class="iname">Vinícius</div><div class="icountry">🇧🇷 Brasil</div></div><div class="iqty">×2</div><button class="btn-blue" onclick="go('share')">Enviar</button></div>
+    <div class="inv-card"><div class="ie">🐴</div><div class="ii"><div class="iname">Mbappé</div><div class="icountry">🇫🇷 França</div></div><div class="iqty">×2</div><button class="btn-blue" onclick="go('share')">Enviar</button></div>
+    <div class="inv-card"><div class="ie">🐴</div><div class="ii"><div class="iname">Bellingham</div><div class="icountry">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Inglaterra</div></div><div class="iqty">×5</div><button class="btn-blue" onclick="go('share')">Enviar</button></div>
+    <div class="inv-card"><div class="ie">🐴</div><div class="ii"><div class="iname">Pedri</div><div class="icountry">🇪🇸 Espanha</div></div><div class="iqty">×3</div><button class="btn-blue" onclick="go('share')">Enviar</button></div>
+    <div class="inv-card"><div class="ie">🐴</div><div class="ii"><div class="iname">Haaland</div><div class="icountry">🇳🇴 Noruega</div></div><div class="iqty">×2</div><button class="btn-blue" onclick="go('share')">Enviar</button></div>
+    <div class="inv-card"><div class="ie">🐴</div><div class="ii"><div class="iname">Neuer</div><div class="icountry">🇩🇪 Alemanha</div></div><div class="iqty">×4</div><button class="btn-blue" onclick="go('share')">Enviar</button></div>
   </div>
 </div>
 
@@ -562,28 +542,12 @@
   <div class="share-content">
     <div class="share-back" onclick="go('inv')">← Voltar</div>
     <h2>Enviar Figurinha</h2>
-    <div class="share-card">
-      <div class="sce">🐴</div>
-      <div class="scn">Messi</div>
-      <div class="scc">🇦🇷 Argentina</div>
-    </div>
+    <div class="share-card"><div class="sce">🐴</div><div class="scn">Messi</div><div class="scc">🇦🇷 Argentina</div></div>
     <div class="contacts-label">Escolha um contato no Phiz:</div>
-    <div class="contact">
-      <div class="cavatar" style="background:#2563EB">M</div>
-      <div><div class="cname">Maria Silva</div><div class="cstatus">Precisa: Messi 🇦🇷</div></div>
-    </div>
-    <div class="contact">
-      <div class="cavatar" style="background:#22c55e">J</div>
-      <div><div class="cname">João Pedro</div><div class="cstatus">Online agora</div></div>
-    </div>
-    <div class="contact">
-      <div class="cavatar" style="background:#f59e0b">R</div>
-      <div><div class="cname">Rafael Costa</div><div class="cstatus">Álbum: 62%</div></div>
-    </div>
-    <div class="contact">
-      <div class="cavatar" style="background:#8b5cf6">A</div>
-      <div><div class="cname">Ana Beatriz</div><div class="cstatus">Álbum: 28%</div></div>
-    </div>
+    <div class="contact"><div class="cavatar" style="background:#2563EB">M</div><div><div class="cname">Maria Silva</div><div class="cstatus">Precisa: Messi 🇦🇷</div></div></div>
+    <div class="contact"><div class="cavatar" style="background:#22c55e">J</div><div><div class="cname">João Pedro</div><div class="cstatus">Online agora</div></div></div>
+    <div class="contact"><div class="cavatar" style="background:#f59e0b">R</div><div><div class="cname">Rafael Costa</div><div class="cstatus">Faltam 8 do Brasil</div></div></div>
+    <div class="contact"><div class="cavatar" style="background:#8b5cf6">A</div><div><div class="cname">Ana Beatriz</div><div class="cstatus">Começou há 3 dias</div></div></div>
     <button class="btn-send-full">Enviar via Phiz Chat 📤</button>
   </div>
 </div>
@@ -608,10 +572,7 @@
 <div class="nav-bar">
   <div class="nav-item active" id="n-home" onclick="go('home')"><div class="ni">🏠</div>Início</div>
   <div class="nav-item" id="n-album" onclick="go('album')"><div class="ni">📖</div>Álbum</div>
-  <div class="nav-item" id="n-open" onclick="go('open')">
-    <div class="ni">🎴</div>Abrir
-    <div class="badge">2</div>
-  </div>
+  <div class="nav-item" id="n-open" onclick="go('open')"><div class="ni">🎴</div>Abrir<div class="badge">2</div></div>
   <div class="nav-item" id="n-inv" onclick="go('inv')"><div class="ni">🔄</div>Repetidas</div>
   <div class="nav-item" id="n-share" onclick="go('share')"><div class="ni">📤</div>Enviar</div>
 </div>
