@@ -43,11 +43,11 @@ _load_sessions()
 
 # Pages that don't require auth
 PUBLIC_PATHS = {
-    '/album-copa.html', '/album-copa-styles.html', '/album-copa-capivara.html',
+    '/album-copa.html', '/album-copa-styles.html', '/album-copa-capivara.html', '/moodboard.html',
     '/api/auth/login', '/api/auth/request-otp', '/api/auth/verify-otp', '/api/auth/check',
-    '/api/health', '/login.html',
+    '/api/health', '/login.html', '/album-api/', '/album-copa/',
 }
-PUBLIC_PREFIXES = ('/capybara_',)  # capybara images
+PUBLIC_PREFIXES = ('/capybara_', '/album-api/', '/album-copa/')  # capybara images + album copa proxy
 
 def _is_public(path):
     if path in PUBLIC_PATHS:
@@ -132,10 +132,13 @@ class Handler(SimpleHTTPRequestHandler):
         return json.loads(self.rfile.read(length)) if length > 0 else {}
 
     def do_OPTIONS(self):
+        path = urlparse(self.path).path
+        if path.startswith('/album-api/') or path.startswith('/album-copa/'):
+            return self._proxy_album('OPTIONS')
         self.send_response(200)
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
         self.end_headers()
 
     def _check_auth(self):
@@ -157,8 +160,57 @@ class Handler(SimpleHTTPRequestHandler):
     def _set_session_cookie(self, token):
         self.send_header('Set-Cookie', f'session={token}; Path=/; HttpOnly; SameSite=Lax; Max-Age={SESSION_EXPIRY}')
 
+    def _proxy_album(self, method='GET'):
+        """Proxy /album-copa/* and /album-api/* requests to Album da Copa backend on port 8891"""
+        import urllib.request as ur, urllib.error
+        path = urlparse(self.path).path
+        if path.startswith('/album-copa/'):
+            subpath = path[len('/album-copa/'):]  # strip prefix, keep /api/...
+        else:
+            subpath = 'api/' + path[len('/album-api/'):]  # legacy: /album-api/X -> /api/X
+        qs = urlparse(self.path).query
+        target = f'http://127.0.0.1:8891/{subpath}'
+        if qs:
+            target += f'?{qs}'
+        try:
+            body = None
+            if method in ('POST', 'PUT'):
+                length = int(self.headers.get('Content-Length', 0))
+                body = self.rfile.read(length) if length > 0 else None
+            headers = {}
+            for key in ('Content-Type', 'Authorization'):
+                if self.headers.get(key):
+                    headers[key] = self.headers[key]
+            req = ur.Request(target, data=body, headers=headers, method=method)
+            resp = ur.urlopen(req, timeout=30)
+            data = resp.read()
+            self.send_response(resp.status)
+            self.send_header('Content-Type', resp.headers.get('Content-Type', 'application/json'))
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+            self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+            self.end_headers()
+            self.wfile.write(data)
+        except urllib.error.HTTPError as e:
+            data = e.read()
+            self.send_response(e.code)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(data)
+        except Exception as e:
+            self.send_response(502)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps({'error': str(e)}).encode())
+
     def do_GET(self):
         path = urlparse(self.path).path
+
+        # Album API proxy (public)
+        if path.startswith('/album-api/') or path.startswith('/album-copa/'):
+            return self._proxy_album('GET')
 
         # Auth endpoints (public)
         if path == '/api/auth/check':
@@ -214,6 +266,10 @@ class Handler(SimpleHTTPRequestHandler):
     def do_POST(self):
         path = urlparse(self.path).path
         try:
+            # Album API proxy (public)
+            if path.startswith('/album-api/') or path.startswith('/album-copa/'):
+                return self._proxy_album('POST')
+
             # === AUTH ENDPOINTS (public) ===
             if path == '/api/auth/login':
                 body = self.read_body()
@@ -370,9 +426,11 @@ class Handler(SimpleHTTPRequestHandler):
             self.send_json({'error': str(e)}, 500)
 
     def do_PUT(self):
+        path = urlparse(self.path).path
+        if path.startswith('/album-api/') or path.startswith('/album-copa/'):
+            return self._proxy_album('PUT')
         if not self._check_auth():
             return
-        path = urlparse(self.path).path
         try:
             if path == '/api/settings/todo-cat-order':
                 body = self.read_body()
@@ -409,9 +467,11 @@ class Handler(SimpleHTTPRequestHandler):
             self.send_json({'error': str(e)}, 500)
 
     def do_DELETE(self):
+        path = urlparse(self.path).path
+        if path.startswith('/album-api/') or path.startswith('/album-copa/'):
+            return self._proxy_album('DELETE')
         if not self._check_auth():
             return
-        path = urlparse(self.path).path
         try:
             if path.startswith('/api/person/'):
                 pid = int(path.split('/')[-1])
@@ -499,3 +559,37 @@ if __name__ == '__main__':
     print(f'🦁 Orgchart server on http://localhost:{PORT}')
     print(f'📀 Database: {db.DB_PATH}')
     HTTPServer(('0.0.0.0', PORT), Handler).serve_forever()
+
+# === Album Copa Backend Proxy ===
+import urllib.request as urllib_req
+import urllib.error
+
+@app.route('/album-api/<path:subpath>', methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
+def album_proxy(subpath):
+    """Proxy requests to the Album da Copa backend on port 8891"""
+    from flask import request as flask_request, Response
+    target_url = f'http://127.0.0.1:8891/api/{subpath}'
+    
+    try:
+        req_data = flask_request.get_data() if flask_request.method in ('POST', 'PUT') else None
+        headers = {}
+        for key in ('Content-Type', 'Authorization'):
+            if key in flask_request.headers:
+                headers[key] = flask_request.headers[key]
+        
+        req = urllib_req.Request(target_url, data=req_data, headers=headers, method=flask_request.method)
+        resp = urllib_req.urlopen(req, timeout=30)
+        
+        response = Response(resp.read(), status=resp.status, content_type=resp.headers.get('Content-Type', 'application/json'))
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+        return response
+    except urllib.error.HTTPError as e:
+        response = Response(e.read(), status=e.code, content_type='application/json')
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
+    except Exception as e:
+        response = Response(f'{{"error": "{str(e)}"}}', status=502, content_type='application/json')
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response

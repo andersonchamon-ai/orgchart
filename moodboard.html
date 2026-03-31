@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎨 Álbum da Copa 2026 — Moodboard v2</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@700;900&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: #1a0a2e;
+  color: #fff;
+  overflow-x: hidden;
+}
+
+/* ======= GAME-STYLE COMPONENTS ======= */
+
+/* Ornate golden frame */
+.gold-frame {
+  background: linear-gradient(180deg, #2d1245 0%, #1a0830 100%);
+  border: 3px solid #c8942e;
+  border-radius: 20px;
+  position: relative;
+  box-shadow:
+    0 0 0 1px #8b6914,
+    0 0 0 5px rgba(200, 148, 46, 0.15),
+    inset 0 0 30px rgba(200, 148, 46, 0.08),
+    0 8px 32px rgba(0,0,0,0.5);
+}
+
+.gold-frame::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: -1px; right: -1px; bottom: -1px;
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(255,215,0,0.2) 0%, transparent 30%, transparent 70%, rgba(255,215,0,0.1) 100%);
+  pointer-events: none;
+}
+
+/* Corner ornaments */
+.gold-frame .corner {
+  position: absolute;
+  width: 20px; height: 20px;
+  border: 3px solid #FFD700;
+  z-index: 2;
+}
+.gold-frame .corner.tl { top: -2px; left: -2px; border-right: none; border-bottom: none; border-radius: 6px 0 0 0; }
+.gold-frame .corner.tr { top: -2px; right: -2px; border-left: none; border-bottom: none; border-radius: 0 6px 0 0; }
+.gold-frame .corner.bl { bottom: -2px; left: -2px; border-right: none; border-top: none; border-radius: 0 0 0 6px; }
+.gold-frame .corner.br { bottom: -2px; right: -2px; border-left: none; border-top: none; border-radius: 0 0 6px 0; }
+
+/* 3D Glossy button (Royal Match style) */
+.btn-game {
+  display: inline-block;
+  padding: 14px 40px;
+  font-family: 'Lilita One', sans-serif;
+  font-size: 1.3rem;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  position: relative;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: transform 0.1s;
+}
+
+.btn-game:active { transform: scale(0.96) translateY(2px); }
+
+.btn-game.green {
+  background: linear-gradient(180deg, #7EC846 0%, #5BA82E 40%, #4A9126 60%, #3D7A1F 100%);
+  box-shadow:
+    0 4px 0 #2D5E15,
+    0 6px 12px rgba(0,0,0,0.4),
+    inset 0 2px 0 rgba(255,255,255,0.25);
+  border: 2px solid #2D5E15;
+  border-top-color: #9AE05C;
+}
+
+.btn-game.red {
+  background: linear-gradient(180deg, #E85D4A 0%, #C9372B 40%, #B02D22 60%, #8E231A 100%);
+  box-shadow:
+    0 4px 0 #6B1A13,
+    0 6px 12px rgba(0,0,0,0.4),
+    inset 0 2px 0 rgba(255,255,255,0.25);
+  border: 2px solid #6B1A13;
+  border-top-color: #F08070;
+}
+
+.btn-game.gold {
+  background: linear-gradient(180deg, #FFCE44 0%, #E5A820 40%, #CC9418 60%, #B07E10 100%);
+  box-shadow:
+    0 4px 0 #7A5508,
+    0 6px 12px rgba(0,0,0,0.4),
+    inset 0 2px 0 rgba(255,255,255,0.3);
+  border: 2px solid #7A5508;
+  border-top-color: #FFE47A;
+  color: #3D2200;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+}
+
+/* Banner/ribbon header */
+.banner {
+  background: linear-gradient(180deg, #8B1A2B 0%, #6B1020 50%, #8B1A2B 100%);
+  padding: 12px 50px;
+  text-align: center;
+  position: relative;
+  margin: 0 -20px;
+  border-top: 2px solid #C4384E;
+  border-bottom: 2px solid #4A0A14;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.banner::before, .banner::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  width: 20px; height: 10px;
+  background: #4A0A14;
+}
+.banner::before { left: 0; clip-path: polygon(0 0, 100% 0, 100% 100%); }
+.banner::after { right: 0; clip-path: polygon(0 0, 100% 0, 0 100%); }
+
+.banner h2 {
+  font-family: 'Lilita One', sans-serif;
+  font-size: 1.4rem;
+  color: #FFD700;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  letter-spacing: 1px;
+}
+
+/* Status bar (top bar with resources) */
+.status-bar {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: linear-gradient(180deg, #4A1060 0%, #2D0845 100%);
+  border-radius: 25px;
+  border: 2px solid #8B4EAE;
+  box-shadow: inset 0 2px 0 rgba(255,255,255,0.1), 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0,0,0,0.3);
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-weight: 900;
+  font-size: 0.85rem;
+  color: #FFD700;
+  border: 1px solid rgba(255,215,0,0.2);
+}
+
+.status-item .icon { font-size: 1.1rem; }
+
+/* ======= PAGE SECTIONS ======= */
+
+.page-header {
+  text-align: center;
+  padding: 40px 20px 20px;
+  background: radial-gradient(ellipse at top, #3D1566 0%, #1a0a2e 70%);
+}
+
+.page-header h1 {
+  font-family: 'Lilita One', sans-serif;
+  font-size: 2.2rem;
+  color: #FFD700;
+  text-shadow: 0 3px 8px rgba(0,0,0,0.6), 0 0 40px rgba(255,215,0,0.2);
+  margin-bottom: 8px;
+}
+
+.page-header p {
+  color: #b088d4;
+  font-size: 0.9rem;
+}
+
+.section {
+  padding: 20px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.section-title {
+  font-family: 'Lilita One', sans-serif;
+  font-size: 1.1rem;
+  color: #c8942e;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+/* ======= MOCKUP PHONE ======= */
+
+.phone-frame {
+  max-width: 390px;
+  margin: 20px auto;
+  border-radius: 36px;
+  overflow: hidden;
+  border: 4px solid #333;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  position: relative;
+}
+
+.phone-screen {
+  background: linear-gradient(180deg, #0D3B0E 0%, #1B5E20 20%, #2E7D32 50%, #1B5E20 80%, #0D3B0E 100%);
+  min-height: 780px;
+  position: relative;
+  overflow: hidden;
+  padding: 16px;
+}
+
+/* Grass texture overlay */
+.phone-screen::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background:
+    repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px),
+    radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.08) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.phone-screen > * { position: relative; z-index: 1; }
+
+/* Pack (figurinha envelope style) */
+.pack-container {
+  text-align: center;
+  margin: 16px 0;
+}
+
+.pack {
+  width: 180px;
+  height: 240px;
+  margin: 0 auto 12px;
+  background: linear-gradient(145deg, #E8D5A3, #C4A265, #A88A45, #C4A265, #E8D5A3);
+  border-radius: 8px;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.2s;
+  box-shadow:
+    0 8px 24px rgba(0,0,0,0.4),
+    0 0 40px rgba(255,215,0,0.15),
+    inset 0 0 20px rgba(255,255,255,0.1);
+  border: 3px solid #8B6914;
+  overflow: hidden;
+}
+
+.pack:hover { transform: rotate(-2deg) scale(1.03); }
+.pack:active { transform: scale(0.97); }
+
+/* Pack inner design */
+.pack-inner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  width: 85%;
+}
+
+.pack-inner .logo {
+  font-family: 'Lilita One', sans-serif;
+  font-size: 1.1rem;
+  color: #1B5E20;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.9);
+  padding: 6px 16px;
+  border-radius: 8px;
+  border: 2px solid #1B5E20;
+  margin-bottom: 8px;
+}
+
+.pack-inner .cup { font-size: 3rem; margin: 8px 0; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3)); }
+
+.pack-inner .year {
+  font-family: 'Lilita One', sans-serif;
+  font-size: 2rem;
+  color: #1B5E20;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+}
+
+/* Pack top tear line */
+.pack::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 30px;
+  background: linear-gradient(180deg, rgba(139,105,20,0.6) 0%, transparent 100%);
+  border-bottom: 2px dashed rgba(139,105,20,0.4);
+}
+
+.pack-label {
+  font-family: 'Lilita One', sans-serif;
+  font-size: 1.2rem;
+  color: #FFD700;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.pack-sublabel {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.6);
+  margin-top: 2px;
+}
+
+/* Badge pill */
+.badge-pill {
+  display: inline-block;
+  background: linear-gradient(180deg, #FF4444 0%, #CC2222 100%);
+  color: #fff;
+  font-weight: 900;
+  font-size: 0.7rem;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  margin-top: 6px;
+}
+
+/* Stats row */
+.stats-row {
+  display: flex;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.stat-box {
+  flex: 1;
+  background: rgba(0,0,0,0.35);
+  border-radius: 16px;
+  padding: 12px 6px;
+  text-align: center;
+  border: 2px solid rgba(255,215,0,0.15);
+  backdrop-filter: blur(4px);
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.stat-box .num {
+  font-family: 'Lilita One', sans-serif;
+  font-size: 1.8rem;
+  color: #FFD700;
+  line-height: 1;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+
+.stat-box .lbl {
+  font-size: 0.6rem;
+  color: rgba(255,255,255,0.5);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+/* Progress ring */
+.progress-ring {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: conic-gradient(#FFD700 0% var(--pct), rgba(255,255,255,0.1) var(--pct) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 4px;
+}
+
+.progress-ring-inner {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 900;
+  color: #FFD700;
+}
+
+/* Team cards */
+.teams-section { margin: 12px 0; }
+
+.teams-label {
+  font-family: 'Lilita One', sans-serif;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.4);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+
+.teams-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.team-card {
+  min-width: 78px;
+  background: rgba(0,0,0,0.4);
+  border-radius: 14px;
+  padding: 10px 6px;
+  text-align: center;
+  border: 2px solid rgba(255,255,255,0.08);
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+
+.team-card:hover { transform: scale(1.05); }
+
+.team-card.gold {
+  border-color: #FFD700;
+  background: linear-gradient(180deg, rgba(255,215,0,0.2) 0%, rgba(255,215,0,0.05) 100%);
+  box-shadow: 0 0 20px rgba(255,215,0,0.15);
+}
+
+.team-card .flag { font-size: 2rem; line-height: 1; }
+.team-card .name { font-size: 0.6rem; color: #fff; margin-top: 4px; font-weight: 700; }
+
+.team-card .prog-bar {
+  height: 5px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 3px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+
+.team-card .prog-bar .fill {
+  height: 100%;
+  border-radius: 3px;
+}
+
+.fill-green { background: linear-gradient(90deg, #4CAF50, #8BC34A); }
+.fill-gold { background: linear-gradient(90deg, #FFD700, #FFA000); }
+.fill-red { background: linear-gradient(90deg, #FF5722, #FF9800); }
+
+.team-card .pct {
+  font-size: 0.55rem;
+  color: rgba(255,255,255,0.5);
+  margin-top: 2px;
+  font-weight: 700;
+}
+
+/* Bottom nav */
+.bottom-nav {
+  display: flex;
+  background: rgba(0,0,0,0.5);
+  border-radius: 20px;
+  padding: 8px 4px;
+  margin-top: 16px;
+  border: 2px solid rgba(255,215,0,0.1);
+}
+
+.nav-btn {
+  flex: 1;
+  text-align: center;
+  padding: 8px 4px;
+  border-radius: 14px;
+  font-size: 0.6rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: rgba(255,255,255,0.4);
+  transition: all 0.2s;
+}
+
+.nav-btn .ico { font-size: 1.2rem; margin-bottom: 2px; }
+
+.nav-btn.active {
+  background: rgba(255,215,0,0.15);
+  color: #FFD700;
+  border: 1px solid rgba(255,215,0,0.2);
+}
+
+/* ======= COMPARISON ======= */
+
+.comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 20px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+@media (max-width: 600px) { .comparison { grid-template-columns: 1fr; } }
+
+.comp-card {
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.comp-card.old {
+  background: linear-gradient(180deg, #2a1515 0%, #1a0a0a 100%);
+  border: 2px solid #ff4444;
+}
+
+.comp-card.new {
+  background: linear-gradient(180deg, #152a15 0%, #0a1a0a 100%);
+  border: 2px solid #44ff44;
+}
+
+.comp-card h3 {
+  font-family: 'Lilita One', sans-serif;
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+}
+
+.comp-card.old h3 { color: #ff6666; }
+.comp-card.new h3 { color: #66ff66; }
+
+.comp-card li {
+  list-style: none;
+  padding: 6px 0;
+  font-size: 0.8rem;
+  color: #ccc;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+/* ======= DESIGN PRINCIPLES ======= */
+
+.principles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 20px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+@media (max-width: 600px) { .principles { grid-template-columns: 1fr; } }
+
+.principle {
+  background: linear-gradient(180deg, #2d1245 0%, #1a0830 100%);
+  border: 1px solid rgba(200,148,46,0.2);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.principle .icon { font-size: 1.5rem; margin-bottom: 8px; }
+
+.principle h4 {
+  font-size: 0.85rem;
+  color: #FFD700;
+  margin-bottom: 6px;
+}
+
+.principle p {
+  font-size: 0.75rem;
+  color: #999;
+  line-height: 1.5;
+}
+
+/* ======= PALETTE ======= */
+
+.palette {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 20px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.swatch {
+  width: 55px; height: 55px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.5rem;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.3;
+  border: 2px solid rgba(255,255,255,0.1);
+}
+
+.divider {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #c8942e, transparent);
+  margin: 30px auto;
+  max-width: 300px;
+}
+
+.footer {
+  text-align: center;
+  padding: 30px;
+  color: #444;
+  font-size: 0.75rem;
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="page-header">
+  <h1>⚽ ÁLBUM DA COPA 2026</h1>
+  <p>Moodboard v2 — Estilo de jogo, não de app</p>
+</div>
+
+<div class="divider"></div>
+
+<!-- MOCKUP -->
+<div class="section">
+  <div class="section-title">📱 Proposta — Home do App</div>
+
+  <div class="phone-frame">
+    <div class="phone-screen">
+
+      <!-- Top status -->
+      <div class="status-bar" style="margin-bottom: 12px;">
+        <div class="status-item"><span class="icon">⚽</span> 142</div>
+        <div class="status-item"><span class="icon">⭐</span> 3</div>
+        <div class="status-item"><span class="icon">🔄</span> 28</div>
+      </div>
+
+      <!-- Banner -->
+      <div class="banner" style="margin: 0 -16px; margin-bottom: 16px;">
+        <h2>⚽ ÁLBUM DA COPA 2026</h2>
+      </div>
+
+      <!-- PACK -->
+      <div class="pack-container">
+        <div class="pack" onclick="this.style.transform='rotate(-3deg) scale(0.95)';setTimeout(()=>this.style.transform='',200)">
+          <div class="pack-inner">
+            <div class="logo">COPA 2026</div>
+            <div class="cup">🏆</div>
+            <div class="year">2026</div>
+          </div>
+        </div>
+        <div class="pack-label">ABRIR PACOTINHO</div>
+        <div class="pack-sublabel">Toque para abrir!</div>
+        <div class="badge-pill">3 disponíveis</div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="progress-ring" style="--pct: 14%">
+            <div class="progress-ring-inner">14%</div>
+          </div>
+          <div class="num">142</div>
+          <div class="lbl">Figurinhas</div>
+        </div>
+        <div class="stat-box">
+          <div class="progress-ring" style="--pct: 6%">
+            <div class="progress-ring-inner">3/48</div>
+          </div>
+          <div class="num">3</div>
+          <div class="lbl">Completas</div>
+        </div>
+        <div class="stat-box">
+          <div class="progress-ring" style="--pct: 100%">
+            <div class="progress-ring-inner">🔄</div>
+          </div>
+          <div class="num">28</div>
+          <div class="lbl">Repetidas</div>
+        </div>
+      </div>
+
+      <!-- Complete teams -->
+      <div class="teams-section">
+        <div class="teams-label">⭐ Completas</div>
+        <div class="teams-scroll">
+          <div class="team-card gold">
+            <div class="flag">🇧🇷</div>
+            <div class="name">Brasil</div>
+            <div class="prog-bar"><div class="fill fill-gold" style="width:100%"></div></div>
+            <div class="pct">⭐ 20/20</div>
+          </div>
+          <div class="team-card gold">
+            <div class="flag">🇦🇷</div>
+            <div class="name">Argentina</div>
+            <div class="prog-bar"><div class="fill fill-gold" style="width:100%"></div></div>
+            <div class="pct">⭐ 20/20</div>
+          </div>
+          <div class="team-card gold">
+            <div class="flag">🇩🇪</div>
+            <div class="name">Alemanha</div>
+            <div class="prog-bar"><div class="fill fill-gold" style="width:100%"></div></div>
+            <div class="pct">⭐ 20/20</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Almost there -->
+      <div class="teams-section">
+        <div class="teams-label">🔥 Quase Lá</div>
+        <div class="teams-scroll">
+          <div class="team-card">
+            <div class="flag">🇫🇷</div>
+            <div class="name">França</div>
+            <div class="prog-bar"><div class="fill fill-green" style="width:90%"></div></div>
+            <div class="pct">18/20</div>
+          </div>
+          <div class="team-card">
+            <div class="flag">🇪🇸</div>
+            <div class="name">Espanha</div>
+            <div class="prog-bar"><div class="fill fill-green" style="width:85%"></div></div>
+            <div class="pct">17/20</div>
+          </div>
+          <div class="team-card">
+            <div class="flag">🇵🇹</div>
+            <div class="name">Portugal</div>
+            <div class="prog-bar"><div class="fill fill-red" style="width:80%"></div></div>
+            <div class="pct">16/20</div>
+          </div>
+          <div class="team-card">
+            <div class="flag">🇳🇱</div>
+            <div class="name">Holanda</div>
+            <div class="prog-bar"><div class="fill fill-red" style="width:75%"></div></div>
+            <div class="pct">15/20</div>
+          </div>
+          <div class="team-card">
+            <div class="flag">🇮🇹</div>
+            <div class="name">Itália</div>
+            <div class="prog-bar"><div class="fill fill-red" style="width:60%"></div></div>
+            <div class="pct">12/20</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom nav -->
+      <div class="bottom-nav">
+        <div class="nav-btn active">
+          <div class="ico">🏠</div>
+          Início
+        </div>
+        <div class="nav-btn">
+          <div class="ico">📖</div>
+          Álbum
+        </div>
+        <div class="nav-btn">
+          <div class="ico">🔄</div>
+          Enviar
+        </div>
+        <div class="nav-btn">
+          <div class="ico">👤</div>
+          Perfil
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- COMPONENTS SHOWCASE -->
+<div class="section">
+  <div class="section-title">🎮 Componentes Game UI</div>
+
+  <div style="text-align:center; margin: 20px 0;">
+    <p style="color:#888; font-size:0.8rem; margin-bottom:12px;">Botões estilo Royal Match</p>
+    <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+      <button class="btn-game green">ABRIR</button>
+      <button class="btn-game red">ENVIAR</button>
+      <button class="btn-game gold">PREMIUM</button>
+    </div>
+  </div>
+
+  <div style="margin: 30px 0;">
+    <p style="color:#888; font-size:0.8rem; margin-bottom:12px; text-align:center;">Frame dourado ornamentado</p>
+    <div class="gold-frame" style="padding: 24px; text-align:center;">
+      <div class="corner tl"></div>
+      <div class="corner tr"></div>
+      <div class="corner bl"></div>
+      <div class="corner br"></div>
+      <div style="font-size:2rem; margin-bottom:8px;">🏆</div>
+      <div style="font-family:'Lilita One'; font-size:1.2rem; color:#FFD700;">SELEÇÃO COMPLETA!</div>
+      <div style="color:#999; font-size:0.8rem; margin-top:4px;">Brasil — 20/20 figurinhas</div>
+      <button class="btn-game green" style="margin-top:16px; font-size:1rem; padding:10px 30px;">COLETAR REWARD</button>
+    </div>
+  </div>
+
+  <div style="margin: 30px 0;">
+    <p style="color:#888; font-size:0.8rem; margin-bottom:12px; text-align:center;">Banner ribbon header</p>
+    <div class="banner" style="margin: 0;">
+      <h2>🔥 EVENTOS ESPECIAIS</h2>
+    </div>
+  </div>
+
+  <div style="margin: 30px 0;">
+    <p style="color:#888; font-size:0.8rem; margin-bottom:12px; text-align:center;">Status bar (recursos)</p>
+    <div class="status-bar">
+      <div class="status-item"><span class="icon">⚽</span> 142</div>
+      <div class="status-item"><span class="icon">📦</span> 3</div>
+      <div class="status-item"><span class="icon">⭐</span> Cheio</div>
+      <div class="status-item"><span class="icon">💎</span> 520</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- COMPARISON -->
+<div class="section-title">🔴🟢 Antes vs Depois</div>
+<div class="comparison">
+  <div class="comp-card old">
+    <h3>❌ App Hoje</h3>
+    <ul>
+      <li>Background branco/cinza plano</li>
+      <li>Cards flat sem profundidade</li>
+      <li>Stats em texto puro</li>
+      <li>Pacote = overlay genérico</li>
+      <li>Font do sistema, sem personalidade</li>
+      <li>Zero animação</li>
+      <li>Parece dashboard corporativo</li>
+    </ul>
+  </div>
+  <div class="comp-card new">
+    <h3>✅ Nova Direção</h3>
+    <ul>
+      <li>Background gradiente gramado + textura</li>
+      <li>Frames dourados ornamentados</li>
+      <li>Stats com progress rings/barras</li>
+      <li>Pacotinho de figurinha real (envelope)</li>
+      <li>Font bold game-style (Lilita One)</li>
+      <li>Botões 3D glossy com sombra</li>
+      <li>Parece JOGO que dá vontade de abrir</li>
+    </ul>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- PALETTE -->
+<div class="section-title">🎨 Paleta</div>
+<div class="palette">
+  <div class="swatch" style="background:#0D3B0E">Gramado<br>Escuro</div>
+  <div class="swatch" style="background:#1B5E20">Gramado</div>
+  <div class="swatch" style="background:#2E7D32">Campo</div>
+  <div class="swatch" style="background:#FFD700">Ouro</div>
+  <div class="swatch" style="background:#c8942e">Bronze</div>
+  <div class="swatch" style="background:#8B1A2B">Vinho</div>
+  <div class="swatch" style="background:#4A1060">Roxo</div>
+  <div class="swatch" style="background:linear-gradient(135deg,#FFD700,#FF8C00)">Pack<br>Gradient</div>
+  <div class="swatch" style="background:linear-gradient(180deg,#7EC846,#3D7A1F)">Botão<br>Verde</div>
+  <div class="swatch" style="background:rgba(0,0,0,0.4);border:1px solid #555">Glass<br>Card</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- PRINCIPLES -->
+<div class="section-title">📐 Princípios</div>
+<div class="principles">
+  <div class="principle">
+    <div class="icon">📦</div>
+    <h4>Pacotinho é Real</h4>
+    <p>Envelope de figurinha, não caixa genérica. Textura de papel, linha de corte, formato de pacote Panini.</p>
+  </div>
+  <div class="principle">
+    <div class="icon">🎮</div>
+    <h4>UI de Jogo</h4>
+    <p>Bordas ornamentadas, botões 3D com sombra, banners ribbon. Estilo Royal Match / Candy Crush, não Material Design.</p>
+  </div>
+  <div class="principle">
+    <div class="icon">✨</div>
+    <h4>Feedback Rico</h4>
+    <p>Toda ação = resposta visual. Abrir pacote = animação de rasgar. Figurinha nova = confete + glow.</p>
+  </div>
+  <div class="principle">
+    <div class="icon">🏟️</div>
+    <h4>Identidade Copa</h4>
+    <p>Verde gramado + dourado + vinho. Cada pixel grita futebol. Bandeiras, troféu, estádio.</p>
+  </div>
+  <div class="principle">
+    <div class="icon">💎</div>
+    <h4>Raridade Visual</h4>
+    <p>Especial = prata + glow. Rara = roxa + shimmer. Lendária = dourada + pulso. PARECER especial.</p>
+  </div>
+  <div class="principle">
+    <div class="icon">📊</div>
+    <h4>Progresso = Game</h4>
+    <p>Nada de texto seco. Anéis de XP, barras coloridas, porcentagens que mudam de cor.</p>
+  </div>
+</div>
+
+<div class="footer">
+  Moodboard v2 — Álbum da Copa 2026 — Bob 🤖
+</div>
+
+</body>
+</html>
