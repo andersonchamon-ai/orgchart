@@ -1345,7 +1345,7 @@
       "role": "Finance",
       "company": "phiz",
       "level": 2,
-      "reportsTo": 375,
+      "reportsTo": 370,
       "responsibilities": [],
       "hcFilled": 0,
       "hcOpen": 0,
@@ -1453,7 +1453,7 @@
       "responsibilities": [],
       "hcFilled": 0,
       "hcOpen": 0,
-      "sortOrder": 1,
+      "sortOrder": 0,
       "region": ""
     },
     {
@@ -1791,7 +1791,7 @@
       "responsibilities": [],
       "hcFilled": 0,
       "hcOpen": 0,
-      "sortOrder": 0,
+      "sortOrder": 1,
       "region": ""
     },
     {
